@@ -93,7 +93,7 @@ el modelo.
 
 ## 4.3.5. Resultados de validación
 
-**Tabla 4.10. Rendimiento medio en los tres cortes de validación temporal.**
+**Tabla 4.13. Rendimiento medio en los tres cortes de validación temporal.**
 
 | Enfoque | MAE diario (media ± desv.) | RMSE diario | Sesgo diario | MAE semanal |
 |---|---:|---:|---:|---:|
@@ -116,7 +116,7 @@ el baseline antes de consultar la prueba final.
 
 ## 4.3.6. Evaluación sobre el tramo de prueba
 
-**Tabla 4.11. Resultados sobre el periodo de prueba reservado.**
+**Tabla 4.14. Resultados sobre el periodo de prueba reservado.**
 
 | Enfoque | MAE diario | RMSE diario | R² | Sesgo diario | MAE semanal |
 |---|---:|---:|---:|---:|---:|

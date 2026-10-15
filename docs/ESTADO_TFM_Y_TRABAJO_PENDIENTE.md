@@ -1,6 +1,6 @@
 # Estado actual y trabajo pendiente del TFM
 
-Fecha de revisión: 7 de octubre de 2026
+Fecha de revisión: 7 de octubre de 2026 (actualizado el 15 de octubre de 2026)
 
 ## 1. Diagnóstico general
 
@@ -15,6 +15,14 @@ en un sistema de recomendación demostrable. Los apartados 5.1, 5.2, 5.3, 6.1,
 de `src/dss`; las carpetas `database`, `dashboards` y `docker` contienen solo la
 estructura inicial.
 
+> **Actualización 15/10/2026.** Los capítulos 1 a 6 tienen contenido completo.
+> El motor del DSS, la aplicación y la validación están implementados (55
+> pruebas automáticas). En la memoria se han homogeneizado el formato de
+> párrafos, títulos y tablas, y se han añadido las leyendas que faltaban
+> (Tablas 3.1–3.4 y 4.1–4.9), lo que renumera las tablas del 4.2 y el 4.3
+> (ahora 4.10–4.14). Quedan pendientes los elementos preliminares y el cierre
+> documental del apartado 6.
+
 ## 2. Estado por capítulo
 
 | Apartado | Estado | Trabajo pendiente |
@@ -24,7 +32,7 @@ estructura inicial.
 | 3. Metodología y arquitectura | Desarrollado | Mantener alineado con las decisiones que se adopten para el DSS, la base de datos y la visualización. |
 | 4. Procesamiento y Machine Learning | Desarrollado para el piloto | Ampliar datos si el calendario lo permite y evitar presentar el modelo como validado agronómicamente. |
 | 5. Sistema de optimización y resultados | Desarrollado para el piloto (12/10/2026) | Revisión por el equipo; incorporar ET0 prevista si se obtiene histórico de predicciones; validación con usuarios. |
-| 6. Conclusiones | Sin desarrollar | Redactar aportaciones, cumplimiento de objetivos, limitaciones e investigación futura. |
+| 6. Conclusiones | Desarrollado (15/10/2026) | Revisión por el equipo. Si se incorpora la ET0 prevista antes de la entrega, actualizar 6.1, 6.2.1 y 6.3.2. |
 | Elementos preliminares y anexos | Incompletos | Portada definitiva, resumen, abstract, palabras clave, índice, listas y anexos técnicos. |
 
 ## 3. Trabajo imprescindible para cerrar el TFM

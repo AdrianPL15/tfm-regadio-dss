@@ -346,9 +346,12 @@ Las credenciales se guardan únicamente en `.env`, excluido de Git. El archivo
 ## 4.1.11. Limitaciones
 
 El ciclo completo permite validar la integración, pero un único año y una sola
-estación todavía no son suficientes para entrenar un modelo generalizable. Antes
-del modelado se deberán añadir varias campañas y, si el alcance lo exige, otras
-estaciones de Almería. También se verificará la unidad contractual de cada
-variable con la documentación oficial. SiAR y AEMET representan el entorno de
-sus estaciones o municipios, por lo que la recomendación deberá declarar esta
-limitación e incorporar datos locales de parcela cuando estén disponibles.
+estación no son suficientes para entrenar un modelo generalizable. Los
+resultados de los apartados 4.3 y 5.3 deben leerse con esta restricción, y la
+ampliación a varias campañas y a otras estaciones de Almería se plantea como
+primera línea de mejora en el apartado 6.3. La coherencia de unidades de las
+variables agronómicas quedó confirmada en el apartado 5.3.1, donde el cálculo
+del motor reproduce la necesidad publicada por SiAR con una diferencia máxima
+de 0,008 mm. SiAR y AEMET representan el entorno de sus estaciones o
+municipios, por lo que la recomendación debe declarar esta limitación e
+incorporar datos locales de parcela cuando estén disponibles.

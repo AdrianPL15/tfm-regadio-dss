@@ -98,7 +98,7 @@ predicción de precipitación y que la persistencia arrastra además al día
 siguiente. El MAE de la persistencia en la prueba, 0,120 mm,
 coincide con el obtenido en el apartado 4.3, lo que confirma que ambos
 experimentos parten de la misma referencia. En desarrollo los valores no son
-directamente comparables con los de la Tabla 4.10, porque aquí se evalúan todas
+directamente comparables con los de la Tabla 4.13, porque aquí se evalúan todas
 las emisiones del periodo y no tres cortes de validación.
 
 ![Figura 5.3. Recomendaciones emitidas cada día con la información del día anterior y error frente a la referencia SiAR.](../images/dss_campana_5_3.png)
