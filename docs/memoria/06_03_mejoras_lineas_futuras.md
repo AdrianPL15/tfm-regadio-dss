@@ -10,9 +10,14 @@ cobertura de los datos, no la falta de algoritmos.
 ## 6.3.1. Ampliación de la evidencia
 
 La primera mejora consiste en ampliar el conjunto con varias campañas, otras
-estaciones de Almería y, después, otros cultivos. La ETL ya está parametrizada
-por estación, cultivo y periodo, de modo que el coste principal es la descarga,
-sujeta a las cuotas de SiAR, y la revisión de calidad. Con varias campañas
+estaciones de Almería y, después, otros cultivos. La extracción meteorológica
+ya admite estación y periodo, pero las necesidades del cultivo se incorporan
+mediante un CSV descargado de la web de SiAR y sus metadatos. Antes de ampliar
+el piloto habrá que permitir seleccionar de forma explícita ese archivo y
+validar la correspondencia entre estación, cultivo y fechas; hoy la ETL toma
+el CSV más recientemente modificado. Las cuotas de la API afectan a la
+descarga climática, mientras que los CSV de necesidades requieren una gestión
+separada y una nueva revisión de calidad. Con varias campañas
 podrá validarse por bloques completos, reservando campañas y estaciones enteras
 para medir la generalización temporal y espacial sin estimaciones optimistas
 del error (Roberts et al., 2017). Esta ampliación permitirá comprobar si la
@@ -22,21 +27,26 @@ del capítulo 4.
 
 ## 6.3.2. Mejora del motor de recomendación
 
-La mejora con mayor efecto sobre la precisión es incorporar una ET0 prevista,
-única vía para anticipar cambios de tiempo en los días 4 a 7 del horizonte. El
-motor ya admite esta entrada, de modo que el trabajo pendiente es de datos y de
-evaluación. La predicción municipal de AEMET OpenData describe los días
+Una mejora prioritaria para anticipar cambios de tiempo es incorporar una ET0
+prevista, especialmente en los días 4 a 7 del horizonte. El motor ya admite
+esta entrada, de modo que el trabajo pendiente es de datos y de evaluación.
+La predicción municipal de AEMET OpenData describe los días
 posteriores a cada emisión y el proyecto no dispone de emisiones pasadas, por
 lo que el histórico debe construirse archivando de forma programada cada
 predicción. Con ese histórico podrán compararse dos alternativas: estimar la
 ET0 con la ecuación de Hargreaves calibrada frente a la ET0 de Penman-Monteith
-observada en la estación (Allen et al., 1998), o utilizar el producto
-pronosticado de SiAR. Cualquiera de ellas debe evaluarse con la misma
-disciplina temporal que el resto del trabajo, utilizando solo predicciones
-emitidas antes de cada fecha objetivo, y sustituir a la vía actual únicamente
-si mejora el error por horizonte de la Tabla 5.5. El mismo archivo permitirá
-evaluar si conviene descontar la lluvia prevista en lugar de limitarse a
-avisar.
+observada en la estación (Allen et al., 1998), o estudiar el pronóstico de
+necesidades netas que publica SiAR, calculado con previsiones de ET0 y lluvia
+de AEMET. Este último cubre seis días (Sistema de Información Agroclimática
+para el Regadío, s. f.), por lo que no resuelve por sí solo el séptimo día del
+horizonte del DSS. Además, si se usa como entrada, su
+comparación con la referencia SiAR debe declararse como contraste entre
+productos relacionados, no como validación independiente. Cualquiera de estas
+vías debe evaluarse con la misma disciplina temporal que el resto del trabajo,
+utilizando solo predicciones emitidas antes de cada fecha objetivo, y sustituir
+a la vía actual únicamente si mejora el error por horizonte de la Tabla 5.5.
+El mismo archivo permitirá evaluar si conviene descontar la lluvia prevista
+en lugar de limitarse a avisar.
 
 Una vez ampliados los datos, el aprendizaje automático debería reintroducirse
 con un papel distinto al del capítulo 4: no para predecir directamente la
