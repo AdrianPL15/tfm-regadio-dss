@@ -8,6 +8,8 @@ El usuario determina ubicación, cultivo y periodo; estos parámetros condiciona
 
 Luis Moreno Díaz, Adrián Pérez Lombal, Manuel Ramos Alascio y Alicia Santamaría Román. Máster en Data Science, curso 2025 2026.
 
+El uso de ChatGPT/Codex y Claude como herramientas de apoyo se declara en [`docs/USO_ASISTENTES_IA.md`](docs/USO_ASISTENTES_IA.md).
+
 ## Estructura del repositorio
 
 ```
