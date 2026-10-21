@@ -85,7 +85,7 @@ Para reproducir el entorno de Python se puede usar indistintamente `environment.
 11. Auditar los volúmenes de las capas con `python -m src.analysis.build_etl_audit_4_1`. El resultado muestra cuántas filas entran en raw, cuántas se conservan tras la normalización y cuántas son válidas para modelar.
 12. Entrenar y comparar Persistencia, Ridge, Random Forest, KNN, SVR y XGBoost con `python -m src.models.train_evaluate`.
 13. Obtener una recomendación de riego con `python -m src.dss.recommend --fecha 2025-06-28 --horizonte 7 --superficie 1.5`. La salida diaria y el resumen se guardan en CSV y JSON en `results/reports`.
-14. Abrir la aplicación de demostración con `streamlit run src/dss/app_streamlit.py`.
+14. Abrir la aplicación de demostración con `streamlit run src/dss/app_streamlit.py`. Para compartirla mediante un enlace público, seguir la [guía de despliegue en Streamlit Community Cloud](docs/STREAMLIT_DESPLIEGUE.md). La interfaz funciona con el CSV piloto versionado y no requiere tokens.
 15. Regenerar la validación del sistema, sus tablas y figuras con `python -m src.analysis.build_validation_5_3` y el esquema del motor con `python -m src.visualization.build_dss_visual`.
 
 Las fuentes, variables y controles de calidad del apartado 3.1 se sintetizan en [`docs/memoria/03_01_fuentes_variables_calidad_datos.md`](docs/memoria/03_01_fuentes_variables_calidad_datos.md). Los inventarios técnicos completos se mantienen en [`docs/FUENTE_DATOS_SIAR.md`](docs/FUENTE_DATOS_SIAR.md), [`docs/FUENTE_DATOS_AEMET.md`](docs/FUENTE_DATOS_AEMET.md) y en el [catálogo de variables](docs/data_samples/feature_catalog_4_2.csv), evitando duplicar diccionarios.
