@@ -1,0 +1,7 @@
+# Dependencias mínimas de la demo en Streamlit Community Cloud.
+# Se mantienen junto al archivo principal para evitar instalar el entorno
+# completo de ETL y entrenamiento al publicar la interfaz.
+streamlit==1.66.0
+pandas==3.0.6
+numpy==2.5.3
+matplotlib==3.11.2
