@@ -8,6 +8,7 @@ una ausencia nunca se confunde con una necesidad nula.
 from __future__ import annotations
 
 import json
+import io
 from pathlib import Path
 from typing import Any
 
@@ -48,6 +49,16 @@ def load_crop_needs(path: Path) -> pd.DataFrame:
         raise FileNotFoundError(f"No se encuentra la referencia agronómica: {path}")
 
     raw = pd.read_csv(path, sep=";", decimal=",", encoding="utf-8-sig")
+    return _normalize_crop_needs(raw, Path(path).as_posix())
+
+
+def load_crop_needs_bytes(content: bytes, source_label: str) -> pd.DataFrame:
+    """Aplica la misma normalización a un CSV obtenido en vivo, sin escribirlo."""
+    raw = pd.read_csv(io.BytesIO(content), sep=";", decimal=",", encoding="utf-8-sig")
+    return _normalize_crop_needs(raw, source_label)
+
+
+def _normalize_crop_needs(raw: pd.DataFrame, source_label: str) -> pd.DataFrame:
     raw = raw.rename(columns=OFFICIAL_CSV_COLUMNS)
     missing = set(CROP_NEEDS_COLUMNS).difference(raw.columns)
     if missing:
@@ -73,7 +84,7 @@ def load_crop_needs(path: Path) -> pd.DataFrame:
     # una fecha, se toma el último valor publicado y se deja constancia.
     data["kc_imputed"] = data["kc"].isna()
     data["kc"] = data["kc"].ffill()
-    data["source_file"] = Path(path).as_posix()
+    data["source_file"] = source_label
     return data.reset_index()
 
 

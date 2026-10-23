@@ -8,6 +8,7 @@ matplotlib
 seaborn
 jupyterlab
 requests
+beautifulsoup4
 sqlalchemy
 mysql-connector-python
 python-dotenv

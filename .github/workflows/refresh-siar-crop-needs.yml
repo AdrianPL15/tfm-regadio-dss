@@ -1,0 +1,76 @@
+name: Revisar necesidades SiAR 2026
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 9 * * *'
+      timezone: Europe/Madrid
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: refresh-siar-crop-needs-2026
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Preparar dependencias del adaptador
+        run: python -m pip install requests beautifulsoup4
+      - name: Omitir campañas posteriores a 2026
+        id: campaign
+        run: |
+          if [ "$(TZ=Europe/Madrid date +%Y)" = "2026" ]; then
+            echo "active=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "active=false" >> "$GITHUB_OUTPUT"
+            echo "Campaña 2026 terminada: configurar la siguiente campaña antes de continuar."
+          fi
+      - name: Recuperar rama de actualización si existe
+        if: steps.campaign.outputs.active == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          if git ls-remote --exit-code --heads origin codex/siar-diario-2026 >/dev/null; then
+            git fetch origin codex/siar-diario-2026
+            git switch -c codex/siar-diario-2026 --track origin/codex/siar-diario-2026
+            git merge --no-edit origin/main
+          else
+            git switch -c codex/siar-diario-2026
+          fi
+      - name: Descargar y validar cuatro casos
+        if: steps.campaign.outputs.active == 'true'
+        run: python -m src.data.refresh_siar_crop_needs
+      - name: Probar lectura de los CSV resultantes
+        if: steps.campaign.outputs.active == 'true'
+        run: |
+          python -m pip install pandas
+          python -m unittest discover -s tests -p 'test_refresh_siar_crop_needs.py'
+          python -m unittest discover -s tests -p 'test_live_calendar_2026.py'
+      - name: Publicar propuesta de actualización
+        if: steps.campaign.outputs.active == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git add data/external/siar_necesidades_*_2026.csv data/external/siar_necesidades_*_2026.metadata.json
+          if git diff --cached --quiet; then
+            echo "SiAR aún no ha publicado nuevas jornadas."
+            exit 0
+          fi
+          git commit -m 'Actualizar necesidades SiAR 2026 verificadas'
+          git push origin codex/siar-diario-2026
+          if [ "$(gh pr list --head codex/siar-diario-2026 --base main --state open --json number --jq 'length')" = "0" ]; then
+            gh pr create --base main --head codex/siar-diario-2026 \
+              --title 'Actualizar CSV diarios de SiAR 2026' \
+              --body 'Descarga de la web pública SiAR. El adaptador ha comprobado estación, cultivo, ciclo, fechas, columnas y que no cambien jornadas ya versionadas. Revisar las nuevas filas y fusionar para publicar los datos en Streamlit.'
+          fi
