@@ -3,8 +3,9 @@
 Los valores por defecto describen el piloto reproducible del TFM: pimiento en
 la estación SiAR AL01 La Mojonera durante la campaña de 2025. Su encuadre como
 cultivo al aire libre es una hipótesis pendiente de acreditar para este CSV.
-Los casos adicionales de la demo reutilizan la misma lógica del motor; sus
-series no constituyen una validación independiente del modelo predictivo.
+Los casos adicionales de la demo reutilizan la misma lógica del motor. Desde
+octubre de 2026 disponen también de una evaluación temporal predictiva por
+caso, que no es una validación externa ni un modelo compartido.
 """
 
 from __future__ import annotations

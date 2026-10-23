@@ -467,7 +467,11 @@ def _apply_plot_style() -> None:
     )
 
 
-def plot_predictions(predictions: pd.DataFrame, output: Path) -> None:
+def plot_predictions(
+    predictions: pd.DataFrame,
+    output: Path,
+    title: str = "Evaluación temporal del piloto de pimiento",
+) -> None:
     dates = pd.to_datetime(predictions["observed_date"])
     fig, axes = plt.subplots(2, 1, figsize=(10, 6.8), sharex=True)
     axes[0].plot(dates, predictions[TARGET], color="#111827", lw=2.2, marker="o", ms=3.5, label="Referencia SiAR")
@@ -494,7 +498,7 @@ def plot_predictions(predictions: pd.DataFrame, output: Path) -> None:
     axes[1].grid(axis="y")
     axes[1].xaxis.set_major_locator(mdates.DayLocator(interval=3))
     axes[1].xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
-    fig.suptitle("Evaluación temporal del piloto de pimiento", fontsize=13, fontweight="bold", y=0.99)
+    fig.suptitle(title, fontsize=13, fontweight="bold", y=0.99)
     fig.legend(legend_handles, legend_labels, ncol=4, frameon=False,
                loc="upper center", bbox_to_anchor=(0.5, 0.955), fontsize=8)
     fig.tight_layout(rect=(0, 0, 1, 0.88), h_pad=2.5)
