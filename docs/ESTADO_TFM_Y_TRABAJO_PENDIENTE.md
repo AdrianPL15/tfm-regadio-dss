@@ -1,6 +1,6 @@
 # Estado actual y trabajo pendiente del TFM
 
-Fecha de revisión: 17 de octubre de 2026
+Fecha de revisión: 23 de octubre de 2026
 
 ## 1. Diagnóstico general
 
@@ -11,8 +11,8 @@ la comparación de seis enfoques predictivos, el motor de recomendaciones y la
 aplicación Streamlit cuentan con código y evidencias. El conjunto oficial de
 necesidades tiene 150 fechas, de las que 148 son válidas para el análisis;
 existe un catálogo de 88 variables. La validación técnica documenta 13
-escenarios. Las 55 pruebas automáticas se ejecutaron correctamente en el
-entorno local del proyecto el 17/10/2026.
+escenarios. Las 61 pruebas automáticas se ejecutaron correctamente en el
+entorno local del proyecto el 23/10/2026.
 
 El piloto estima la necesidad neta calculada por SiAR y propone dosis diarias
 y semanales. No se ha medido el riego aplicado, el ahorro de agua ni la respuesta
@@ -31,7 +31,7 @@ prototipo.
 | 4. Procesamiento y Machine Learning | Implementado y documentado para el piloto | Revisar reproducción de cifras y que los resultados no se describan como validación agronómica. |
 | 5. DSS y resultados | Implementado y documentado para el piloto | Validar con usuarios y datos de campo en una fase posterior; falta histórico de previsiones alineado. |
 | 6. Conclusiones | Redactado | Revisar con el equipo el grado de cumplimiento de objetivos y las afirmaciones de alcance. |
-| Elementos preliminares y anexos | Incompletos | Portada definitiva, resumen, abstract, palabras clave, índice, listas y anexos técnicos. |
+| Elementos preliminares y anexos | Versión de revisión preparada | Portada, resumen en español, palabras clave, índices y anexo A están en `docs/memoria/TFM_revision_coherencia_2026-10.docx` y su PDF de 85 páginas. El abstract en inglés se eliminó por decisión del equipo; comprobar los requisitos formales antes de entregar. |
 
 ## 3. Qué demuestra el repositorio
 
@@ -46,7 +46,7 @@ prototipo.
 - Motor de recomendación con reglas, dosis neta y bruta, conversión opcional a
   volumen, advertencias y explicación; aplicación Streamlit y línea de comandos.
 - Validación técnica frente a SiAR, análisis por horizonte, 13 escenarios y
-  55 pruebas automáticas. La referencia es calculada, no riego real observado.
+  61 pruebas automáticas. La referencia es calculada, no riego real observado.
 
 Los comandos para reproducir cada fase figuran en el README. No existe un único
 comando que regenere íntegramente todas las salidas de los capítulos 4 y 5.
@@ -67,10 +67,11 @@ consultar las APIs.
 
 ## 5. Trabajo imprescindible antes de la entrega
 
-1. Completar portada, resumen, abstract, palabras clave, índice y listas de
-   figuras y tablas conforme a las normas del máster.
-2. Añadir anexos breves con instrucciones de ejecución, esquema de datos,
-   evidencia de pruebas y relación entre memoria y archivos del repositorio.
+1. Confirmar con el tutor que la portada, el resumen español, los índices y el
+   anexo A de la versión de revisión cumplen las normas del máster; no se
+   incluye abstract en inglés por decisión del equipo.
+2. Revisar la guía `docs/DEMO_TFM.md` y probar la demostración local desde un
+   clon limpio antes de la entrega final.
 3. Revisar todas las referencias cruzadas, pies de tablas y figuras, citas,
    bibliografía, unidades, redondeos y ortografía. Confirmar el origen y la
    aplicabilidad al pimiento al aire libre del calendario y los coeficientes
@@ -80,9 +81,12 @@ consultar las APIs.
 5. Ejecutar el flujo documentado y las pruebas en un entorno reproducible,
    registrar versiones de dependencias y comprobar que no se versionan tokens,
    credenciales ni datos sensibles.
-6. Preparar una demostración sin dependencia de las APIs en directo y una
-   explicación breve de qué está implementado, qué se ha evaluado y qué queda
-   como trabajo futuro.
+6. Comprobar y publicar la aplicación Streamlit con un enlace accesible para
+   el tutor. La demostración local sin dependencia de las APIs ya tiene guía
+   en `docs/DEMO_TFM.md`, pero no equivale a un despliegue público.
+7. Integrar la rama de revisión en `main` tras comprobar el estado remoto y
+   revisar la misma versión de Word y PDF; después, crear el fork para el
+   despliegue y mantener identificado el repositorio de origen.
 
 Las prioridades posteriores a la entrega son ampliar campañas y estaciones,
 archivar previsiones por fecha de emisión, incorporar datos de suelo y riego
