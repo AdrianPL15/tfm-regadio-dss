@@ -1,6 +1,8 @@
 # Dependencias mínimas de la demo en Streamlit Community Cloud.
 # Se mantienen junto al archivo principal para evitar instalar el entorno
 # completo de ETL y entrenamiento al publicar la interfaz.
+# Al cambiar la configuración de campañas, reconstruir el proceso de la app
+# para evitar reutilizar módulos Python anteriores en una recarga en caliente.
 streamlit==1.66.0
 pandas==3.0.6
 numpy==2.5.3
