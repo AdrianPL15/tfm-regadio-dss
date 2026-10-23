@@ -1,0 +1,20 @@
+{
+  "source": "SiAR - Cálculo de necesidades netas",
+  "source_url": "https://servicio.mapa.gob.es/siarweb/necesidadesHidricas/calculo",
+  "retrieved_at": "2026-10-23",
+  "community": "Andalucía",
+  "province": "Almería",
+  "station_code": "AL01",
+  "station_name": "La Mojonera",
+  "region": "Dalias",
+  "crop": "Pimiento",
+  "crop_cycle": "May / Sep",
+  "active_months": [5, 6, 7, 8, 9],
+  "frequency": "Diarios",
+  "requested_start_date": "2026-05-01",
+  "requested_end_date": "2026-10-23",
+  "first_returned_date": "2026-05-01",
+  "last_returned_date": "2026-10-22",
+  "record_count": 175,
+  "notes": "CSV oficial descargado el 23/10/2026. El 23/10 no estaba publicado. En octubre Kc=0 por fin del ciclo SiAR; no se extrapola pimiento para el 24/10. No acredita el sistema de producción."
+}

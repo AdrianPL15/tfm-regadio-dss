@@ -32,7 +32,10 @@ from src.models.train_evaluate import (
 DEFAULT_REPORT = Path("docs/data_samples/model_evaluation_multicultivo_2025.json")
 DEFAULT_PREDICTIONS = Path("docs/data_samples/model_predictions_multicultivo_2025.csv")
 DEFAULT_IMAGE_ROOT = Path("docs/images")
-EXTENSION_CASES = tuple(case for case in DEMO_CASES if case.crop in {"Maíz", "Algodón"})
+EXTENSION_CASES = tuple(
+    case for case in DEMO_CASES
+    if case.crop in {"Maíz", "Algodón"} and case.campaign_year == 2025
+)
 
 
 def modeling_source_for_case(case: CropCase) -> tuple[pd.DataFrame, dict[str, Any]]:

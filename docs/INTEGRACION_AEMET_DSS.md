@@ -36,7 +36,7 @@ La app permite consultar la predicción AEMET actual si hay clave local o un sec
 python -m src.dss.recommend --fecha 2025-06-28 --prevision ruta/al/escenario.csv --fraccion-lluvia 0.25
 ```
 
-El usuario debe identificar ese CSV como escenario o como previsión realmente archivada. El motor rechaza una fecha de emisión posterior a la consulta. La opción `--aemet-live` exige fecha de hoy y un CSV SiAR que cubra esa fecha. Los tres ciclos actualmente versionados terminan en septiembre de 2025; por eso **hoy no permiten calcular una dosis operativa con AEMET actual**. Para esa función harán falta un ciclo SiAR vigente, Kc adecuado y observaciones recientes. No se ha modificado ningún dato original de SiAR para ocultar ese desfase.
+El usuario debe identificar ese CSV como escenario o como previsión realmente archivada. El motor rechaza una fecha de emisión posterior a la consulta. El 23/10/2026 se añadieron cuatro CSV SiAR oficiales de 2026 ([inventario y límites](CAMPANAS_SIAR_2026.md)); solo la coliflor AL01 sigue en ciclo para mañana. La aplicación puede calcular una **estimación condicionada** para el 24/10 usando un Kc prolongado dentro del mes y la predicción AEMET emitida hoy. No se ha modificado ningún dato observado SiAR para ocultar la ausencia de datos futuros. El comando `--aemet-live` conserva su contrato anterior y no realiza esa proyección de Kc; la funcionalidad de mañana está en la interfaz Streamlit.
 
 ## Qué falta para incorporar AEMET a los modelos
 
@@ -48,4 +48,4 @@ Los modelos de `src/models/train_evaluate.py` y la nueva evaluación de maíz y 
 python -m src.features.build_aemet_model_table
 ```
 
-Con la instantánea real archivada el 23/10/2026 y los ciclos SiAR versionados de 2025, la tabla contiene **0 filas**. Es el resultado correcto, no un error de extracción. No se ha entrenado ni atribuido una mejora a un modelo AEMET con una muestra temporalmente incompatible.
+La instantánea AEMET del 23/10/2026 no puede incorporarse a la evaluación de las campañas de 2025. Tampoco basta una sola emisión actual para medir de manera fiable la mejora en las campañas de 2026: se requiere archivar muchos pronósticos a lo largo del ciclo y evaluar las predicciones como se conocían entonces. No se ha entrenado ni atribuido una mejora a un modelo AEMET con muestras temporalmente incompatibles.

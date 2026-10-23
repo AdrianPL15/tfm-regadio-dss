@@ -29,7 +29,7 @@ def archive_forecast(
     hourly = provider.get_hourly_municipality_forecast(municipality_code)
     if not isinstance(daily, list) or not isinstance(hourly, list):
         raise ValueError("La respuesta AEMET no contiene los productos esperados.")
-    normalized = forecast_from_payloads(daily, hourly)
+    normalized = forecast_from_payloads(daily, hourly, municipality_code=municipality_code)
     if normalized["municipality_code"].iat[0] != municipality_code:
         raise ValueError("El municipio solicitado no coincide con la respuesta AEMET.")
     stamp = normalized["issued_at"].iat[0].replace(":", "").replace("-", "")

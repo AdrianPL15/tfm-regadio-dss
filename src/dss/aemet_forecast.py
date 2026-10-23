@@ -20,20 +20,28 @@ from src.data.transform_interim import normalize_aemet_daily, normalize_aemet_ho
 def forecast_from_payloads(
     daily_payload: list[dict[str, Any]],
     hourly_payload: list[dict[str, Any]],
+    *,
+    municipality_code: str | None = None,
 ) -> pd.DataFrame:
     """Une dos productos del mismo municipio, sin confundir probabilidad y mm."""
     if not daily_payload:
         raise ValueError("Falta la predicción diaria de AEMET.")
     daily_root = daily_payload[0]
-    daily_code = str(daily_root.get("id", "")).removeprefix("id").zfill(5)
-    if not daily_code.isdigit():
+    daily_code_raw = str(daily_root.get("id", "")).removeprefix("id")
+    daily_code = daily_code_raw.zfill(5) if daily_code_raw.isdigit() else None
+    if daily_code is None and municipality_code is None:
         raise ValueError("El municipio AEMET no es válido.")
+    if daily_code is not None and municipality_code is not None and daily_code != municipality_code:
+        raise ValueError("La predicción diaria AEMET no corresponde al municipio solicitado.")
+    resolved_code = municipality_code or daily_code
     daily_issued = pd.Timestamp(daily_root["elaborado"])
     hourly_issued = pd.NaT
     if hourly_payload:
         hourly_root = hourly_payload[0]
         hourly_code = str(hourly_root.get("id", "")).removeprefix("id").zfill(5)
-        if daily_code != hourly_code:
+        if hourly_code != resolved_code:
+            raise ValueError("Las predicciones AEMET no corresponden al mismo municipio.")
+        if daily_code is None and daily_root.get("nombre") != hourly_root.get("nombre"):
             raise ValueError("Las predicciones AEMET no corresponden al mismo municipio.")
         hourly_issued = pd.Timestamp(hourly_root["elaborado"])
         if abs((daily_issued - hourly_issued).total_seconds()) > 24 * 3600:
@@ -84,7 +92,7 @@ def forecast_from_payloads(
             **amount,
             "issued_at": daily_issued.isoformat(),
             "hourly_issued_at": hourly_issued.isoformat() if pd.notna(hourly_issued) else None,
-            "municipality_code": daily_code,
+            "municipality_code": resolved_code,
             "source": "AEMET OpenData",
         })
     return pd.DataFrame(rows).sort_values("date").reset_index(drop=True)
@@ -100,7 +108,7 @@ def fetch_live_forecast(municipality_code: str, *, client: AEMETClient | None = 
         hourly = []
     if not isinstance(daily, list) or not isinstance(hourly, list):
         raise ValueError("La respuesta municipal AEMET no tiene el formato esperado.")
-    return forecast_from_payloads(daily, hourly)
+    return forecast_from_payloads(daily, hourly, municipality_code=municipality_code)
 
 
 def require_current_forecast(forecast: pd.DataFrame, issue_date: date) -> None:

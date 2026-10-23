@@ -174,11 +174,18 @@ def estimate_day(
 
     kc = float(target["kc"])
     if bool(target.get("kc_imputed", False)):
-        warnings.append(
-            "La fuente no devolvió esta fecha; el Kc se toma del último valor "
-            "publicado del calendario."
-        )
-        rules.append("R10 Kc completado con el último valor publicado")
+        if target.get("record_status") == "kc_proyectado_mes":
+            warnings.append(
+                "El Kc futuro no está publicado por SiAR: se mantiene el último "
+                "Kc observado dentro del mismo mes y ciclo. Es una hipótesis."
+            )
+            rules.append("R10 Kc futuro proyectado dentro del mes")
+        else:
+            warnings.append(
+                "La fuente no devolvió esta fecha; el Kc se toma del último valor "
+                "publicado del calendario."
+            )
+            rules.append("R10 Kc completado con el último valor publicado")
 
     # Modo seguimiento: el día ya está cerrado y se usa la referencia observada.
     if mode == "seguimiento":
@@ -420,6 +427,7 @@ def recommend(
                 and request.rain_effective_fraction is not None
                 and pd.notna(rain_mm)
                 and pd.notna(net)
+                and float(rain_mm) > 0
             ):
                 effective_rain = min(net, float(rain_mm) * request.rain_effective_fraction)
                 net = max(0.0, net - effective_rain)

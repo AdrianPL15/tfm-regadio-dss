@@ -63,10 +63,37 @@ class CropCase:
     community: str = "Andalucía"
     region: str = "Dalias"
     aemet_municipality_code: str = "04013"
+    campaign_year: int = 2025
 
 
 DEMO_CASES: tuple[CropCase, ...] = (
     CropCase(),
+    CropCase(
+        crop="Pimiento",
+        production_system="No acreditado",
+        station_code="AL01",
+        station_name="La Mojonera",
+        province="Almería",
+        source_file=Path("data/external/siar_necesidades_pimiento_AL01_2026.csv"),
+        metadata_file=Path("data/external/siar_necesidades_pimiento_AL01_2026.metadata.json"),
+        community="Andalucía",
+        region="Dalias",
+        aemet_municipality_code="04013",
+        campaign_year=2026,
+    ),
+    CropCase(
+        crop="Coliflor",
+        production_system="No acreditado",
+        station_code="AL01",
+        station_name="La Mojonera",
+        province="Almería",
+        source_file=Path("data/external/siar_necesidades_coliflor_AL01_2026.csv"),
+        metadata_file=Path("data/external/siar_necesidades_coliflor_AL01_2026.metadata.json"),
+        community="Andalucía",
+        region="Dalias",
+        aemet_municipality_code="04013",
+        campaign_year=2026,
+    ),
     CropCase(
         crop="Maíz",
         production_system="No acreditado",
@@ -80,6 +107,19 @@ DEMO_CASES: tuple[CropCase, ...] = (
         aemet_municipality_code="50095",
     ),
     CropCase(
+        crop="Maíz",
+        production_system="No acreditado",
+        station_code="Z06",
+        station_name="Ejea de los Caballeros",
+        province="Zaragoza",
+        source_file=Path("data/external/siar_necesidades_maiz_Z06_2026.csv"),
+        metadata_file=Path("data/external/siar_necesidades_maiz_Z06_2026.metadata.json"),
+        community="Aragón",
+        region="Ejea de los Caballeros",
+        aemet_municipality_code="50095",
+        campaign_year=2026,
+    ),
+    CropCase(
         crop="Algodón",
         production_system="No acreditado",
         station_code="BA08",
@@ -90,6 +130,19 @@ DEMO_CASES: tuple[CropCase, ...] = (
         community="Extremadura",
         region="Don Benito",
         aemet_municipality_code="06044",
+    ),
+    CropCase(
+        crop="Algodón",
+        production_system="No acreditado",
+        station_code="BA08",
+        station_name="Don Benito",
+        province="Badajoz",
+        source_file=Path("data/external/siar_necesidades_algodon_BA08_2026.csv"),
+        metadata_file=Path("data/external/siar_necesidades_algodon_BA08_2026.metadata.json"),
+        community="Extremadura",
+        region="Don Benito",
+        aemet_municipality_code="06044",
+        campaign_year=2026,
     ),
 )
 

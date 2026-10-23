@@ -23,6 +23,14 @@ data/external/*
 !data/external/siar_necesidades_maiz_Z06_2025.metadata.json
 !data/external/siar_necesidades_algodon_BA08_2025.csv
 !data/external/siar_necesidades_algodon_BA08_2025.metadata.json
+!data/external/siar_necesidades_pimiento_AL01_2026.csv
+!data/external/siar_necesidades_pimiento_AL01_2026.metadata.json
+!data/external/siar_necesidades_coliflor_AL01_2026.csv
+!data/external/siar_necesidades_coliflor_AL01_2026.metadata.json
+!data/external/siar_necesidades_maiz_Z06_2026.csv
+!data/external/siar_necesidades_maiz_Z06_2026.metadata.json
+!data/external/siar_necesidades_algodon_BA08_2026.csv
+!data/external/siar_necesidades_algodon_BA08_2026.metadata.json
 
 # Modelos entrenados (pueden pesar mucho, se gestionan aparte)
 models/*
