@@ -25,6 +25,15 @@ CROP_NEEDS_COLUMNS = {
     "ETc - Pe (mm)": "net_need_mm",
 }
 
+# La descarga CSV directa de la web SiAR usa cabeceras sin la unidad; la
+# instantánea inicial de pimiento conserva las cabeceras de la tabla web.
+OFFICIAL_CSV_COLUMNS = {
+    "ET0": "ET0 (mm)",
+    "ETc": "ETc (mm)",
+    "Pe": "Pe (mm)",
+    "ETc - Pe": "ETc - Pe (mm)",
+}
+
 FORECAST_COLUMNS = {"date", "et0_mm", "precipitation_mm", "precipitation_probability_pct"}
 
 
@@ -35,6 +44,7 @@ def load_crop_needs(path: Path) -> pd.DataFrame:
         raise FileNotFoundError(f"No se encuentra la referencia agronómica: {path}")
 
     raw = pd.read_csv(path, sep=";", decimal=",", encoding="utf-8-sig")
+    raw = raw.rename(columns=OFFICIAL_CSV_COLUMNS)
     missing = set(CROP_NEEDS_COLUMNS).difference(raw.columns)
     if missing:
         raise ValueError(f"Faltan columnas en la referencia SiAR: {sorted(missing)}")

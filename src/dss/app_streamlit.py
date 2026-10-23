@@ -20,6 +20,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.dss.config import (  # noqa: E402
+    DEMO_CASES,
     IRRIGATION_EFFICIENCY,
     MAX_HORIZON_DAYS,
     CropCase,
@@ -42,13 +43,6 @@ def _absolute(path: Path) -> Path:
     return path if path.is_absolute() else ROOT / path
 
 
-case = CropCase()
-history, metadata = _load(
-    str(_absolute(case.source_file)), str(_absolute(case.metadata_file))
-)
-first_day = history["date"].min().date()
-last_day = history["date"].max().date()
-
 params = st.query_params
 try:
     default_issue = date.fromisoformat(params.get("fecha", "2025-06-28"))
@@ -61,17 +55,42 @@ st.caption(
     "el estado real de la parcela y el criterio técnico."
 )
 st.caption(
-    "Demostración retrospectiva del pimiento en Almería (campaña 2025). "
-    "Utiliza el CSV SiAR versionado; no consulta APIs ni requiere tokens."
+    "Demostración retrospectiva con tres combinaciones reales de SiAR de 2025. "
+    "Utiliza CSV versionados; no consulta APIs ni requiere tokens."
 )
 
 with st.sidebar:
     st.header("Caso analizado")
-    st.selectbox("Cultivo", [f"{case.crop} ({case.production_system.lower()})"], disabled=True)
-    st.caption("Sistema de cultivo del CSV pendiente de acreditación documental.")
-    st.selectbox("Estación SiAR", [f"{case.station_code} {case.station_name} ({case.province})"],
-                 disabled=True)
-    st.caption("El piloto valida una combinación; el motor admite otras fuentes con el mismo formato.")
+    community = st.selectbox(
+        "Comunidad autónoma", list(dict.fromkeys(item.community for item in DEMO_CASES))
+    )
+    community_cases = [item for item in DEMO_CASES if item.community == community]
+    province = st.selectbox(
+        "Provincia", list(dict.fromkeys(item.province for item in community_cases))
+    )
+    province_cases = [item for item in community_cases if item.province == province]
+    crop = st.selectbox("Cultivo", list(dict.fromkeys(item.crop for item in province_cases)))
+    crop_cases = [item for item in province_cases if item.crop == crop]
+    station_codes = [item.station_code for item in crop_cases]
+    station_code = st.selectbox(
+        "Estación SiAR",
+        station_codes,
+        format_func=lambda code: next(
+            f"{item.station_code} - {item.station_name}"
+            for item in crop_cases if item.station_code == code
+        ),
+    )
+    case = next(item for item in crop_cases if item.station_code == station_code)
+    st.caption(
+        "Solo aparecen combinaciones con CSV local verificado. La demo no extrae "
+        "automáticamente todas las zonas y cultivos de SiAR."
+    )
+
+    history, metadata = _load(
+        str(_absolute(case.source_file)), str(_absolute(case.metadata_file))
+    )
+    first_day = history["date"].min().date()
+    last_day = history["date"].max().date()
 
     st.header("Consulta")
     mode_label = st.radio(
@@ -81,10 +100,11 @@ with st.sidebar:
     mode = "planificacion" if mode_label.startswith("Planificación") else "seguimiento"
     issue = st.date_input(
         "Fecha de emisión",
-        value=default_issue,
+        value=min(max(default_issue, first_day), last_day),
         min_value=first_day,
         max_value=last_day + timedelta(days=MAX_HORIZON_DAYS),
         format="DD/MM/YYYY",
+        key=f"fecha_{case.station_code}_{case.crop}",
     )
     horizon = st.slider("Horizonte (días)", 1, MAX_HORIZON_DAYS, 7)
 
@@ -113,6 +133,24 @@ request = RecommendationRequest(
     area_ha=area if area > 0 else None,
     weekly_allocation_mm=allocation,
     mode=mode,
+    case=case,
+)
+
+st.info(
+    f"Caso seleccionado: **{case.crop} · {case.station_code} {case.station_name} "
+    f"({case.province}, {case.community})**. Serie diaria del "
+    f"{first_day:%d/%m/%Y} al {last_day:%d/%m/%Y} "
+    f"({metadata.get('record_count', len(history))} registros descargados)."
+)
+if case != DEMO_CASES[0]:
+    st.caption(
+        "Este caso adicional demuestra el funcionamiento con otros datos SiAR. "
+        "Las métricas publicadas de evaluación del TFM corresponden únicamente "
+        "al piloto de pimiento AL01; no acreditan precisión para este cultivo."
+    )
+st.caption(
+    "El CSV SiAR identifica cultivo y estación, pero no acredita el sistema de "
+    "producción concreto (por ejemplo, aire libre o invernadero)."
 )
 
 try:
@@ -194,6 +232,6 @@ with st.expander("Explicación de cada recomendación y reglas aplicadas"):
 st.download_button(
     "Descargar recomendación (CSV)",
     daily.to_csv(index=False, date_format="%Y-%m-%d").encode("utf-8"),
-    file_name=f"recomendacion_{issue:%Y%m%d}.csv",
+    file_name=f"recomendacion_{case.crop.lower()}_{case.station_code}_{issue:%Y%m%d}.csv",
     mime="text/csv",
 )

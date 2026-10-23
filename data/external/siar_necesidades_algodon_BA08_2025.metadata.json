@@ -1,0 +1,18 @@
+{
+  "source": "SiAR - Cálculo de necesidades netas (CSV oficial)",
+  "source_url": "https://servicio.mapa.gob.es/siarweb/necesidadesHidricas/calculo",
+  "retrieved_at": "2026-10-23",
+  "community": "Extremadura",
+  "province": "Badajoz",
+  "station_code": "BA08",
+  "station_name": "Don Benito",
+  "region": "Don Benito",
+  "crop": "Algodón",
+  "crop_cycle": "Abr / Sep",
+  "frequency": "Diarios",
+  "requested_start_date": "2025-04-01",
+  "requested_end_date": "2025-09-30",
+  "record_count": 183,
+  "production_system": "No acreditado por el CSV",
+  "validation_status": "Caso de demostración; sin evaluación independiente del modelo"
+}

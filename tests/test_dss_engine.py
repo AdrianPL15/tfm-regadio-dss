@@ -8,8 +8,8 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from src.dss.config import RecommendationRequest
-from src.dss.data_access import load_crop_needs
+from src.dss.config import DEMO_CASES, RecommendationRequest
+from src.dss.data_access import load_case, load_crop_needs
 from src.dss.engine import campaign_plan, recommend, weekly_table
 
 
@@ -43,6 +43,19 @@ def run(history, **kwargs):
 
 
 class LoadCropNeedsTests(unittest.TestCase):
+    def test_direct_siar_csv_headers_are_accepted(self):
+        content = (
+            "Fecha;Kc;ET0;ETc;Pe;ETc - Pe\n"
+            "01/04/2025;0,31;3,56;1,11;0,00;1,11\n"
+        )
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder) / "needs.csv"
+            path.write_text(content, encoding="utf-8")
+            data = load_crop_needs(path)
+
+        self.assertAlmostEqual(data.loc[0, "et0_mm"], 3.56)
+        self.assertAlmostEqual(data.loc[0, "net_need_mm"], 1.11)
+
     def test_missing_dates_are_kept_as_rows_without_need(self):
         content = (
             "Fecha;Kc;ET0 (mm);ETc (mm);Pe (mm);ETc - Pe (mm)\n"
@@ -59,6 +72,35 @@ class LoadCropNeedsTests(unittest.TestCase):
         self.assertTrue(data.loc[1, "kc_imputed"])
         self.assertTrue(pd.isna(data.loc[1, "net_need_mm"]))
         self.assertEqual(data.loc[2, "record_status"], "meteorologia_ausente")
+
+
+class DemoCaseTests(unittest.TestCase):
+    def test_case_sources_and_metadata_match(self):
+        self.assertEqual(len(DEMO_CASES), 3)
+        self.assertEqual(len({case.source_file for case in DEMO_CASES}), 3)
+        for case in DEMO_CASES:
+            with self.subTest(case=case.crop):
+                history, metadata = load_case(case)
+                self.assertEqual(metadata["crop"], case.crop)
+                self.assertEqual(metadata["community"], case.community)
+                self.assertEqual(metadata["province"], case.province)
+                self.assertEqual(metadata["station_code"], case.station_code)
+                self.assertEqual(metadata["record_count"],
+                                 int(history["record_status"].ne("fecha_no_devuelta").sum()))
+
+    def test_cases_produce_distinct_recommendations(self):
+        values = []
+        for case in DEMO_CASES:
+            history, metadata = load_case(case)
+            request = RecommendationRequest(
+                issue_date=date(2025, 6, 28), horizon_days=1,
+                mode="seguimiento", case=case,
+            )
+            result = recommend(request, history=history, metadata=metadata)
+            values.append(result.daily["net_need_mm"].iat[0])
+            self.assertIn(case.source_file.name,
+                          result.daily["source_file"].iat[0])
+        self.assertEqual(len(set(values)), 3)
 
 
 class RecommendTests(unittest.TestCase):

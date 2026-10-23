@@ -3,8 +3,8 @@
 Los valores por defecto describen el piloto reproducible del TFM: pimiento en
 la estación SiAR AL01 La Mojonera durante la campaña de 2025. Su encuadre como
 cultivo al aire libre es una hipótesis pendiente de acreditar para este CSV.
-Cualquier otro caso se define creando un ``CropCase`` distinto, sin modificar
-la lógica del motor.
+Los casos adicionales de la demo reutilizan la misma lógica del motor; sus
+series no constituyen una validación independiente del modelo predictivo.
 """
 
 from __future__ import annotations
@@ -59,6 +59,35 @@ class CropCase:
     province: str = "Almería"
     source_file: Path = DEFAULT_CROP_NEEDS
     metadata_file: Path = DEFAULT_CROP_METADATA
+    community: str = "Andalucía"
+    region: str = "Dalias"
+
+
+DEMO_CASES: tuple[CropCase, ...] = (
+    CropCase(),
+    CropCase(
+        crop="Maíz",
+        production_system="No acreditado",
+        station_code="Z06",
+        station_name="Ejea de los Caballeros",
+        province="Zaragoza",
+        source_file=Path("data/external/siar_necesidades_maiz_Z06_2025.csv"),
+        metadata_file=Path("data/external/siar_necesidades_maiz_Z06_2025.metadata.json"),
+        community="Aragón",
+        region="Ejea de los Caballeros",
+    ),
+    CropCase(
+        crop="Algodón",
+        production_system="No acreditado",
+        station_code="BA08",
+        station_name="Don Benito",
+        province="Badajoz",
+        source_file=Path("data/external/siar_necesidades_algodon_BA08_2025.csv"),
+        metadata_file=Path("data/external/siar_necesidades_algodon_BA08_2025.metadata.json"),
+        community="Extremadura",
+        region="Don Benito",
+    ),
+)
 
 
 @dataclass(frozen=True)
