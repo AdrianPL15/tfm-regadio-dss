@@ -9,10 +9,10 @@ La visión del producto permite que el usuario elija ubicación, cultivo y perio
 | Si quieres... | Abre... |
 |---|---|
 | Leer la versión candidata de la memoria | [PDF revisado](docs/memoria/TFM_revision_coherencia_2026-10.pdf) o [Word editable](docs/memoria/TFM_revision_coherencia_2026-10.docx) |
-| Probar el prototipo | [Aplicación Streamlit](src/dss/app_streamlit.py) y [guía de publicación](docs/STREAMLIT_DESPLIEGUE.md); como alternativa, [demo local](docs/DEMO_TFM.md) |
+| Probar el prototipo | [Demo pública en Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía de uso y despliegue](docs/STREAMLIT_DESPLIEGUE.md); como alternativa, [demo local](docs/DEMO_TFM.md) |
 | Ver qué datos entraron y cómo se transformaron | [Guía de reproducción](docs/REPRODUCCION_PILOTO.md) y [auditoría de coherencia](docs/AUDITORIA_COHERENCIA_2026-10-22.md) |
 
-La URL pública de Streamlit se añadirá solo después de verificar el despliegue desde una sesión sin acceso al repositorio.
+La demo pública se comprobó el 23/10/2026 desde un navegador sin iniciar sesión en Streamlit. Utiliza el caso piloto fijo y datos versionados; no solicita claves de SiAR ni AEMET.
 
 ## Autoría
 
