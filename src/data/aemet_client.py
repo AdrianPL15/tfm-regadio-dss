@@ -40,7 +40,8 @@ class AEMETClient:
         resolved_key = api_key or os.getenv("AEMET_API_KEY")
         if not resolved_key:
             raise ValueError(
-                "No se ha configurado AEMET_API_KEY en el fichero .env."
+                "No se ha configurado AEMET_API_KEY. En local, añádela a .env; "
+                "en Streamlit Community Cloud, configúrala en App settings → Secrets."
             )
 
         self._api_key = resolved_key
