@@ -1,0 +1,18 @@
+# Campañas SiAR 2026 y alcance de la predicción de mañana
+
+El 23/10/2026 se consultó el formulario oficial de [necesidades netas de SiAR](https://servicio.mapa.gob.es/siarweb/necesidadesHidricas/calculo) para cuatro combinaciones. Se descargó el CSV diario original de cada resultado y se conservaron sus bytes en `data/external`, sin alterar ni completar valores. Las peticiones terminaban el 23/10; la última jornada que SiAR devolvió fue **22/10/2026**. No se ha creado una fila observada del 23/10.
+
+| Caso | Estación y provincia | Intervalo devuelto | Filas | Calidad | Situación el 24/10 |
+|---|---|---|---:|---|---|
+| Pimiento | AL01 La Mojonera, Almería | 01/05–22/10 | 175 | 174 completas; 1 sin meteorología | Fuera del ciclo May–Sep; Kc=0 en octubre |
+| Coliflor | AL01 La Mojonera, Almería | 01/06–22/10 | 144 | 144 completas | Ciclo Jun–Dic; Kc=0,99 el 22/10 |
+| Maíz | Z06 Ejea de los Caballeros, Zaragoza | 01/04–22/10 | 205 | 205 completas | Fuera del ciclo Abr–Sep; Kc=0 en octubre |
+| Algodón | BA08 Don Benito, Badajoz | 01/04–22/10 | 205 | 204 completas; 1 sin meteorología | Fuera del ciclo Abr–Sep; Kc=0 en octubre |
+
+Los archivos `.metadata.json` adjuntos indican lugar, cultivo, ciclo, periodo solicitado y periodo realmente devuelto. Son **instantáneas de descarga**, no una sincronización continua. Los cuatro CSV tienen Kc, ET0, ETc, precipitación efectiva y necesidad neta; SiAR no da aquí riegos efectivamente realizados. Las tres campañas de 2025 permanecen para reproducir sus evaluaciones temporales y no se sustituyen por las de 2026.
+
+Para calcular el **24/10/2026** en coliflor, el prototipo prolonga el último Kc oficial de 0,99 **solo dentro de octubre y del ciclo SiAR**. No atribuye a SiAR ese Kc futuro ni inventa ET0 o lluvia observadas. Combina ese supuesto con la media de ET0 observada en los siete días recientes y, cuando el usuario consulta AEMET con una clave válida, muestra la lluvia municipal prevista. Solo descuenta una cantidad prevista si el producto horario cubre las 24 horas y el usuario acepta una fracción aprovechable **hipotética**. Esta fracción no está calibrada con suelo, humedad ni riego real. La app distingue la dosis base de la condicionada y advierte que no equivale a una recomendación agronómica validada.
+
+El mismo día se archivaron localmente predicciones AEMET para Almería (`04013`), Ejea (`50095`) y Don Benito (`06044`) en `data/raw/aemet/forecast` y `data/interim/aemet/forecast`; estas instantáneas están excluidas de Git para no confundir previsiones emitidas hoy con un histórico utilizable en la evaluación de 2025. En Ejea, la respuesta diaria de AEMET usa un identificador interno negativo (`-15441`) mientras la horaria usa el código municipal `50095`: el adaptador conserva el código solicitado y comprueba que el producto horario y el nombre municipal coinciden.
+
+**Límite metodológico:** esta incorporación amplía los datos históricos y la demostración de consulta actual, pero **no reentrena ni reevalúa los modelos de 2025 con pronósticos de 2026**. Para afirmar que AEMET mejora el modelo harán falta previsiones archivadas antes de cada fecha objetivo, de múltiples fechas y campañas, y validación temporal sin fuga de información. Los CSV identifican cultivo y estación, no sistema productivo ni parcela concreta. En octubre, maíz, algodón y pimiento son comparaciones históricas, no opciones de riego para mañana.

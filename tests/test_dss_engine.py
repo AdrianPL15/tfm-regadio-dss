@@ -76,8 +76,8 @@ class LoadCropNeedsTests(unittest.TestCase):
 
 class DemoCaseTests(unittest.TestCase):
     def test_case_sources_and_metadata_match(self):
-        self.assertEqual(len(DEMO_CASES), 3)
-        self.assertEqual(len({case.source_file for case in DEMO_CASES}), 3)
+        self.assertEqual(len(DEMO_CASES), 7)
+        self.assertEqual(len({case.source_file for case in DEMO_CASES}), 7)
         for case in DEMO_CASES:
             with self.subTest(case=case.crop):
                 history, metadata = load_case(case)
@@ -90,7 +90,7 @@ class DemoCaseTests(unittest.TestCase):
 
     def test_cases_produce_distinct_recommendations(self):
         values = []
-        for case in DEMO_CASES:
+        for case in (case for case in DEMO_CASES if case.campaign_year == 2025):
             history, metadata = load_case(case)
             request = RecommendationRequest(
                 issue_date=date(2025, 6, 28), horizon_days=1,

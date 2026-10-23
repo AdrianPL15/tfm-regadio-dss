@@ -69,6 +69,16 @@ class AemetForecastDssTests(unittest.TestCase):
         self.assertTrue(table["precipitation_mm"].isna().all())
         self.assertEqual(table["precipitation_probability_pct"].iat[0], 80)
 
+    def test_ejea_daily_uses_internal_negative_id_but_hourly_confirms_requested_code(self):
+        daily, hourly = sample_payloads()
+        daily[0].update({"id": -15441, "nombre": "Ejea de los Caballeros"})
+        hourly[0].update({"id": "50095", "nombre": "Ejea de los Caballeros"})
+        table = forecast_from_payloads(daily, hourly, municipality_code="50095")
+        self.assertEqual(table["municipality_code"].iat[0], "50095")
+        hourly[0]["nombre"] = "Otro municipio"
+        with self.assertRaisesRegex(ValueError, "mismo municipio"):
+            forecast_from_payloads(daily, hourly, municipality_code="50095")
+
     def test_archives_issued_snapshot_without_overwriting(self):
         daily, hourly = sample_payloads()
 

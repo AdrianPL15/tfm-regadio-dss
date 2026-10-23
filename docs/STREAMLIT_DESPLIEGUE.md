@@ -1,6 +1,6 @@
 # Publicación de la demostración Streamlit
 
-La app utiliza CSV SiAR versionados para tres casos concretos; esa demostración retrospectiva no necesita claves. La ampliación opcional consulta AEMET actual y requiere su API key configurada como secreto. La demo está publicada en [Streamlit Community Cloud](https://tfm-regadio-dss-adrianpl15.streamlit.app/); permite al tutor escoger comunidad, provincia, cultivo y estación entre las combinaciones disponibles, cambiar parámetros y consultar una recomendación orientativa. Los [datos y límites de cada caso](DEMO_CASOS_SIAR_2025.md) están documentados por separado.
+La app conserva tres casos SiAR de 2025 para la evaluación retrospectiva y añade cuatro CSV de 2026 ([inventario](CAMPANAS_SIAR_2026.md)). La consulta AEMET actual requiere su API key configurada como secreto. La demo está publicada en [Streamlit Community Cloud](https://tfm-regadio-dss-adrianpl15.streamlit.app/); permite escoger comunidad, provincia, cultivo, estación y campaña solo entre las combinaciones descargadas. La estimación de mañana se ofrece únicamente cuando la campaña sigue activa y el último dato SiAR es reciente.
 
 ## Configuración de publicación
 
@@ -16,7 +16,13 @@ El despliegue se creó el 23/10/2026 desde el fork de Adrián en [Streamlit Comm
 | Secretos | Ninguno para SiAR retrospectivo; `AEMET_API_KEY` opcional para la consulta actual |
 | URL pública | `https://tfm-regadio-dss-adrianpl15.streamlit.app/` |
 
-La rama principal contiene también `environment.yml` y `requirements.txt` para el TFM completo. Streamlit busca primero un archivo de dependencias en el directorio de la app; `src/dss/requirements.txt` contiene las bibliotecas necesarias para la interfaz y la consulta AEMET. No publicar `.env` ni añadir claves al repositorio. Para activar la consulta actual en Community Cloud, el administrador de la app debe configurar `AEMET_API_KEY` en **App settings → Secrets**. Hasta entonces, la demo histórica sigue funcionando y el botón de AEMET informa de que falta la clave. AEMET [indica](https://opendata.aemet.es/centrodedescargas/novedades) que las claves nuevas caducan a los tres meses; habrá que renovarla en el panel cuando corresponda.
+La rama principal contiene también `environment.yml` y `requirements.txt` para el TFM completo. Streamlit busca primero un archivo de dependencias en el directorio de la app; `src/dss/requirements.txt` contiene las bibliotecas necesarias para la interfaz y la consulta AEMET. No publicar `.env` ni añadir claves al repositorio. Para activar la consulta actual en Community Cloud, el administrador de la app debe abrir **App settings → Secrets** y pegar exactamente esta entrada TOML, sustituyendo el marcador por el valor actual de `AEMET_API_KEY` del `.env` local:
+
+```toml
+AEMET_API_KEY = "PEGAR_AQUÍ_LA_CLAVE_ACTUAL"
+```
+
+Guardar el secreto y reiniciar la app si no se actualiza sola. No copiar el archivo `.env` entero ni enviar la clave por chat o GitHub. Hasta entonces, la demo histórica sigue funcionando y el botón de AEMET informa de que falta la clave. AEMET [indica](https://opendata.aemet.es/centrodedescargas/novedades) que las claves nuevas caducan a los tres meses; habrá que renovarla en el panel cuando corresponda.
 
 ## Comprobación del despliegue
 
@@ -31,4 +37,4 @@ La rama principal contiene también `environment.yml` y `requirements.txt` para 
 
 La URL figura en la primera pantalla del `README.md`. Falta incorporarla al anexo de la versión final de la memoria, junto con una fecha de consulta y la advertencia de alcance del piloto. Si la app se suspende por inactividad, puede tardar unos segundos en reactivarse.
 
-**Alcance:** el prototipo es retrospectivo y ofrece tres combinaciones concretas durante 2025, no un catálogo nacional dinámico. Hay evaluaciones predictivas independientes para pimiento, maíz y algodón, pero no un modelo común ni validación en campo. El escenario de lluvia es hipotético; la predicción AEMET actual no se cruza con 2025. El sistema de producción exacto no queda acreditado por los CSV. La referencia SiAR no es riego real observado. La demo no demuestra ahorro de agua ni validez agronómica fuera del piloto.
+**Alcance:** los ensayos de 2025 siguen siendo retrospectivos y los cuatro CSV de 2026 son instantáneas oficiales, no un catálogo nacional dinámico. Hay evaluaciones predictivas independientes para pimiento, maíz y algodón en 2025, pero no un modelo común ni validación en campo. En 2026 solo coliflor AL01 está activa el 24/10; su Kc de mañana es una proyección local dentro del mes y el descuento de lluvia usa una fracción hipotética. La predicción AEMET actual no se cruza con 2025. El sistema de producción exacto no queda acreditado por los CSV. La referencia SiAR no es riego real observado. La demo no demuestra ahorro de agua ni validez agronómica fuera del piloto.
