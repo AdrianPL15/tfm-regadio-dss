@@ -36,8 +36,10 @@ lluvia prevista. Es una decisión prudente en un clima con 2,51 mm de
 precipitación efectiva en toda la campaña, pero en zonas más lluviosas
 trasladaría al usuario un número mayor de avisos que resolver.
 
-La cuarta es funcional. El sistema decide cuánto regar, pero no cuándo, porque
-sin balance hídrico del suelo trata todas las necesidades como diarias. La
+La cuarta es funcional. El sistema propone una dosis diaria orientativa, pero
+no determina cuándo regar, porque no mantiene un balance hídrico del suelo.
+Tampoco conoce si una recomendación anterior llegó a aplicarse, por lo que no
+la trata como riego realizado ni la descuenta de la necesidad posterior. La
 restricción de agua se aplica mediante una reducción proporcional, que no
 reparte el déficit según la sensibilidad de cada fase del cultivo (Fereres &
 Soriano, 2007). La aplicación, por su parte, trabaja con un caso fijo, no

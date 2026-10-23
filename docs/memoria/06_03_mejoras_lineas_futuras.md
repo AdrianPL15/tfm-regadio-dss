@@ -64,8 +64,11 @@ La tercera mejora del motor es un balance hídrico del suelo con agotamiento
 admisible, como el propuesto en FAO-56 (Allen et al., 1998). Permitiría decidir
 no solo cuánto sino cuándo regar y aprovechar la lluvia realmente almacenada en
 el suelo. Requiere la capacidad de retención, la profundidad radicular y el
-registro de riegos de cada parcela. Con esa información, la reducción
-proporcional por dotación podría sustituirse por una estrategia de riego
+registro de los riegos realmente aplicados en cada parcela: recomendar una
+dosis no prueba que se haya ejecutado. El balance podría adaptar mejor la
+recomendación a la situación de la parcela, pero cualquier mejora de precisión
+debería comprobarse con observaciones y ensayos de campo. Con esa información,
+la reducción proporcional por dotación podría sustituirse por una estrategia de riego
 deficitario que concentre el déficit en las fases menos sensibles del cultivo
 (Fereres & Soriano, 2007).
 

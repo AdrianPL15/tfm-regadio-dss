@@ -35,8 +35,14 @@ El 23/10/2026 se repitieron las 61 pruebas con un directorio temporal dentro
 del espacio de trabajo (61/61 correctas) y se ejecutó la prueba local de la
 interfaz Streamlit: sin excepciones, con título y cuatro indicadores visibles.
 Esta comprobación no equivale a un despliegue público ni a una prueba manual
-en navegador. La memoria revisada se exportó de nuevo a PDF (84 páginas) y se
+en navegador. La memoria revisada se exportó de nuevo a PDF y se
 comprobó visualmente la disposición de las secciones 3.1 y 4.1.
+
+También el 23/10 se precisó en los apartados 5.1, 6.2 y 6.3 que una
+recomendación previa no equivale a riego aplicado. El balance de parcela queda
+como mejora futura, cuya posible mayor precisión requeriría verificación en
+campo. La nueva exportación tiene 85 páginas; se revisaron visualmente las
+páginas afectadas y su transición.
 
 ## Límites que no se deben esconder
 

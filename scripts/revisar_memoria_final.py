@@ -450,6 +450,22 @@ def main() -> None:
         raise ValueError("No se encontró el inicio del apartado 4.1")
     first_chapter_four_paragraph.paragraph_format.space_before = Pt(12)
 
+    replace(
+        498,
+        "porque no se dispone de humedad del suelo, riego aplicado ni respuesta productiva.",
+        "porque no se dispone de humedad del suelo, riego aplicado ni respuesta productiva. Una dosis recomendada en una fecha anterior no se considera riego realizado ni se descuenta automáticamente de la necesidad de una fecha posterior.",
+    )
+    replace(
+        629,
+        "El sistema decide cuánto regar, pero no cuándo, porque sin balance hídrico del suelo trata todas las necesidades como diarias.",
+        "El sistema propone una dosis diaria orientativa, pero no determina cuándo regar, porque no mantiene un balance hídrico del suelo. Tampoco conoce si una recomendación anterior llegó a aplicarse, por lo que no la trata como riego realizado ni la descuenta de la necesidad posterior.",
+    )
+    replace(
+        646,
+        "Requiere la capacidad de retención, la profundidad radicular y el registro de riegos de cada parcela.",
+        "Requiere la capacidad de retención, la profundidad radicular y el registro de los riegos realmente aplicados en cada parcela: recomendar una dosis no prueba que se haya ejecutado. El balance podría adaptar mejor la recomendación a la situación de la parcela, pero cualquier mejora de precisión debería comprobarse con observaciones y ensayos de campo.",
+    )
+
     project_phases_table = document.tables[3]
     if project_phases_table.cell(0, 0).text != "Fase":
         raise ValueError("No se encontró la tabla de fases del apartado 3.3")

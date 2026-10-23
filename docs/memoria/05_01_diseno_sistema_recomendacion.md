@@ -20,6 +20,8 @@ productiva. Lo que ofrece es una referencia hídrica razonada, acompañada de la
 reglas que la han modificado y de las advertencias que deben revisarse antes de
 regar, en línea con el planteamiento híbrido descrito en el apartado 2.3
 (Navarro-Hellín et al., 2016; Zhai et al., 2020).
+Una dosis recomendada en una fecha anterior no se considera riego realizado ni
+se descuenta automáticamente de la necesidad de una fecha posterior.
 
 ## 5.1.1. Requisitos de partida
 
