@@ -7,7 +7,8 @@
 credenciales/
 secrets/
 
-# Datos (no se versionan los datos reales, solo la estructura)
+# Datos (solo se versiona una instantánea pública y acotada del piloto,
+# añadida explícitamente para reproducibilidad; el resto sigue excluido)
 data/raw/*
 data/interim/*
 data/processed/*
@@ -44,6 +45,7 @@ ENV/
 
 # Jupyter
 .ipynb_checkpoints/
+.test_tmp/
 
 # Apache Hop (logs y ficheros temporales de ejecución)
 *.hst

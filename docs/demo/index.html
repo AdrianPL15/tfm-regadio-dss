@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demostración del DSS de riego</title>
+  <style>
+    :root{font-family:system-ui,Segoe UI,sans-serif;color:#17344b;background:#eef4f5}*{box-sizing:border-box}
+    body{margin:0}header{background:#123b53;color:white;padding:20px max(24px,calc((100vw - 1220px)/2))}
+    h1{margin:0 0 4px;font-size:1.6rem}header p{margin:0;color:#cce0e8}
+    main{max-width:1220px;margin:24px auto;padding:0 18px;display:grid;grid-template-columns:300px 1fr;gap:18px}
+    aside,section{background:white;border:1px solid #d7e2e5;border-radius:12px;padding:20px;box-shadow:0 2px 8px #15374a0a}
+    label{display:block;font-weight:650;margin:15px 0 5px}input,select,button{font:inherit;width:100%;padding:9px;border:1px solid #acc4cb;border-radius:7px;background:white}
+    button{margin-top:17px;background:#146c88;border-color:#146c88;color:white;font-weight:700;cursor:pointer}button:hover{background:#0c526a}
+    .small{font-size:.87rem;color:#4c6877}.note{border-left:4px solid #df9d38;background:#fff8e9;padding:10px 12px;margin:12px 0}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.card{background:#edf5f7;padding:13px;border-radius:9px}
+    .card span{display:block;font-size:.81rem;color:#496777}.card strong{font-size:1.35rem}
+    h2{font-size:1.15rem;margin:22px 0 10px}.chart{display:flex;align-items:end;gap:11px;height:220px;border-bottom:1px solid #9cb3bd;padding:12px 4px 0}
+    .bar{flex:1;position:relative;background:#64a8be;border-radius:5px 5px 0 0;min-height:2px;text-align:center}
+    .bar b{position:absolute;bottom:100%;left:0;right:0;font-size:.75rem;padding-bottom:3px}.bar em{position:absolute;top:100%;left:0;right:0;font-size:.75rem;font-style:normal;padding-top:5px}
+    .tablewrap{overflow-x:auto;margin-top:24px}table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{padding:9px;border-bottom:1px solid #dde8ea;text-align:right}th:first-child,td:first-child{text-align:left}th{background:#e5f0f3}
+    details{margin-top:15px}summary{cursor:pointer;font-weight:650}.error{color:#a52b29;font-weight:700}
+    @media(max-width:850px){main{grid-template-columns:1fr}.cards{grid-template-columns:repeat(2,1fr)}}
+  </style>
+</head>
+<body>
+<header><h1>DSS de riego · caso piloto</h1><p>Pimiento al aire libre · estación SiAR AL01, La Mojonera · campaña 2025</p></header>
+<main>
+<aside>
+  <strong>Preparar una consulta</strong>
+  <p class="small">Datos oficiales versionados. No se conectan APIs ni se necesitan tokens.</p>
+  <form id="form">
+    <label for="fecha">Fecha de emisión</label><input id="fecha" name="fecha" type="date" min="2025-05-01" max="2025-09-30" value="2025-06-28" required>
+    <label for="horizonte">Horizonte</label><select id="horizonte" name="horizonte"><option value="1">1 día</option><option value="3">3 días</option><option value="7" selected>7 días</option></select>
+    <label for="sistema">Sistema de riego</label><select id="sistema" name="sistema"><option value="goteo">Goteo</option><option value="aspersion">Aspersión</option><option value="superficie">Superficie</option></select>
+    <label for="eficiencia">Eficiencia de aplicación</label><input id="eficiencia" name="eficiencia" type="number" min="0.30" max="1" step="0.01" value="0.90" required>
+    <label for="superficie">Superficie (ha)</label><input id="superficie" name="superficie" type="number" min="0.01" step="0.01" value="1.5" required>
+    <label for="dotacion">Dotación semanal (mm, opcional)</label><input id="dotacion" name="dotacion" type="number" min="0" step="0.1" placeholder="Sin límite">
+    <button type="submit">Calcular recomendación</button>
+  </form>
+  <p class="small">La consulta es retrospectiva. Prueba también a cambiar la eficiencia o a fijar una dotación de 20 mm.</p>
+</aside>
+<section aria-live="polite"><h2 id="title">Resultado</h2><div id="status">Calculando…</div><div id="content" hidden>
+  <div class="cards" id="cards"></div><div id="warnings"></div>
+  <h2>Dosis bruta diaria (mm)</h2><div class="chart" id="chart" role="img" aria-label="Gráfico de dosis bruta por día"></div>
+  <div class="tablewrap"><table><thead><tr><th>Fecha</th><th>Kc</th><th>Necesidad neta</th><th>Dosis bruta</th><th>Volumen m³</th><th>Confianza</th></tr></thead><tbody id="rows"></tbody></table></div>
+  <details><summary>Ver fundamento y reglas</summary><p id="method"></p><div id="explanations"></div></details>
+  <button id="download" type="button">Descargar resultado CSV</button>
+  <p class="note">Orientativo: se compara con la necesidad calculada por SiAR, no con riego real ni producción en campo. No sustituye una decisión agronómica.</p>
+  </div></section>
+</main>
+<script>
+const $=id=>document.getElementById(id), fmt=(v,n=2)=>v==null?'—':Number(v).toLocaleString('es-ES',{minimumFractionDigits:n,maximumFractionDigits:n});
+let latest=null;
+$('sistema').addEventListener('change',()=>{$('eficiencia').value={goteo:0.90,aspersion:0.75,superficie:0.60}[$('sistema').value]});
+async function run(ev){if(ev)ev.preventDefault();$('status').textContent='Calculando…';$('status').className='';$('content').hidden=true;
+  try{const q=new URLSearchParams(new FormData($('form')));const response=await fetch('/api/recommend?'+q);const data=await response.json();if(!response.ok)throw Error(data.error||'Consulta fallida');latest=data;
+    const s=data.summary; $('cards').innerHTML=[['Necesidad neta',fmt(s.net_need_total_mm)+' mm'],['Dosis bruta',fmt(s.gross_dose_total_mm)+' mm'],['Volumen',fmt(s.volume_total_m3,0)+' m³'],['Días calculados',s.days_with_recommendation+' / '+s.days_requested]].map(([a,b])=>`<div class="card"><span>${a}</span><strong>${b}</strong></div>`).join('');
+    $('warnings').replaceChildren();for(const w of data.warnings){const p=document.createElement('p');p.className='note';p.textContent=w;$('warnings').append(p)}
+    const max=Math.max(...data.daily.map(d=>d.gross_dose_mm||0),1);$('chart').replaceChildren();$('rows').replaceChildren();$('explanations').replaceChildren();
+    for(const d of data.daily){const label=d.date.slice(8,10)+'/'+d.date.slice(5,7);const bar=document.createElement('div');bar.className='bar';bar.style.height=(d.gross_dose_mm||0)/max*175+'px';bar.innerHTML=`<b>${fmt(d.gross_dose_mm,1)}</b><em>${label}</em>`;$('chart').append(bar);
+      const tr=document.createElement('tr');for(const v of [label,fmt(d.kc),fmt(d.net_need_mm),fmt(d.gross_dose_mm),fmt(d.volume_m3,0),d.confidence]){const td=document.createElement('td');td.textContent=v;tr.append(td)}$('rows').append(tr);
+      const p=document.createElement('p');p.textContent=d.explanation+' Reglas: '+d.rules_applied+(d.warnings?' Aviso: '+d.warnings:'');$('explanations').append(p)}
+    $('method').textContent='Método principal: '+s.main_method+' · eficiencia: '+fmt(s.efficiency*100,0)+' %. Fuente: '+(data.metadata.source||'SiAR')+'.';
+    $('title').textContent='Planificación emitida el '+q.get('fecha').split('-').reverse().join('/');$('status').textContent='';$('content').hidden=false;
+  }catch(e){$('status').textContent=e.message;$('status').className='error'}}
+$('form').addEventListener('submit',run);
+$('download').addEventListener('click',()=>{if(!latest)return;const cols=['date','kc','net_need_mm','gross_dose_mm','volume_m3','confidence','method','warnings'];const csv=[cols.join(';'),...latest.daily.map(d=>cols.map(k=>JSON.stringify(d[k]??'')).join(';'))].join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}));a.download='recomendacion_dss.csv';a.click();URL.revokeObjectURL(a.href)});
+run();
+</script>
+</body></html>

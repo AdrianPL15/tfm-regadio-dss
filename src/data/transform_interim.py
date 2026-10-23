@@ -80,6 +80,24 @@ def _load_latest(root: Path, pattern: str) -> tuple[dict[str, Any], Path]:
     return document, path
 
 
+def _load_siar_weather(root: Path, selected: Path | None) -> tuple[dict[str, Any], Path]:
+    """Exige una selección inequívoca del histórico meteorológico SiAR."""
+    if selected is None:
+        candidates = sorted(root.glob("siar/weather/daily/**/*.json"))
+        if len(candidates) != 1:
+            raise ValueError(
+                "Debe indicar --siar-weather-file cuando haya cero o varios "
+                "archivos meteorológicos SiAR en data/raw."
+            )
+        selected = candidates[0]
+    if not selected.is_file():
+        raise FileNotFoundError(f"No existe el raw meteorológico SiAR: {selected}.")
+    document = json.loads(selected.read_text(encoding="utf-8"))
+    if not isinstance(document, dict) or "data" not in document:
+        raise ValueError(f"El archivo {selected} no contiene un sobre raw válido.")
+    return document, selected
+
+
 def normalize_siar_daily(
     records: list[dict[str, Any]], *, ingested_at: str, source_file: str
 ) -> list[dict[str, Any]]:
@@ -490,12 +508,55 @@ def _calendar_gaps(rows: list[dict[str, Any]]) -> list[str] | None:
     return [value.isoformat() for value in sorted(expected - set(parsed))]
 
 
+def _select_crop_needs_file(external_root: Path, selected: Path | None) -> Path:
+    """Evita que un archivo recién copiado cambie el caso de estudio sin aviso."""
+    if selected is None:
+        candidates = sorted(external_root.glob("siar_necesidades_*.csv"))
+        if not candidates:
+            raise FileNotFoundError(
+                f"No se encontró un CSV de necesidades hídricas en {external_root}."
+            )
+        if len(candidates) > 1:
+            raise ValueError(
+                "Hay varios CSV de cultivo. Indique uno con --crop-needs-file; "
+                "no se selecciona por fecha de modificación."
+            )
+        selected = candidates[0]
+    if not selected.is_file():
+        raise FileNotFoundError(f"No existe el CSV de cultivo: {selected}.")
+    if not selected.with_suffix(".metadata.json").is_file():
+        raise FileNotFoundError(
+            f"Falta el fichero de metadatos asociado: {selected.with_suffix('.metadata.json')}."
+        )
+    return selected
+
+
+def _validate_case_alignment(
+    weather_rows: list[dict[str, Any]], crop_rows: list[dict[str, Any]]
+) -> None:
+    """Impide combinar sin aviso estaciones o campañas incompatibles."""
+    weather_stations = {row["station_code"] for row in weather_rows}
+    crop_stations = {row["station_code"] for row in crop_rows}
+    if not weather_stations or weather_stations != crop_stations:
+        raise ValueError(
+            "La estación del CSV de cultivo no coincide con la del raw SiAR."
+        )
+    weather_dates = {row["observed_date"] for row in weather_rows}
+    crop_dates = {row["observed_date"] for row in crop_rows}
+    if not weather_dates.intersection(crop_dates):
+        raise ValueError(
+            "El CSV de cultivo y el raw SiAR no comparten fechas de campaña."
+        )
+
+
 def transform_interim(
     raw_root: Path = DEFAULT_RAW_ROOT,
     interim_root: Path = DEFAULT_INTERIM_ROOT,
     external_root: Path = DEFAULT_EXTERNAL_ROOT,
+    crop_needs_file: Path | None = None,
+    siar_weather_file: Path | None = None,
 ) -> list[TableResult]:
-    siar_doc, siar_file = _load_latest(raw_root, "siar/weather/daily/**/*.json")
+    siar_doc, siar_file = _load_siar_weather(raw_root, siar_weather_file)
     daily_doc, daily_file = _load_latest(raw_root, "aemet/forecast/daily/**/*.json")
     hourly_doc, hourly_file = _load_latest(raw_root, "aemet/forecast/hourly/**/*.json")
 
@@ -515,19 +576,8 @@ def transform_interim(
         source_file=str(hourly_file),
     )
 
-    crop_needs_files = list(external_root.glob("siar_necesidades_*.csv"))
-    if not crop_needs_files:
-        raise FileNotFoundError(
-            "No se encontró el CSV de necesidades hídricas en data/external."
-        )
-    crop_needs_file = max(
-        crop_needs_files, key=lambda candidate: candidate.stat().st_mtime
-    )
+    crop_needs_file = _select_crop_needs_file(external_root, crop_needs_file)
     metadata_file = crop_needs_file.with_suffix(".metadata.json")
-    if not metadata_file.exists():
-        raise FileNotFoundError(
-            f"Falta el fichero de metadatos asociado: {metadata_file}."
-        )
     metadata = json.loads(metadata_file.read_text(encoding="utf-8"))
     with crop_needs_file.open("r", encoding="utf-8-sig", newline="") as stream:
         crop_needs_records = list(csv.DictReader(stream, delimiter=";"))
@@ -536,6 +586,7 @@ def transform_interim(
         metadata=metadata,
         source_file=str(crop_needs_file),
     )
+    _validate_case_alignment(siar_rows, crop_needs_rows)
 
     tables = [
         ("siar_weather_daily", siar_rows, SIAR_FIELDS, ("station_code", "observed_date")),
@@ -596,12 +647,23 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--raw-root", type=Path, default=DEFAULT_RAW_ROOT)
     parser.add_argument("--interim-root", type=Path, default=DEFAULT_INTERIM_ROOT)
     parser.add_argument("--external-root", type=Path, default=DEFAULT_EXTERNAL_ROOT)
+    parser.add_argument(
+        "--crop-needs-file", type=Path,
+        help="CSV oficial de necesidades del cultivo; obligatorio si hay varios candidatos.",
+    )
+    parser.add_argument(
+        "--siar-weather-file", type=Path,
+        help="Raw SiAR de la estación y campaña; obligatorio si hay varios candidatos.",
+    )
     return parser.parse_args()
 
 
 def main() -> None:
     args = _parse_args()
-    outputs = transform_interim(args.raw_root, args.interim_root, args.external_root)
+    outputs = transform_interim(
+        args.raw_root, args.interim_root, args.external_root,
+        args.crop_needs_file, args.siar_weather_file,
+    )
     print("Transformación completada.")
     for output in outputs:
         print(

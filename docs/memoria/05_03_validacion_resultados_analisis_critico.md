@@ -45,9 +45,11 @@ nadie la confunda con un error de cálculo.
 La vía por defecto del sistema promedia la ET0 de los días anteriores. Antes de
 fijar la longitud de esa ventana se evaluaron cinco alternativas, de uno a
 catorce días, simulando emisiones diarias con horizontes de uno a siete días.
-Para mantener la coherencia con el capítulo 4, se utilizó como prueba el mismo
-tramo reservado, del 8 al 30 de septiembre, y la selección se hizo únicamente
-con el periodo de desarrollo. Como criterio se fijó, antes de calcular los
+Para mantener la coherencia con el capítulo 4, se utilizó para la evaluación
+el mismo tramo, del 8 al 30 de septiembre, y la selección de ventana se hizo
+únicamente con el periodo de desarrollo. No se trata de una segunda prueba
+independiente: esas fechas ya habían sido consultadas en el experimento del
+capítulo 4. Como criterio se fijó, antes de calcular los
 resultados, elegir la ventana más corta cuyo error no superase al mínimo en más
 de un 1 %, porque una ventana corta reacciona antes ante un cambio de tiempo.
 
@@ -86,7 +88,9 @@ corresponden a fechas sin referencia publicada.
 | Prueba | DSS (ET0 reciente × Kc) | 23 | **0,090** | **0,113** | 0,047 |
 | Prueba | Persistencia | 23 | 0,120 | 0,156 | 0,000 |
 
-El sistema reduce el MAE respecto a la persistencia en un 7 % en desarrollo y
+Los 124 días de desarrollo comparables de esta tabla son uno menos que las 125
+etiquetas válidas del capítulo 4 porque la primera emisión se realiza el 2 de
+mayo y necesita información anterior. El sistema reduce el MAE respecto a la persistencia en un 7 % en desarrollo y
 en un 25 % en la prueba. La reducción es mayor en el RMSE, un 18 % en
 desarrollo, lo que indica que la mejora se concentra en los errores grandes. La
 Figura 5.3 ayuda a entenderlo. Los mayores errores de la persistencia se
@@ -129,6 +133,10 @@ nuevas y el error crece con la anticipación. La Figura 5.4 y la Tabla 5.5
 comparan la vía del sistema con una persistencia extendida, que repite la
 última necesidad conocida durante todo el horizonte y es el punto de partida
 habitual en predicción de series temporales (Hyndman & Athanasopoulos, 2021).
+Esta simulación empieza el 16 de mayo para exigir historia previa suficiente a
+todas las ventanas candidatas. Por ello, el día 1 de la Tabla 5.5 no usa
+exactamente las mismas emisiones de desarrollo que la Tabla 5.4 y sus MAE no
+deben coincidir; en la prueba ambas tablas sí abarcan las mismas 23 emisiones.
 
 ![Figura 5.4. MAE diario según el día del horizonte en los periodos de desarrollo y prueba.](../images/dss_horizonte_5_3.png)
 
@@ -162,12 +170,14 @@ sobre esa tendencia. El sistema mantiene la ventaja hasta el quinto día, la
 reduce en el sexto y pierde frente a la persistencia en el séptimo, con 0,134
 frente a 0,126 mm.
 
-Estos resultados justifican tres decisiones del diseño. La primera es ofrecer
-horizontes de hasta siete días, puesto que el error se mantiene acotado y
-nunca empeora de manera brusca. La segunda es asignar confianza baja a partir
-del cuarto día, porque es a partir de ahí cuando el comportamiento empieza a
-depender de la evolución del tiempo. La tercera es mostrar en cada día el error
-esperado de la tabla anterior mediante la regla R9, en lugar de presentar una
+Estos resultados permiten ofrecer horizontes de hasta siete días como
+planificación orientativa, aunque el séptimo día de la prueba pierde frente al
+baseline. La confianza baja desde el cuarto día es una regla prudencial de
+interfaz, no un umbral calibrado estadísticamente ni una probabilidad de
+acierto: reconoce que, sin pronóstico de ET0 validado, aumenta la exposición a
+cambios meteorológicos no observados. La regla R9 muestra el MAE histórico por
+día del horizonte, que no debe interpretarse como un intervalo de predicción
+individual ni como garantía para un nuevo cultivo o campaña. Así se evita presentar una
 semana entera con la misma apariencia de certeza. Una mejora real en los
 horizontes largos requiere una ET0 prevista, cuya vía ya está preparada en el
 motor.
@@ -203,7 +213,7 @@ y es también el más difícil de conocer con precisión. Aplicada sobre la
 necesidad neta de toda la campaña, la diferencia entre sistemas resulta
 considerable.
 
-**Tabla 5.6. Dosis bruta de la campaña según el sistema de riego.**
+**Tabla 5.6. Dosis bruta estimada para los 148 días con referencia válida de la campaña según el sistema de riego.**
 
 | Sistema | Eficiencia | Dosis bruta (mm) | Volumen (m3/ha) |
 |---|---:|---:|---:|
@@ -211,7 +221,10 @@ considerable.
 | Aspersión | 0,75 | 708,1 | 7.081 |
 | Superficie | 0,60 | 885,1 | 8.851 |
 
-Con la misma necesidad del cultivo, pasar del riego por goteo al de superficie
+La base de 531,05 mm netos procede solo de los días con referencia válida; no
+se imputa la demanda de las tres fechas ausentes ni de las dos observaciones
+sin ET0. Por tanto, los volúmenes de la tabla no son una estimación del total
+íntegro de los 153 días de calendario. Con la misma necesidad del cultivo, pasar del riego por goteo al de superficie
 supone aplicar un 50 % más de agua. Una desviación de diez puntos en la
 eficiencia introducida, por ejemplo usar 0,90 cuando la instalación real
 trabaja a 0,80, genera un error de alrededor del 12 % en la dosis bruta,
@@ -257,8 +270,9 @@ emitir recomendación. Este comportamiento responde a la idea, expuesta en el
 apartado 2.3, de que la incertidumbre debe formar parte de la salida.
 
 Las comprobaciones de la Tabla 5.7 se complementan con quince pruebas
-automáticas en `tests/test_dss_engine.py`, que se suman a las cuarenta
-existentes para las fases anteriores. Entre otras cosas, verifican que la
+automáticas en `tests/test_dss_engine.py`. Tras añadir controles de selección
+de archivos y compatibilidad de estación y campaña, la suite completa contiene
+61 pruebas. Entre otras cosas, verifican que la
 planificación no cambia si se alteran los datos posteriores a la fecha de
 emisión, que es la garantía formal de que el sistema no utiliza información
 futura.
@@ -333,7 +347,7 @@ El primer comando produce el informe completo
 (`docs/data_samples/dss_validation_5_3.json`), los errores por horizonte
 (`dss_horizon_errors_5_3.csv`), los escenarios (`dss_scenarios_5_3.csv`), el
 ejemplo del apartado 5.2 y las Figuras 5.3, 5.4 y 5.5. El segundo genera la
-Figura 5.1 y el tercero ejecuta las cincuenta y cinco pruebas automáticas del
+Figura 5.1 y el tercero ejecuta las sesenta y una pruebas automáticas del
 proyecto. La captura de la Figura 5.2 se obtiene arrancando la aplicación con
 `streamlit run src/dss/app_streamlit.py` y abriendo la dirección local con los
 parámetros `?fecha=2025-06-28&referencia=1`.

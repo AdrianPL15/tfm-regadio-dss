@@ -64,6 +64,7 @@ st.caption(
 with st.sidebar:
     st.header("Caso analizado")
     st.selectbox("Cultivo", [f"{case.crop} ({case.production_system.lower()})"], disabled=True)
+    st.caption("Sistema de cultivo del CSV pendiente de acreditación documental.")
     st.selectbox("Estación SiAR", [f"{case.station_code} {case.station_name} ({case.province})"],
                  disabled=True)
     st.caption("El piloto valida una combinación; el motor admite otras fuentes con el mismo formato.")
@@ -180,7 +181,7 @@ table = pd.DataFrame(
         "Avisos": daily["warnings"],
     }
 )
-st.dataframe(table, hide_index=True, use_container_width=True)
+st.dataframe(table, hide_index=True, width="stretch")
 
 with st.expander("Explicación de cada recomendación y reglas aplicadas"):
     for _, row in daily.iterrows():

@@ -1,26 +1,29 @@
 # 4.1. Extracción, transformación y almacenamiento de datos
 
-El sistema de apoyo a la decisión necesita combinar observaciones
-agroclimáticas históricas con predicciones meteorológicas. Para ello se ha
+La visión del sistema combina observaciones agroclimáticas históricas con
+predicciones meteorológicas. El piloto evaluado utiliza las primeras; las
+segundas constituyen una prueba de integración. Para ello se ha
 diseñado un proceso reproducible de extracción, transformación y almacenamiento
 que mantiene separadas las respuestas originales de las tablas preparadas para
 el análisis. Esta separación permite auditar cada recomendación, repetir el
 procesamiento cuando cambien las reglas y evitar que una corrección destruya el
 contenido recibido de la fuente.
 
-El piloto utiliza como referencia el pimiento al aire libre en Almería. Se ha
+El piloto plantea como referencia el pimiento al aire libre en Almería, con la
+correspondencia del CSV de SiAR a ese sistema aún pendiente de acreditar. Se ha
 extraído un ciclo completo del 1 de mayo al 30 de septiembre de 2025 para la
 estación SiAR `AL01` La Mojonera, junto con las necesidades hídricas del
-pimiento en esa misma estación y periodo. Las predicciones se obtienen para el
-municipio AEMET `04013` Almería. Esta configuración es un caso de validación y
-no una restricción fija del producto. El diseño conserva identificadores de
-fuente, estación, municipio, cultivo y tiempo para que la selección del usuario
-determine qué datos se consultan en cada ejecución.
+pimiento en esa misma estación y periodo. Se obtuvo una predicción de prueba
+para el municipio AEMET `04013` Almería en 2026; no alimenta la evaluación
+retrospectiva de 2025. Esta configuración es un caso de validación y no una
+restricción fija del producto. El diseño conserva identificadores de fuente,
+estación, municipio, cultivo y tiempo para preparar otros casos; la interfaz
+actual no ofrece esa selección.
 
 ![Flujo de procesamiento de datos del piloto](../images/procesamiento_datos_4_1.png)
 
-*Figura 4.1. ETL parametrizable desde la selección del usuario hasta la tabla
-analítica del piloto. Los gráficos inferiores utilizan datos reales de la
+*Figura 4.1. ETL del caso piloto desde su configuración hasta la tabla
+analítica. Los gráficos inferiores utilizan datos reales de la
 extracción del 24 de septiembre de 2026.*
 
 ## 4.1.1. Fuentes utilizadas
@@ -172,13 +175,18 @@ data/external/
 
 La partición por fuente, producto, estación o municipio y fecha permite realizar
 cargas incrementales sin sobrescribir ejecuciones anteriores. Los archivos raw
-no se almacenan en Git debido a su volumen. El repositorio conserva el código,
-las pruebas, los esquemas y la documentación necesarios para reproducirlos.
+de trabajo no se almacenan por defecto en Git. Como excepción se conserva una
+instantánea pública pequeña del piloto, con observaciones SiAR y una emisión
+AEMET, para reconstruir los resultados sin credenciales. Sus rutas, procedencia
+y huellas SHA-256 están en `docs/REPRODUCCION_PILOTO.md`.
 
 ## 4.1.5. Transformación y normalización
 
-El segundo proceso selecciona la extracción más reciente de cada producto y
-genera tablas planas. Las reglas implementadas son:
+El segundo proceso genera tablas planas. Si hay varios archivos meteorológicos
+SiAR o CSV de cultivo, exige una ruta explícita en lugar de escoger el último
+modificado; además, rechaza combinaciones sin estación o fechas en común. Para
+los productos AEMET de este piloto hay una única emisión por tipo. Las reglas
+implementadas son:
 
 1. Normalizar nombres en inglés técnico y formato `snake_case`.
 2. Mantener unidades explícitas en los nombres de las columnas.
@@ -202,8 +210,9 @@ genera tablas planas. Las reglas implementadas son:
 
 No se combinan todavía las observaciones SiAR con las predicciones AEMET. Una
 observación describe lo que ocurrió y una predicción describe lo que se esperaba
-en un momento concreto. La unión para evaluación se realizará posteriormente
-mediante fecha válida, fecha de emisión y horizonte.
+en un momento concreto. No se unieron en la evaluación de 2025 porque la
+predicción disponible se emitió en 2026. Una evaluación futura requerirá
+pronósticos históricos y una unión por fecha válida, emisión y horizonte.
 
 ## 4.1.6. Tablas interim
 
@@ -225,7 +234,7 @@ Ejemplo de la tabla diaria SiAR:
 | 02/05/2025 | 21,47 | 59,55 | 5,57 | PASS |
 | 03/05/2025 | 19,93 | 58,28 | 5,27 | PASS |
 
-Ejemplo de necesidades hídricas del pimiento:
+Ejemplo de necesidades hídricas del pimiento (cuatro fechas mensuales seleccionadas; no son filas consecutivas):
 
 | Fecha | Kc | ET0 (mm) | ETc (mm) | Pe (mm) | Necesidad neta (mm) |
 |---|---:|---:|---:|---:|---:|
@@ -234,7 +243,7 @@ Ejemplo de necesidades hídricas del pimiento:
 | 01/08/2025 | 1,00 | 5,26 | 5,26 | 0,00 | 5,26 |
 | 01/09/2025 | 0,30 | 4,56 | 1,37 | 0,00 | 1,37 |
 
-Ejemplo de la predicción diaria AEMET:
+Ejemplo de la predicción diaria AEMET (horizontes D+0, D+1, D+2 y D+4 seleccionados; D+3 no se muestra):
 
 | Fecha válida | Horizonte | Tmin (°C) | Tmax (°C) | Probabilidad máxima de lluvia |
 |---|---:|---:|---:|---:|
@@ -330,7 +339,7 @@ El proceso se reproduce mediante:
 ```powershell
 python -m src.data.extract_pilot
 python -m src.data.extract_siar_history --start-date 2025-05-01 --end-date 2025-09-30
-python -m src.data.transform_interim
+python -m src.data.transform_interim --siar-weather-file data/raw/siar/weather/daily/station=AL01/period=2025-05-01_2025-09-30/history__20260924T113344Z.json --crop-needs-file data/external/siar_necesidades_pimiento_AL01_2025.csv
 python -m src.analysis.build_etl_audit_4_1
 python -m src.visualization.build_etl_visual
 ```

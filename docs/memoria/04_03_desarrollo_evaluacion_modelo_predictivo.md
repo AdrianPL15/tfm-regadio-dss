@@ -16,7 +16,10 @@ trazabilidad entre extracción, preparación y modelización, y se evita repetir
 transformaciones con criterios diferentes. De los 150 días del ciclo, 148
 disponen de objetivo válido y participan en el experimento.
 
-Los nueve predictores utilizados son el coeficiente de cultivo conocido para
+De las 88 columnas de la tabla analítica no se introducen todas en los modelos:
+incluyen identificadores, campos de control, variables derivadas de la propia
+etiqueta y meteorología del día que no estaría disponible al emitir una
+predicción. Los nueve predictores utilizados son el coeficiente de cultivo conocido para
 la fecha; la codificación cíclica del día del año; los retardos de 1, 3 y 7 días
 de la necesidad neta; y sus acumulados históricos de 3, 7 y 14 días. Todos
 ellos están disponibles antes del día que se desea estimar. Los retardos se
@@ -37,13 +40,20 @@ al 30 de septiembre de 2025, se reservan como prueba final y no intervienen en
 la selección. Las 125 observaciones anteriores forman el periodo de desarrollo.
 Sobre este periodo se aplica una validación temporal con tres cortes y ventana
 expansiva: cada modelo aprende únicamente con el pasado y se valida sobre el
-bloque inmediatamente posterior.
+bloque inmediatamente posterior. Los tamaños de entrenamiento y validación
+son, respectivamente, 32/31, 63/31 y 94/31 observaciones; los tres bloques de
+validación cubren del 2 de junio al 7 de septiembre. Estos cortes reproducen
+consultas a un día con nuevas observaciones que se van conociendo, no una
+predicción de siete días sin actualizar entradas.
 
 Este diseño es más robusto que escoger un modelo mediante una sola partición,
 porque permite observar si su rendimiento se mantiene a medida que avanza el
-ciclo del cultivo. El bloque de prueba se consulta una sola vez después de
-seleccionar el enfoque con menor MAE medio de validación. Se fija la semilla 42
-y las predicciones se limitan a un mínimo físico de 0 mm/día.
+ciclo del cultivo. El bloque de prueba se consultó después de seleccionar el
+enfoque con menor MAE medio de validación para esta comparación de seis modelos.
+El capítulo 5 emplea posteriormente las mismas fechas para evaluar otro método,
+por lo que ese tramo no constituye una segunda prueba independiente de todo el
+proyecto. Se fija la semilla 42 y las predicciones se limitan a un mínimo físico
+de 0 mm/día.
 
 ## 4.3.3. Enfoques comparados
 
@@ -84,8 +94,12 @@ mejora estable y medible.
 El MAE diario es la métrica principal porque se interpreta directamente en
 milímetros y es menos sensible que el RMSE a episodios extremos. Se añaden el
 RMSE diario, el coeficiente R², el sesgo medio —positivo cuando se sobreestima y
-negativo cuando se infraestima— y el MAE de los acumulados semanales. Esta
-última métrica es coherente con el DSS, que debe ofrecer recomendaciones
+negativo cuando se infraestima— y el MAE de los acumulados semanales. En este
+apartado cada bloque semanal empieza en la primera fecha del corte evaluado y
+agrupa hasta siete días consecutivos de calendario; se comparan las sumas de
+referencia y predicción de esos bloques, incluido el último si es parcial.
+No equivale a las semanas naturales completas de lunes a domingo del apartado
+5.3.5. Esta última métrica es coherente con el DSS, que debe ofrecer recomendaciones
 diarias y semanales. El R² se interpreta con cautela: el tramo final presenta
 una variación reducida de la necesidad neta y puede producir valores negativos
 aunque el error absoluto sea pequeño. Por ello no se utiliza para seleccionar

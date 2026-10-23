@@ -469,7 +469,7 @@ def _apply_plot_style() -> None:
 
 def plot_predictions(predictions: pd.DataFrame, output: Path) -> None:
     dates = pd.to_datetime(predictions["observed_date"])
-    fig, axes = plt.subplots(2, 1, figsize=(10, 6.3), sharex=True, constrained_layout=True)
+    fig, axes = plt.subplots(2, 1, figsize=(10, 6.8), sharex=True)
     axes[0].plot(dates, predictions[TARGET], color="#111827", lw=2.2, marker="o", ms=3.5, label="Referencia SiAR")
     palette = {
         "persistence": "#2563EB",
@@ -483,7 +483,7 @@ def plot_predictions(predictions: pd.DataFrame, output: Path) -> None:
         axes[0].plot(dates, predictions[f"prediction_{name}_mm"], color=color, lw=1.5, label=MODEL_LABELS[name])
     axes[0].set_ylabel("Necesidad neta (mm/día)")
     axes[0].set_title("Predicciones en el tramo de prueba")
-    axes[0].legend(ncol=4, frameon=False, loc="upper center", fontsize=8)
+    legend_handles, legend_labels = axes[0].get_legend_handles_labels()
     axes[0].grid(axis="y")
     for name, color in palette.items():
         residual = predictions[f"prediction_{name}_mm"] - predictions[TARGET]
@@ -494,7 +494,10 @@ def plot_predictions(predictions: pd.DataFrame, output: Path) -> None:
     axes[1].grid(axis="y")
     axes[1].xaxis.set_major_locator(mdates.DayLocator(interval=3))
     axes[1].xaxis.set_major_formatter(mdates.DateFormatter("%d %b"))
-    fig.suptitle("Evaluación temporal del piloto de pimiento", fontsize=13, fontweight="bold")
+    fig.suptitle("Evaluación temporal del piloto de pimiento", fontsize=13, fontweight="bold", y=0.99)
+    fig.legend(legend_handles, legend_labels, ncol=4, frameon=False,
+               loc="upper center", bbox_to_anchor=(0.5, 0.955), fontsize=8)
+    fig.tight_layout(rect=(0, 0, 1, 0.88), h_pad=2.5)
     fig.savefig(output, dpi=200, bbox_inches="tight")
     plt.close(fig)
 

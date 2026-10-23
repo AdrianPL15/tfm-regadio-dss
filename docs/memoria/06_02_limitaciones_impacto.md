@@ -28,8 +28,9 @@ La tercera afecta a la capacidad predictiva. El sistema no dispone de una ET0
 prevista contrastada. AEMET está integrado y normalizado, pero sus predicciones
 no coinciden temporalmente con la campaña de 2025, y sin un histórico de
 emisiones no es posible calibrar ni evaluar una ET0 futura sin incurrir en fuga
-de información. En consecuencia, a partir del cuarto día del horizonte la
-recomendación depende de que el tiempo se mantenga, y en la prueba el sistema
+de información. En consecuencia, cualquier horizonte futuro depende de que el
+tiempo no cambie demasiado respecto al periodo reciente; el cuarto día se
+utiliza solo como umbral prudencial de aviso en la interfaz. En la prueba el sistema
 llega a perder frente a la persistencia en el séptimo día. Tampoco descuenta la
 lluvia prevista. Es una decisión prudente en un clima con 2,51 mm de
 precipitación efectiva en toda la campaña, pero en zonas más lluviosas
@@ -68,10 +69,11 @@ El impacto debe valorarse con la misma prudencia. El trabajo no ha demostrado
 ahorro de agua, y no podía hacerlo con el diseño adoptado. Conviene recordar,
 además, que una dosis menor en parcela no equivale necesariamente a un ahorro
 neto a escala de cuenca, porque parte de las pérdidas retorna al sistema
-hidrológico (Perry, 2007). Con esa salvedad, el proyecto tiene tres impactos
-verificables y uno potencial.
+hidrológico (Perry, 2007). Con esa salvedad, el proyecto presenta tres
+resultados observables en el prototipo y un impacto potencial. Ninguno de los
+tres primeros equivale a un beneficio cuantificado en una explotación real.
 
-El primero es operativo. El sistema transforma datos públicos y gratuitos en
+El primero es una capacidad funcional comprobada. El sistema transforma datos públicos y gratuitos en
 una dosis diaria y semanal expresada en milímetros y en metros cúbicos por
 parcela, acompañada de su explicación y sin necesidad de sensores. Su valor
 práctico se concentra en los cambios de fase. En la semana analizada en el
@@ -79,7 +81,8 @@ apartado 5.2.3, la persistencia habría planificado 6,77 mm menos de los que
 necesitó el cultivo, un 18 % de la referencia, justo al entrar en una fase de
 mayor demanda; el sistema se desvió un 4,9 %. Es el tipo de error que un
 calendario fijo o la repetición de la última dosis no ponen de manifiesto y que
-se traduce en un déficit hídrico precisamente cuando la demanda aumenta.
+podría traducirse en un déficit hídrico si se utilizara para decidir sin otros
+controles; el ejemplo retrospectivo no demuestra que ocurriera en una parcela.
 
 El segundo es un hallazgo que reordena las prioridades de mejora. El análisis
 de sensibilidad mostró que un error de diez puntos en la eficiencia de la

@@ -12,10 +12,11 @@ cobertura de los datos, no la falta de algoritmos.
 La primera mejora consiste en ampliar el conjunto con varias campañas, otras
 estaciones de Almería y, después, otros cultivos. La extracción meteorológica
 ya admite estación y periodo, pero las necesidades del cultivo se incorporan
-mediante un CSV descargado de la web de SiAR y sus metadatos. Antes de ampliar
-el piloto habrá que permitir seleccionar de forma explícita ese archivo y
-validar la correspondencia entre estación, cultivo y fechas; hoy la ETL toma
-el CSV más recientemente modificado. Las cuotas de la API afectan a la
+mediante un CSV descargado de la web de SiAR y sus metadatos. La ETL ya permite
+seleccionar explícitamente ese CSV y el raw meteorológico, y comprueba que
+coincidan estación y campaña. Antes de ampliar el piloto falta un catálogo de
+casos seleccionable en la interfaz y comprobar la aplicabilidad agronómica de
+cada calendario. Las cuotas de la API afectan a la
 descarga climática, mientras que los CSV de necesidades requieren una gestión
 separada y una nueva revisión de calidad. Con varias campañas
 podrá validarse por bloques completos, reservando campañas y estaciones enteras

@@ -83,9 +83,10 @@ que es el uso operativo, la ET0 y la precipitación efectiva del día que se
 quiere regar todavía no se conocen. Para ese caso se establecieron tres vías
 con un orden de preferencia fijo.
 
-La vía preferente utiliza una ET0 prevista cuando el usuario o la fuente la
-proporcionan, ya sea el producto pronosticado de SiAR o una estimación
-calculada a partir de la predicción de AEMET. La necesidad se obtiene
+La vía preferente utiliza una ET0 prevista cuando se proporciona como entrada
+explícita; el prototipo no descarga ni calcula automáticamente esta predicción.
+Los productos pronosticados de SiAR y una estimación derivada de AEMET son
+opciones de integración futura que requerirán calibración y validación. La necesidad se obtiene
 multiplicando esa ET0 por el Kc del día. La segunda vía, que es la que se
 emplea por defecto en el piloto porque no se dispone de un histórico de
 predicciones alineado con la campaña, sustituye la ET0 futura por la media de
@@ -169,8 +170,10 @@ ellas se asigna a cada día un nivel de confianza. Es alta cuando se trata de un
 día cerrado calculado con datos observados; media en los tres primeros días de
 una planificación sin incidencias; y baja a partir del cuarto día o cuando
 existe cualquier aviso, incluido el de datos con más de dos días de
-antigüedad. Los umbrales de horizonte se apoyan en los errores medidos en el
-apartado 5.3 y pueden ajustarse cuando se disponga de más campañas.
+antigüedad. El umbral del cuarto día es una convención conservadora de la
+interfaz, no una probabilidad calibrada a partir de datos. El apartado 5.3
+aporta los errores históricos por horizonte; harán falta más campañas para
+calibrar niveles de confianza o intervalos transferibles.
 
 ## 5.1.5. Estructura de la salida
 

@@ -8,9 +8,11 @@ ambientales, agronómicos e hidrológicos, estimara las necesidades de riego y
 las transformara en recomendaciones operativas, trazables y comprensibles. Al
 término del proyecto puede afirmarse que el objetivo se ha alcanzado como
 prueba de concepto y dentro de un caso acotado. El repositorio contiene una
-cadena completa y reproducible que parte de las APIs públicas de SiAR y AEMET y
-termina en una recomendación diaria y semanal, explicada y evaluada frente a
-una referencia oficial. Esa afirmación tiene un límite preciso: se ha
+cadena reproducible que parte de observaciones y necesidades de SiAR y termina
+en una recomendación diaria y semanal, explicada y evaluada frente a una
+referencia oficial. AEMET se extrajo y normalizó como prueba de integración,
+pero su predicción de 2026 no alimenta el motor evaluado con 2025. Esa
+afirmación tiene un límite preciso: se ha
 demostrado con una estación, un cultivo y una campaña, y frente a una necesidad
 calculada, no frente al riego aplicado ni a la respuesta del cultivo. La
 dimensión hidrológica del objetivo, además, se ha resuelto mediante una
@@ -35,7 +37,7 @@ valoración.
 | Desarrollar y comparar modelos predictivos | Apartado 4.3; seis enfoques con validación temporal | Cumplido | Comparación con métricas objetivas y prueba reservada. Ningún algoritmo de aprendizaje supera de forma estable a la persistencia. |
 | Diseñar una lógica de recomendación sobre cantidad y momento de riego | Apartado 5.1; motor con reglas R1 a R10 | Parcial | Resuelve cuánto regar a escala diaria y semanal, con eficiencia y dotación. El momento solo se trata mediante avisos de aplazamiento: sin balance hídrico del suelo no puede decidirse cuándo regar. |
 | Implementar un prototipo de aplicación o panel de visualización | Apartado 5.2; aplicación en Streamlit y línea de comandos | Cumplido | Aplicación funcional y reproducible. Cultivo y estación fijados en el caso piloto; Power BI o Tableau sustituidos de forma justificada; sin evaluación con usuarios. |
-| Evaluar el funcionamiento integral del sistema | Apartado 5.3; validación, 13 escenarios y 55 pruebas automáticas | Cumplido | Comparación con la referencia SiAR y con la persistencia, error por horizonte, coherencia semanal y robustez. Validación técnica, no externa ni de campo. |
+| Evaluar el funcionamiento integral del sistema | Apartado 5.3; validación, 13 escenarios y 61 pruebas automáticas | Cumplido | Comparación con la referencia SiAR y con la persistencia, error por horizonte, coherencia semanal y robustez. Validación técnica, no externa ni de campo. |
 
 El balance es de cuatro objetivos cumplidos y tres parciales. Las desviaciones
 no tienen una única causa: faltan datos hidrológicos y de parcela, diversidad
@@ -75,11 +77,13 @@ coherente con lo expuesto en el apartado 2.2: con un único ciclo de 148
 observaciones y una necesidad neta muy relacionada con el calendario del
 cultivo (su correlación con el Kc es de 0,93), los modelos más complejos no
 disponen de diversidad suficiente para demostrar una mejora estable. La
-fiabilidad de la comparación descansa en dos decisiones documentadas. La primera
+validez de la comparación de los seis enfoques del capítulo 4 descansa en dos decisiones documentadas. La primera
 fue excluir la ET0, la ETc y la precipitación efectiva del mismo día, que
 habrían permitido reconstruir el objetivo de forma algebraica y producir
 métricas aparentemente excelentes. La segunda, seleccionar el enfoque antes de
-consultar la prueba final. Leídos conjuntamente, los capítulos 4 y 5 respaldan
+consultar la prueba final. El método ET0 reciente × Kc se desarrolló y evaluó
+después usando las mismas fechas de septiembre; su resultado no constituye una
+validación independiente adicional. Leídos conjuntamente, los capítulos 4 y 5 respaldan
 el planteamiento híbrido del apartado 2.3: con pocos datos, el conocimiento
 agronómico explícito aporta más que el algoritmo, y el aprendizaje automático
 encuentra su lugar como corrección de una referencia física, no como sustituto
@@ -101,7 +105,7 @@ La cuarta aportación es la reproducibilidad. El repositorio conserva los datos
 del piloto, los informes de evaluación y los módulos que generan las
 principales evidencias cuantitativas y visualizaciones de los capítulos 4 y 5;
 el README documenta los comandos separados
-para ejecutar cada fase. Las cincuenta y cinco pruebas automáticas se han
+para ejecutar cada fase. Las sesenta y una pruebas automáticas se han
 ejecutado correctamente en el entorno local del proyecto y el motor de
 recomendación puede utilizar el CSV oficial versionado sin nuevas credenciales.
 Así, el lector puede comprobar la correspondencia entre la memoria y el código,
