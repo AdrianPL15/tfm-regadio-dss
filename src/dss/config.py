@@ -62,6 +62,7 @@ class CropCase:
     metadata_file: Path = DEFAULT_CROP_METADATA
     community: str = "Andalucía"
     region: str = "Dalias"
+    aemet_municipality_code: str = "04013"
 
 
 DEMO_CASES: tuple[CropCase, ...] = (
@@ -76,6 +77,7 @@ DEMO_CASES: tuple[CropCase, ...] = (
         metadata_file=Path("data/external/siar_necesidades_maiz_Z06_2025.metadata.json"),
         community="Aragón",
         region="Ejea de los Caballeros",
+        aemet_municipality_code="50095",
     ),
     CropCase(
         crop="Algodón",
@@ -87,6 +89,7 @@ DEMO_CASES: tuple[CropCase, ...] = (
         metadata_file=Path("data/external/siar_necesidades_algodon_BA08_2025.metadata.json"),
         community="Extremadura",
         region="Don Benito",
+        aemet_municipality_code="06044",
     ),
 )
 
@@ -102,6 +105,9 @@ class RecommendationRequest:
     area_ha: float | None = None
     weekly_allocation_mm: float | None = None
     mode: str = "planificacion"
+    # Hipótesis explícita del usuario para un escenario condicionado a lluvia;
+    # None conserva la dosis base, sin atribuir a AEMET lluvia efectiva medida.
+    rain_effective_fraction: float | None = None
     case: CropCase = field(default_factory=CropCase)
 
     def resolved_efficiency(self) -> float:
@@ -130,3 +136,5 @@ class RecommendationRequest:
             raise ValueError("La dotación semanal no puede ser negativa.")
         if self.mode not in {"planificacion", "seguimiento"}:
             raise ValueError("El modo debe ser 'planificacion' o 'seguimiento'.")
+        if self.rain_effective_fraction is not None and not 0 <= self.rain_effective_fraction <= 1:
+            raise ValueError("La fracción efectiva hipotética de lluvia debe estar entre 0 y 1.")

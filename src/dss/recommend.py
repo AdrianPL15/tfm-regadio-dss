@@ -11,8 +11,9 @@ import argparse
 from datetime import date
 from pathlib import Path
 
-from src.dss.config import IRRIGATION_EFFICIENCY, MAX_HORIZON_DAYS, RecommendationRequest
-from src.dss.data_access import load_forecast
+from src.dss.config import DEMO_CASES, IRRIGATION_EFFICIENCY, MAX_HORIZON_DAYS, RecommendationRequest
+from src.dss.aemet_forecast import fetch_live_forecast, require_current_forecast
+from src.dss.data_access import load_case, load_forecast
 from src.dss.engine import recommend
 
 
@@ -32,12 +33,34 @@ def _parse_args() -> argparse.Namespace:
                         choices=["planificacion", "seguimiento"])
     parser.add_argument("--prevision", type=Path, default=None,
                         help="CSV opcional con ET0 o lluvia prevista por fecha.")
+    parser.add_argument("--aemet-live", action="store_true",
+                        help="Consulta AEMET actual; solo se permite para la fecha de hoy.")
+    parser.add_argument("--caso", choices=[case.station_code for case in DEMO_CASES],
+                        default=DEMO_CASES[0].station_code)
+    parser.add_argument("--fraccion-lluvia", type=float, default=None,
+                        help="Fracción efectiva HIPOTÉTICA 0–1 para escenario condicionado.")
     parser.add_argument("--salida", type=Path, default=Path("results/reports"))
     return parser.parse_args()
 
 
 def main() -> None:
     args = _parse_args()
+    if args.prevision is not None and args.aemet_live:
+        raise ValueError("Indique un CSV de previsión o AEMET actual, no ambos.")
+    case = next(case for case in DEMO_CASES if case.station_code == args.caso)
+    if args.aemet_live:
+        if args.fecha != date.today():
+            raise ValueError("La consulta AEMET actual solo puede usarse con la fecha de hoy.")
+        history, _ = load_case(case)
+        if not history["date"].dt.date.eq(args.fecha).any():
+            raise ValueError(
+                "La serie SiAR del caso no cubre hoy. Actualice el ciclo y las observaciones "
+                "antes de generar una dosis con AEMET actual."
+            )
+        forecast = fetch_live_forecast(case.aemet_municipality_code)
+        require_current_forecast(forecast, args.fecha)
+    else:
+        forecast = load_forecast(args.prevision)
     request = RecommendationRequest(
         issue_date=args.fecha,
         horizon_days=args.horizonte,
@@ -46,8 +69,10 @@ def main() -> None:
         area_ha=args.superficie,
         weekly_allocation_mm=args.dotacion,
         mode=args.modo,
+        rain_effective_fraction=args.fraccion_lluvia,
+        case=case,
     )
-    result = recommend(request, forecast=load_forecast(args.prevision))
+    result = recommend(request, forecast=forecast)
     paths = result.save(args.salida, stem=f"recomendacion_{args.fecha:%Y%m%d}")
 
     print(f"Recomendación emitida el {args.fecha:%d/%m/%Y} ({args.modo})")

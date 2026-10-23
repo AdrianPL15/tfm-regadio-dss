@@ -12,7 +12,7 @@ La visión del producto permite que el usuario elija ubicación, cultivo y perio
 | Probar el prototipo | [Demo pública en Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía de uso y despliegue](docs/STREAMLIT_DESPLIEGUE.md); como alternativa, [demo local](docs/DEMO_TFM.md) |
 | Ver qué datos entraron y cómo se transformaron | [Guía de reproducción](docs/REPRODUCCION_PILOTO.md) y [auditoría de coherencia](docs/AUDITORIA_COHERENCIA_2026-10-22.md) |
 
-La demo pública se comprobó el 23/10/2026 desde un navegador sin iniciar sesión en Streamlit. La ampliación a tres casos queda descrita en [datos y alcance de la demo](docs/DEMO_CASOS_SIAR_2025.md); utiliza CSV versionados y no solicita claves de SiAR ni AEMET.
+La demo pública se comprobó el 23/10/2026 desde un navegador sin iniciar sesión en Streamlit. La ampliación a tres casos queda descrita en [datos y alcance de la demo](docs/DEMO_CASOS_SIAR_2025.md); las recomendaciones retrospectivas utilizan CSV versionados y no solicitan claves. La nueva [integración AEMET](docs/INTEGRACION_AEMET_DSS.md) permite consultar la predicción actual cuando se configura una clave por separado y explorar escenarios de lluvia condicionados. La versión pública puede tardar en reflejar estos cambios hasta que la rama se fusione y despliegue.
 
 ## Autoría
 
@@ -113,6 +113,7 @@ El resumen de la sesión del apartado 4.2 está en [`docs/RESUMEN_SESION_2026-09
 El desarrollo, los resultados y el resumen del apartado 4.3 están en [`docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md`](docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md), [`docs/data_samples/model_evaluation_4_3.json`](docs/data_samples/model_evaluation_4_3.json) y [`docs/RESUMEN_SESION_2026-09-28_LUISM_4_3.md`](docs/RESUMEN_SESION_2026-09-28_LUISM_4_3.md).
 
 La ampliación reproducible a maíz y algodón, con sus métricas y figuras, está en [`docs/EVALUACION_MAIZ_ALGODON_2025.md`](docs/EVALUACION_MAIZ_ALGODON_2025.md).
+La incorporación inicial de AEMET al motor, las pruebas de escenario y la captura de previsiones emitidas se describen en [`docs/INTEGRACION_AEMET_DSS.md`](docs/INTEGRACION_AEMET_DSS.md).
 El cierre conjunto de los capítulos 3 y 4 tras la revisión del tutor se recoge en [`docs/RESUMEN_SESION_2026-10-07.md`](docs/RESUMEN_SESION_2026-10-07.md).
 El diseño del motor de recomendación, la aplicación y la validación del capítulo 5 están en [`docs/memoria/05_01_diseno_sistema_recomendacion.md`](docs/memoria/05_01_diseno_sistema_recomendacion.md), [`docs/memoria/05_02_aplicacion_visualizacion_resultados.md`](docs/memoria/05_02_aplicacion_visualizacion_resultados.md) y [`docs/memoria/05_03_validacion_resultados_analisis_critico.md`](docs/memoria/05_03_validacion_resultados_analisis_critico.md), con el informe reproducible en [`docs/data_samples/dss_validation_5_3.json`](docs/data_samples/dss_validation_5_3.json) y el resumen de trabajo en [`docs/RESUMEN_SESION_2026-10-12_CAPITULO_5.md`](docs/RESUMEN_SESION_2026-10-12_CAPITULO_5.md).
 Las conclusiones del capítulo 6 están en [`docs/memoria/06_01_cumplimiento_objetivos_aportaciones.md`](docs/memoria/06_01_cumplimiento_objetivos_aportaciones.md), [`docs/memoria/06_02_limitaciones_impacto.md`](docs/memoria/06_02_limitaciones_impacto.md) y [`docs/memoria/06_03_mejoras_lineas_futuras.md`](docs/memoria/06_03_mejoras_lineas_futuras.md).

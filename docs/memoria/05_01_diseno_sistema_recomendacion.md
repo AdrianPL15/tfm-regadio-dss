@@ -122,6 +122,17 @@ cultivo sin agua en pleno verano. El sistema opta por mantener la dosis y
 avisar de que conviene aplazar el riego y recalcular cuando se conozca la
 precipitación real.
 
+Como ampliación experimental posterior a la validación principal, el motor
+admite un escenario condicionado por una cantidad de lluvia prevista y una
+fracción aprovechable introducida explícitamente por el usuario. Presenta la
+necesidad antes del ajuste y la dosis resultante, junto con un aviso de que la
+fracción es hipotética y debe recalcularse tras la lluvia real. No se interpreta
+como precipitación efectiva medida ni como recomendación agronómica validada.
+La conexión AEMET conserva la fecha de emisión y solo puede emplearse para
+fechas contemporáneas; las predicciones actuales no se combinan con el piloto
+histórico de 2025. Los detalles y límites se documentan en
+`docs/INTEGRACION_AEMET_DSS.md`.
+
 ## 5.1.4. Reglas de decisión
 
 Sobre la estimación se aplica un conjunto de diez reglas, numeradas para que
@@ -179,12 +190,14 @@ calibrar niveles de confianza o intervalos transferibles.
 
 ## 5.1.5. Estructura de la salida
 
-Cada consulta genera una tabla diaria con dieciocho campos y un resumen del
+Cada consulta genera una tabla diaria con veintidós campos y un resumen del
 horizonte. La tabla incluye la fecha, el día del horizonte, el Kc, la ET0
 utilizada y su origen, la necesidad neta, el método, la persistencia como
 referencia, la dosis bruta, el factor de dotación, el volumen, la confianza,
 las reglas aplicadas, los avisos, la explicación, la fecha del último dato
-observado y el archivo de origen. El resumen agrega los totales, el método
+observado y el archivo de origen. La ampliación opcional añade la necesidad
+anterior a la lluvia hipotética, la fracción efectiva supuesta y la fecha de
+emisión de la previsión cuando existe. El resumen agrega los totales, el método
 principal, la eficiencia aplicada y el número de días con avisos. La cabecera
 conserva la versión del motor, los parámetros de la consulta, la URL de la
 fuente y la fecha de descarga. Todo ello se exporta en CSV y JSON, lo que
@@ -197,7 +210,7 @@ necesidad neta estimada es de 6,2 mm a partir de una ET0 media reciente de 6,84
 mm y un Kc de 0,90, y que con una eficiencia del 90 % la dosis bruta propuesta
 es de 6,8 mm, unos 103 m3 para una parcela de 1,5 ha. La frase no añade
 información que no esté en los datos, pero permite que el usuario compruebe el
-razonamiento sin interpretar una tabla de dieciocho columnas.
+razonamiento sin interpretar una tabla extensa.
 
 ## 5.1.6. Decisiones descartadas
 
