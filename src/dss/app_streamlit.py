@@ -341,8 +341,8 @@ else:
 
 if horizon > 1:
     st.subheader(
-        f"{'Periodo histórico' if historical_view else 'Próximos días'} "
-        f"· {horizon} días · orientación"
+        f"{'Periodo histórico de' if historical_view else 'Próximos'} "
+        f"{horizon} días · orientación"
     )
     col1, col2, col3 = st.columns(3)
     col1.metric("Riego total estimado", f"{fmt_es(summary['gross_dose_total_mm'])} L/m²")
