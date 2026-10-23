@@ -2,6 +2,8 @@
 
 La app conserva tres casos SiAR de 2025 para la evaluación retrospectiva y añade cuatro CSV de 2026 ([inventario](CAMPANAS_SIAR_2026.md)). La consulta AEMET actual requiere su API key configurada como secreto. La demo está publicada en [Streamlit Community Cloud](https://tfm-regadio-dss-adrianpl15.streamlit.app/); permite escoger comunidad, provincia, cultivo, estación y campaña solo entre las combinaciones descargadas. La estimación de mañana se ofrece únicamente cuando la campaña sigue activa y el último dato SiAR es reciente.
 
+La pantalla separa la **dosis del primer día** de la **suma provisional de hasta siete días**. Expresa la primera en mm, L/m², m³/ha y m³ para la superficie introducida (`1 mm = 1 L/m² = 10 m³/ha`). El acumulado no debe interpretarse como una orden de riego para toda la semana: el Kc futuro es una proyección limitada al mes, la ET0 se estima a partir de observaciones recientes y AEMET puede no publicar mm completos para todos los días. La predicción meteorológica se renueva con el botón; los CSV SiAR versionados siguen siendo una instantánea y requieren una nueva descarga para avanzar la fecha observada.
+
 ## Configuración de publicación
 
 El despliegue se creó el 23/10/2026 desde el fork de Adrián en [Streamlit Community Cloud](https://share.streamlit.io/) con esta configuración:
@@ -27,13 +29,13 @@ Guardar el secreto y reiniciar la app si no se actualiza sola. No copiar el arch
 ## Comprobación del despliegue
 
 1. Abrir la URL pública y verificar que carga sin errores. **Comprobado el 23/10/2026** también desde un navegador separado sin iniciar sesión.
-2. Confirmar los valores iniciales para el 28/06/2025, horizonte de siete días, goteo, eficiencia 0,90 y 1,5 ha: **39,0 mm netos**, **43,3 mm brutos** y **649 m³** en pantalla. El motor conserva mayor precisión: 38,96 mm, 43,29 mm y 649,4 m³.
+2. Para la campaña 2025 y el 28/06/2025, horizonte de siete días, goteo, eficiencia 0,90 y 1,5 ha, verificar en el bloque **panorama provisional** **39,0 mm netos**, **43,3 mm brutos** y **649 m³**. El motor conserva mayor precisión: 38,96 mm, 43,29 mm y 649,4 m³. La dosis destacada del primer día es distinta del acumulado.
 3. Cambiar el sistema de riego a aspersión. **Comprobado:** 39,0 mm netos sin cambio y 52,0 mm brutos con eficiencia de 0,75.
 4. Activar una dotación semanal de 20 mm. **Comprobado:** la dosis bruta se limita a 20,0 mm y se muestra una advertencia de déficit.
 5. Abrir el desplegable de reglas aplicadas. **Comprobado:** explica ET0, Kc, eficiencia y volumen por día.
 6. Descargar y abrir el CSV para verificar su contenido antes de la entrega; el botón está disponible, pero esta comprobación del fichero sigue pendiente.
 7. Seleccionar Aragón → Zaragoza → Maíz → Z06 y Extremadura → Badajoz → Algodón → BA08. **Comprobado localmente y en el enlace público el 23/10/2026**, sin errores: para 28/06/2025, siete días y los parámetros iniciales, maíz muestra 50,4 mm netos / 56,0 mm brutos y algodón 47,9 mm netos / 53,2 mm brutos.
-8. **Cambio aún no desplegado en la URL pública:** activar en la rama de integración el escenario manual de 8 mm y fracción hipotética del 50 %. La prueba local muestra 35,0 mm netos y 38,9 mm brutos condicionados, frente a 39,0/43,3 mm de la dosis base. La consulta AEMET real muestra la predicción actual, pero no modifica la campaña 2025. Tras fusionar y desplegar, repetir esta comprobación en la URL.
+8. Activar el escenario manual de 8 mm y fracción hipotética del 50 %. La prueba local previa mostraba 35,0 mm netos y 38,9 mm brutos condicionados, frente a 39,0/43,3 mm de la dosis base. La consulta AEMET actual no debe modificar la campaña 2025. Queda pendiente repetir esta comprobación tras cada despliegue.
 
 La URL figura en la primera pantalla del `README.md`. Falta incorporarla al anexo de la versión final de la memoria, junto con una fecha de consulta y la advertencia de alcance del piloto. Si la app se suspende por inactividad, puede tardar unos segundos en reactivarse.
 
