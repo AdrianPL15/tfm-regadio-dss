@@ -1,4 +1,4 @@
-"""Actualiza las cuatro instantáneas 2026 de necesidades netas desde SiAR Web.
+"""Actualiza las seis instantáneas 2026 de necesidades netas desde SiAR Web.
 
 La web pública usa formulario, sesión y CSRF. No es la API SiAR documentada;
 este adaptador valida identidad, calendario y coincidencia histórica antes de
@@ -35,6 +35,8 @@ CASES = (
     "siar_necesidades_coliflor_AL01_2026",
     "siar_necesidades_maiz_Z06_2026",
     "siar_necesidades_algodon_BA08_2026",
+    "siar_necesidades_alfalfa_Z06_2026",
+    "siar_necesidades_alcachofa_BA08_2026",
 )
 HEADERS = ("Fecha", "Kc", "ET0", "ETc", "Pe", "ETc - Pe")
 HEADER_ALIASES = {"ET0 (mm)": "ET0", "ETc (mm)": "ETc", "Pe (mm)": "Pe", "ETc - Pe (mm)": "ETc - Pe"}
@@ -232,7 +234,7 @@ def _atomic_write(path: Path, content: bytes) -> None:
 
 
 def refresh(today: date, check: bool = False, data_dir: Path = DATA_DIR) -> list[str]:
-    """Prepara los cuatro casos antes de escribir cualquiera de ellos."""
+    """Prepara los seis casos antes de escribir cualquiera de ellos."""
     staged = []
     report = []
     with requests.Session() as session:

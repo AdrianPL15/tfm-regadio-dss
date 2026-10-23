@@ -76,8 +76,8 @@ class LoadCropNeedsTests(unittest.TestCase):
 
 class DemoCaseTests(unittest.TestCase):
     def test_case_sources_and_metadata_match(self):
-        self.assertEqual(len(DEMO_CASES), 7)
-        self.assertEqual(len({case.source_file for case in DEMO_CASES}), 7)
+        self.assertEqual(len(DEMO_CASES), 9)
+        self.assertEqual(len({case.source_file for case in DEMO_CASES}), 9)
         for case in DEMO_CASES:
             with self.subTest(case=case.crop):
                 history, metadata = load_case(case)
