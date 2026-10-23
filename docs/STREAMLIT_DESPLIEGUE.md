@@ -26,7 +26,7 @@ La rama principal contiene también `environment.yml` y `requirements.txt` para 
 4. Activar una dotación semanal de 20 mm. **Comprobado:** la dosis bruta se limita a 20,0 mm y se muestra una advertencia de déficit.
 5. Abrir el desplegable de reglas aplicadas. **Comprobado:** explica ET0, Kc, eficiencia y volumen por día.
 6. Descargar y abrir el CSV para verificar su contenido antes de la entrega; el botón está disponible, pero esta comprobación del fichero sigue pendiente.
-7. Seleccionar Aragón → Zaragoza → Maíz → Z06 y Extremadura → Badajoz → Algodón → BA08. **Comprobado localmente** con la prueba de interfaz, sin excepciones: para 28/06/2025, siete días y los parámetros iniciales, maíz muestra 50,4 mm netos / 56,0 mm brutos y algodón 47,9 mm netos / 53,2 mm brutos. La comprobación del enlace público queda pendiente tras publicar la ampliación multicaso.
+7. Seleccionar Aragón → Zaragoza → Maíz → Z06 y Extremadura → Badajoz → Algodón → BA08. **Comprobado localmente y en el enlace público el 23/10/2026**, sin errores: para 28/06/2025, siete días y los parámetros iniciales, maíz muestra 50,4 mm netos / 56,0 mm brutos y algodón 47,9 mm netos / 53,2 mm brutos.
 
 La URL figura en la primera pantalla del `README.md`. Falta incorporarla al anexo de la versión final de la memoria, junto con una fecha de consulta y la advertencia de alcance del piloto. Si la app se suspende por inactividad, puede tardar unos segundos en reactivarse.
 
