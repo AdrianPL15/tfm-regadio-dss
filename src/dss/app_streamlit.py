@@ -126,7 +126,15 @@ with st.sidebar:
         format="DD/MM/YYYY",
         key=f"fecha_{case.station_code}_{case.crop}_{case.campaign_year}",
     )
-    horizon = st.slider("Horizonte (días)", 1, MAX_HORIZON_DAYS, 1 if live_case else 7)
+    horizon = st.slider(
+        "Horizonte orientativo (días)", 1, MAX_HORIZON_DAYS,
+        MAX_HORIZON_DAYS if live_case else 7,
+    )
+    if live_case and issue == tomorrow:
+        st.caption(
+            "El primer día es la recomendación principal. Los siguientes son una "
+            "previsión provisional, que conviene recalcular con nuevos datos SiAR y AEMET."
+        )
     if case.campaign_year == date.today().year and not live_case:
         st.caption(
             "La campaña de este cultivo no está activa mañana según SiAR; "
@@ -176,7 +184,8 @@ with st.sidebar:
 st.subheader("Predicción municipal AEMET actual")
 st.caption(
     "La predicción corresponde al municipio, no a la estación SiAR ni a la parcela. "
-    "Solo se aplica a una recomendación de mañana con SiAR 2026 reciente y cultivo en ciclo."
+    "Solo se aplica al horizonte futuro de un cultivo en ciclo con SiAR 2026 reciente. "
+    "AEMET se renueva al pulsar el botón; los CSV SiAR de esta demo no se actualizan solos."
 )
 if st.button("Consultar AEMET ahora"):
     try:
@@ -268,20 +277,55 @@ daily = result.daily.copy()
 for warning in result.warnings:
     st.warning(warning)
 
-col1, col2, col3, col4 = st.columns(4)
-col1.metric("Necesidad neta", f"{fmt_es(summary['net_need_total_mm'])} mm")
-col2.metric(
-    "Dosis bruta condicionada" if use_scenario else "Dosis bruta propuesta",
-    f"{fmt_es(summary['gross_dose_total_mm'])} mm",
-)
-col3.metric(
-    "Volumen estimado",
-    f"{fmt_es(summary['volume_total_m3'], 0)} m³" if summary["volume_total_m3"] else "sin superficie",
-)
-col4.metric(
-    "Días con recomendación",
-    f"{summary['days_with_recommendation']} de {summary['days_requested']}",
-)
+first = daily.iloc[0]
+st.subheader(f"Riego propuesto para el {first['date']:%d/%m/%Y}")
+if pd.notna(first["gross_dose_mm"]):
+    dose = float(first["gross_dose_mm"])
+    first_volume = first["volume_m3"]
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Dosis a aplicar", f"{fmt_es(dose)} mm")
+    col2.metric("Equivale a", f"{fmt_es(dose)} L/m²")
+    col3.metric("Por hectárea", f"{fmt_es(dose * 10, 0)} m³/ha")
+    col4.metric(
+        f"Para tu parcela ({fmt_es(area, 2)} ha)",
+        f"{fmt_es(first_volume, 0)} m³" if pd.notna(first_volume) else "indica superficie",
+    )
+    st.caption(
+        f"La necesidad neta del cultivo es {fmt_es(first['net_need_mm'])} mm. "
+        "La dosis bruta incorpora la eficiencia del sistema; si limitas la dotación, "
+        "la cantidad propuesta puede quedar por debajo y se advierte del déficit. "
+        "1 mm de riego = 1 litro por m² = 10 m³ por hectárea."
+    )
+else:
+    st.warning("No hay datos suficientes para proponer una dosis para el primer día.")
+
+if horizon > 1:
+    st.subheader(f"Panorama provisional de {horizon} días")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Necesidad neta acumulada", f"{fmt_es(summary['net_need_total_mm'])} mm")
+    col2.metric("Riego acumulado estimado", f"{fmt_es(summary['gross_dose_total_mm'])} mm")
+    col3.metric(
+        "Volumen para tu parcela",
+        f"{fmt_es(summary['volume_total_m3'], 0)} m³"
+        if summary["volume_total_m3"] is not None else "indica superficie",
+    )
+    col4.metric(
+        "Días calculables",
+        f"{summary['days_with_recommendation']} de {summary['days_requested']}",
+    )
+    if live_case and issue == tomorrow:
+        st.warning(
+            "Los días posteriores a mañana son orientativos: se mantiene temporalmente "
+            "el último Kc SiAR dentro del mismo mes, la ET0 se estima con observaciones "
+            "recientes y la lluvia solo se descuenta cuando AEMET aporta mm horarios "
+            "completos. Una lluvia sin cantidad disponible no significa lluvia cero. "
+            "Recalcula antes de regar cada día."
+        )
+    if summary["days_with_recommendation"] < summary["days_requested"]:
+        st.warning(
+            "El acumulado solo suma los días calculables; no representa una dosis "
+            "para todo el horizonte seleccionado."
+        )
 
 left, right = st.columns([3, 2])
 with left:
@@ -325,7 +369,10 @@ table = pd.DataFrame(
         "Necesidad neta (mm)": daily["net_need_mm"].map(lambda v: fmt_es(v, 2)),
         "Necesidad sin lluvia hipotética (mm)": daily["base_need_before_rain_mm"].map(lambda v: fmt_es(v, 2)),
         "Lluvia prevista/hipotética (mm)": daily["precipitation_forecast_mm"].map(lambda v: fmt_es(v, 2)),
-        "Dosis bruta (mm)": daily["gross_dose_mm"].map(lambda v: fmt_es(v, 2)),
+        "Dosis a aplicar (mm = L/m²)": daily["gross_dose_mm"].map(lambda v: fmt_es(v, 2)),
+        "Por hectárea (m³/ha)": daily["gross_dose_mm"].map(
+            lambda v: fmt_es(v * 10, 1) if pd.notna(v) else "sin dato"
+        ),
         "Volumen (m³)": daily["volume_m3"].map(lambda v: fmt_es(v, 0)),
         "Confianza": daily["confidence"],
         "Avisos": daily["warnings"],

@@ -12,7 +12,7 @@ La visión del producto permite que el usuario elija ubicación, cultivo y perio
 | Probar el prototipo | [Demo pública en Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía de uso y despliegue](docs/STREAMLIT_DESPLIEGUE.md); como alternativa, [demo local](docs/DEMO_TFM.md) |
 | Ver qué datos entraron y cómo se transformaron | [Guía de reproducción](docs/REPRODUCCION_PILOTO.md) y [auditoría de coherencia](docs/AUDITORIA_COHERENCIA_2026-10-22.md) |
 
-La demo pública se comprobó el 23/10/2026 desde un navegador sin iniciar sesión en Streamlit. Los [datos de 2026 y su alcance](docs/CAMPANAS_SIAR_2026.md) complementan los [casos retrospectivos de 2025](docs/DEMO_CASOS_SIAR_2025.md). La [integración AEMET](docs/INTEGRACION_AEMET_DSS.md) permite consultar la predicción actual cuando se configura una clave por separado y explorar escenarios de lluvia condicionados. La versión pública puede tardar en reflejar estos cambios hasta que la rama se fusione y despliegue.
+La demo pública se comprobó el 23/10/2026 desde un navegador sin iniciar sesión en Streamlit. Los [datos de 2026 y su alcance](docs/CAMPANAS_SIAR_2026.md) complementan los [casos retrospectivos de 2025](docs/DEMO_CASOS_SIAR_2025.md). La app separa la dosis del primer día del panorama provisional de hasta siete días y traduce los mm de riego a L/m², m³/ha y m³ para la parcela. La [integración AEMET](docs/INTEGRACION_AEMET_DSS.md) permite consultar la predicción actual cuando se configura una clave por separado; los CSV SiAR versionados requieren actualización explícita, no se refrescan solos.
 
 ## Autoría
 
