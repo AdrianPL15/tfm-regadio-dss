@@ -12,17 +12,19 @@ from src.dss.live_calendar import extend_recent_kc
 
 
 class Campaign2026Tests(unittest.TestCase):
-    def test_all_four_official_series_are_present_and_stop_at_last_published_day(self):
+    def test_all_six_official_series_are_present_and_start_from_verified_snapshot(self):
         cases = [case for case in DEMO_CASES if case.campaign_year == 2026]
-        self.assertEqual(len(cases), 4)
-        counts = {"Pimiento": 175, "Coliflor": 144, "Maíz": 205, "Algodón": 205}
+        self.assertEqual(len(cases), 6)
+        counts = {"Pimiento": 175, "Coliflor": 144, "Maíz": 205,
+                  "Algodón": 205, "Alfalfa": 236, "Alcachofa": 295}
         for case in cases:
             with self.subTest(case=case.crop):
                 history, metadata = load_case(case)
-                self.assertEqual(len(history), counts[case.crop])
+                self.assertGreaterEqual(len(history), counts[case.crop])
                 self.assertEqual(metadata["record_count"], len(history))
-                self.assertEqual(history["date"].max().date(), date(2026, 10, 22))
-                self.assertEqual(metadata["last_returned_date"], "2026-10-22")
+                self.assertGreaterEqual(history["date"].max().date(), date(2026, 10, 22))
+                self.assertEqual(metadata["last_returned_date"],
+                                 history["date"].max().date().isoformat())
                 self.assertFalse(history["date"].duplicated().any())
 
     def test_october_maize_and_cotton_are_not_projected_as_active_crops(self):
@@ -44,6 +46,20 @@ class Campaign2026Tests(unittest.TestCase):
         wet = recommend(request, history=extended, metadata=metadata, forecast=rain)
         self.assertAlmostEqual(dry.daily["net_need_mm"].iat[0] - wet.daily["net_need_mm"].iat[0], 2.0)
         self.assertIn("Kc futuro", wet.daily["warnings"].iat[0])
+
+    def test_three_regions_have_different_active_crops_on_pilot_date(self):
+        cases = [case for case in DEMO_CASES if case.campaign_year == 2026
+                 and case.crop in {"Coliflor", "Alfalfa", "Alcachofa"}]
+        self.assertEqual({case.province for case in cases}, {"Almería", "Zaragoza", "Badajoz"})
+        for case in cases:
+            with self.subTest(case=case.crop):
+                history, metadata = load_case(case)
+                extended = extend_recent_kc(
+                    history, metadata, target_day=date(2026, 10, 24),
+                    as_of=date(2026, 10, 23),
+                )
+                self.assertEqual(extended.iloc[-1]["record_status"], "kc_proyectado_mes")
+                self.assertGreater(float(extended.iloc[-1]["kc"]), 0)
 
 
 if __name__ == "__main__":

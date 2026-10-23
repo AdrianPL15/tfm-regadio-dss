@@ -48,7 +48,7 @@ jobs:
           else
             git switch -c codex/siar-diario-2026
           fi
-      - name: Descargar y validar cuatro casos
+      - name: Descargar y validar seis casos
         if: steps.campaign.outputs.active == 'true'
         run: python -m src.data.refresh_siar_crop_needs
       - name: Probar lectura de los CSV resultantes

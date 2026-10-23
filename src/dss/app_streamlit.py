@@ -48,6 +48,20 @@ def _absolute(path: Path) -> Path:
     return path if path.is_absolute() else ROOT / path
 
 
+def _active_for_tomorrow(item: CropCase) -> bool:
+    """Selecciona un ejemplo vigente; el dato real se verifica otra vez al cargarlo."""
+    today = date.today()
+    if item.campaign_year != today.year:
+        return False
+    history, metadata = _load(str(_absolute(item.source_file)), str(_absolute(item.metadata_file)))
+    last = history.iloc[-1]
+    return (
+        (today + timedelta(days=1)).month in metadata.get("active_months", [])
+        and last["record_status"] == "completo"
+        and float(last["kc"]) > 0
+    )
+
+
 params = st.query_params
 try:
     default_issue = date.fromisoformat(params.get("fecha", "2025-06-28"))
@@ -76,7 +90,10 @@ with st.sidebar:
     )
     province_cases = [item for item in community_cases if item.province == province]
     crop_options = list(dict.fromkeys(item.crop for item in province_cases))
-    preferred_crop = "Coliflor" if date.today().month == 10 and "Coliflor" in crop_options else crop_options[0]
+    preferred_crop = next(
+        (item.crop for item in province_cases if _active_for_tomorrow(item)),
+        crop_options[0],
+    )
     crop = st.selectbox("Cultivo", crop_options, index=crop_options.index(preferred_crop))
     crop_cases = [item for item in province_cases if item.crop == crop]
     station_codes = [item.station_code for item in crop_cases]
@@ -136,6 +153,7 @@ with st.sidebar:
         case.campaign_year == date.today().year
         and tomorrow.month in metadata.get("active_months", [])
         and 0 <= (date.today() - last_day).days <= 2
+        and history["record_status"].iloc[-1] == "completo"
         and float(history["kc"].iloc[-1]) > 0
     )
     issue_key = f"fecha_{case.station_code}_{case.crop}_{case.campaign_year}"
@@ -183,10 +201,17 @@ with st.sidebar:
             "previsión provisional, que conviene recalcular con nuevos datos SiAR y AEMET."
         )
     if case.campaign_year == date.today().year and not live_case:
-        st.caption(
-            "La campaña de este cultivo no está activa mañana según SiAR; "
-            "mostramos un día histórico con Kc positivo, sin aplicar AEMET actual."
-        )
+        if tomorrow.month not in metadata.get("active_months", []) or float(history["kc"].iloc[-1]) <= 0:
+            st.warning(
+                "No hay predicción actual: este cultivo figura fuera de su periodo "
+                "de ciclo en SiAR (Kc nulo o mes no activo). Hay datos históricos, "
+                "pero no se aplicará la previsión AEMET de hoy."
+            )
+        else:
+            st.warning(
+                "No hay predicción actual: falta una observación SiAR reciente y "
+                "completa. Prueba a actualizar las fuentes."
+            )
 
     st.header("Parcela")
     system = st.selectbox("Sistema de riego", list(IRRIGATION_EFFICIENCY), index=0)
@@ -312,7 +337,13 @@ for warning in result.warnings:
     st.warning(warning)
 
 first = daily.iloc[0]
-st.subheader(f"Riego propuesto para el {first['date']:%d/%m/%Y}")
+historical_view = case.campaign_year != date.today().year or not live_case or issue != tomorrow
+st.subheader(
+    f"{'Ejemplo histórico de riego' if historical_view else 'Riego propuesto'} "
+    f"para el {first['date']:%d/%m/%Y}"
+)
+if historical_view:
+    st.caption("Esta cifra corresponde a un día pasado; no es una dosis para regar mañana.")
 if pd.notna(first["gross_dose_mm"]):
     dose = float(first["gross_dose_mm"])
     first_volume = first["volume_m3"]

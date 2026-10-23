@@ -144,6 +144,32 @@ DEMO_CASES: tuple[CropCase, ...] = (
         aemet_municipality_code="06044",
         campaign_year=2026,
     ),
+    CropCase(
+        crop="Alfalfa",
+        production_system="No acreditado",
+        station_code="Z06",
+        station_name="Ejea de los Caballeros",
+        province="Zaragoza",
+        source_file=Path("data/external/siar_necesidades_alfalfa_Z06_2026.csv"),
+        metadata_file=Path("data/external/siar_necesidades_alfalfa_Z06_2026.metadata.json"),
+        community="Aragón",
+        region="Ejea de los Caballeros",
+        aemet_municipality_code="50095",
+        campaign_year=2026,
+    ),
+    CropCase(
+        crop="Alcachofa",
+        production_system="No acreditado",
+        station_code="BA08",
+        station_name="Don Benito",
+        province="Badajoz",
+        source_file=Path("data/external/siar_necesidades_alcachofa_BA08_2026.csv"),
+        metadata_file=Path("data/external/siar_necesidades_alcachofa_BA08_2026.metadata.json"),
+        community="Extremadura",
+        region="Don Benito",
+        aemet_municipality_code="06044",
+        campaign_year=2026,
+    ),
 )
 
 
