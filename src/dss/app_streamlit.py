@@ -37,7 +37,7 @@ from src.dss.live_calendar import extend_recent_kc  # noqa: E402
 st.set_page_config(page_title="DSS de riego", layout="wide")
 
 
-@st.cache_data
+@st.cache_data(ttl=900)
 def _load(source: str, metadata: str):
     case = CropCase(source_file=Path(source), metadata_file=Path(metadata))
     return load_case(case)
