@@ -68,15 +68,10 @@ try:
 except ValueError:
     default_issue = date(2025, 6, 28)
 
-st.title("Sistema de apoyo a la decisión para el riego")
+st.title("¿Cuánto regar?")
 st.caption(
-    "Prototipo del TFM. La recomendación es orientativa y debe contrastarse con "
-    "el estado real de la parcela y el criterio técnico."
-)
-st.caption(
-    "Conservamos las campañas SiAR de 2025 para evaluación y añadimos datos "
-    "observados de 2026. Para un cultivo activo, se puede estimar mañana con "
-    "ET0 reciente, Kc proyectado y la predicción AEMET emitida hoy."
+    "Elige cultivo y zona a la izquierda. Verás una dosis orientativa para tu parcela; "
+    "confírmala con el estado real del cultivo y el criterio técnico."
 )
 
 with st.sidebar:
@@ -253,23 +248,9 @@ with st.sidebar:
         ) / 100
         st.caption("La fracción es orientativa. Solo se descuenta si AEMET cubre las 24 horas de mañana con mm numéricos.")
 
-st.subheader("Fuentes actuales: SiAR y AEMET")
-st.caption(
-    "El botón de la izquierda consulta SiAR y AEMET para la combinación seleccionada. "
-    "SiAR se usa en memoria y no altera el CSV versionado en GitHub. La predicción "
-    "AEMET corresponde al municipio, no a la estación SiAR ni a la parcela. "
-    "Solo se aplica al horizonte futuro de un cultivo en ciclo con SiAR reciente."
-)
 live_forecast = st.session_state.get(aemet_key)
 forecast_input = None
 if live_forecast is not None:
-    visible = live_forecast[[
-        "date", "precipitation_probability_pct", "precipitation_mm",
-        "precipitation_hours_covered", "precipitation_amount_status",
-    ]].copy()
-    visible["date"] = visible["date"].dt.strftime("%d/%m/%Y")
-    st.dataframe(visible, hide_index=True, width="stretch")
-    st.caption(f"Emisión AEMET: {live_forecast['issued_at'].iat[0]}; municipio {case.aemet_municipality_code}.")
     if issue == tomorrow and live_case and not use_scenario:
         try:
             require_current_forecast(live_forecast, date.today())
@@ -280,10 +261,6 @@ if live_forecast is not None:
             forecast_input.loc[incomplete, "precipitation_mm"] = float("nan")
         except ValueError as error:
             st.warning(str(error))
-    else:
-        st.info("Esta fecha no es mañana dentro de un ciclo SiAR vigente: AEMET se muestra, pero no se aplica al cálculo histórico.")
-elif live_case and issue == tomorrow and not use_scenario:
-    st.info("Pulsa «Actualizar fuentes y generar recomendación» para considerar la previsión de lluvia de mañana; mientras tanto se muestra la dosis base.")
 
 if use_scenario:
     forecast_input = pd.DataFrame({
@@ -304,22 +281,6 @@ request = RecommendationRequest(
     case=case,
 )
 
-st.info(
-    f"Caso seleccionado: **{case.crop} · {case.station_code} {case.station_name} "
-    f"({case.province}, {case.community})**. Serie diaria del "
-    f"{first_day:%d/%m/%Y} al {last_day:%d/%m/%Y} "
-    f"({metadata.get('record_count', len(history))} registros descargados)."
-)
-if case.campaign_year == 2025 and case.crop in {"Maíz", "Algodón"}:
-    st.caption(
-        "Este caso dispone de una evaluación temporal predictiva adicional, "
-        "independiente por cultivo; no acredita ahorro ni precisión en campo."
-    )
-st.caption(
-    "El CSV SiAR identifica cultivo y estación, pero no acredita el sistema de "
-    "producción concreto (por ejemplo, aire libre o invernadero)."
-)
-
 try:
     calculation_history = (
         extend_recent_kc(history, metadata, target_day=issue, as_of=date.today(), horizon_days=horizon)
@@ -333,48 +294,61 @@ except ValueError as error:
 summary = result.summary
 daily = result.daily.copy()
 
+st.caption(
+    f"{case.crop} · {case.station_name} ({case.province}) · "
+    f"Parcela de {fmt_es(area, 2)} ha"
+)
 for warning in result.warnings:
     st.warning(warning)
 
 first = daily.iloc[0]
 historical_view = case.campaign_year != date.today().year or not live_case or issue != tomorrow
 st.subheader(
-    f"{'Ejemplo histórico de riego' if historical_view else 'Riego propuesto'} "
-    f"para el {first['date']:%d/%m/%Y}"
+    f"{'Ejemplo histórico' if historical_view else 'Riego recomendado'} "
+    f"· {first['date']:%d/%m/%Y}"
 )
 if historical_view:
-    st.caption("Esta cifra corresponde a un día pasado; no es una dosis para regar mañana.")
+    st.warning("Esta cifra es de un día pasado. No es una dosis para regar mañana.")
 if pd.notna(first["gross_dose_mm"]):
     dose = float(first["gross_dose_mm"])
     first_volume = first["volume_m3"]
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Dosis a aplicar", f"{fmt_es(dose)} mm")
-    col2.metric("Equivale a", f"{fmt_es(dose)} L/m²")
-    col3.metric("Por hectárea", f"{fmt_es(dose * 10, 0)} m³/ha")
-    col4.metric(
-        f"Para tu parcela ({fmt_es(area, 2)} ha)",
+    col1, col2, col3 = st.columns([2, 1, 1])
+    col1.metric("Agua por metro cuadrado", f"{fmt_es(dose)} L/m²")
+    col2.metric("Para tu parcela",
         f"{fmt_es(first_volume, 0)} m³" if pd.notna(first_volume) else "indica superficie",
     )
+    col3.metric("Por hectárea", f"{fmt_es(dose * 10, 0)} m³/ha")
     st.caption(
-        f"La necesidad neta del cultivo es {fmt_es(first['net_need_mm'])} mm. "
-        "La dosis bruta incorpora la eficiencia del sistema; si limitas la dotación, "
-        "la cantidad propuesta puede quedar por debajo y se advierte del déficit. "
-        "1 mm de riego = 1 litro por m² = 10 m³ por hectárea."
+        f"Equivale a {fmt_es(dose)} mm de lámina de agua. "
+        f"Necesidad neta del cultivo: {fmt_es(first['net_need_mm'])} mm. "
+        "La dosis indicada considera la eficiencia del riego."
     )
+    if live_case and issue == tomorrow and not use_scenario:
+        if forecast_input is None:
+            st.info(
+                "Esta dosis todavía no descuenta lluvia prevista. Pulsa «Actualizar fuentes y "
+                "generar recomendación» para incorporar los datos de AEMET."
+            )
+        elif pd.isna(first["precipitation_forecast_mm"]):
+            st.info("AEMET no aporta una cantidad de lluvia completa para mañana; no se descuenta lluvia.")
+        else:
+            st.caption(
+                f"Lluvia prevista para mañana: {fmt_es(first['precipitation_forecast_mm'])} mm "
+                f"(fracción aprovechable supuesta: {fmt_es(rain_fraction * 100, 0)} %)."
+            )
 else:
     st.warning("No hay datos suficientes para proponer una dosis para el primer día.")
 
 if horizon > 1:
-    st.subheader(f"Panorama provisional de {horizon} días")
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Necesidad neta acumulada", f"{fmt_es(summary['net_need_total_mm'])} mm")
-    col2.metric("Riego acumulado estimado", f"{fmt_es(summary['gross_dose_total_mm'])} mm")
-    col3.metric(
-        "Volumen para tu parcela",
+    st.subheader(f"Próximos {horizon} días · orientación")
+    col1, col2, col3 = st.columns(3)
+    col1.metric("Riego total estimado", f"{fmt_es(summary['gross_dose_total_mm'])} L/m²")
+    col2.metric(
+        "Para tu parcela en total",
         f"{fmt_es(summary['volume_total_m3'], 0)} m³"
         if summary["volume_total_m3"] is not None else "indica superficie",
     )
-    col4.metric(
+    col3.metric(
         "Días calculables",
         f"{summary['days_with_recommendation']} de {summary['days_requested']}",
     )
@@ -392,25 +366,28 @@ if horizon > 1:
             "para todo el horizonte seleccionado."
         )
 
-left, right = st.columns([3, 2])
-with left:
-    st.subheader("Recomendación diaria")
-    fig, axis = plt.subplots(figsize=(7.5, 3.2))
-    labels = daily["date"].dt.strftime("%d/%m")
-    axis.bar(labels, daily["gross_dose_mm"], color="#5FA8D3", label="Dosis bruta")
-    axis.plot(labels, daily["net_need_mm"], color="#E07A1F", marker="o", label="Necesidad neta")
-    if show_reference:
-        reference = daily["date"].map(history.set_index("date")["net_need_mm"])
-        axis.plot(labels, reference, color="#1B4965", marker="s", ls="--",
-                  label="Referencia SiAR")
-    axis.set_ylabel("mm/día")
-    axis.spines[["top", "right"]].set_visible(False)
-    axis.legend(frameon=False, fontsize=8)
-    st.pyplot(fig)
-    plt.close(fig)
+st.subheader("Riego día a día")
+fig, axis = plt.subplots(figsize=(7.5, 3.2))
+labels = daily["date"].dt.strftime("%d/%m")
+axis.bar(labels, daily["gross_dose_mm"], color="#5FA8D3", label="Dosis propuesta")
+axis.plot(labels, daily["net_need_mm"], color="#E07A1F", marker="o", label="Necesidad neta")
+if show_reference:
+    reference = daily["date"].map(history.set_index("date")["net_need_mm"])
+    axis.plot(labels, reference, color="#1B4965", marker="s", ls="--",
+              label="Referencia SiAR")
+axis.set_ylabel("L/m² al día (equivale a mm)")
+axis.spines[["top", "right"]].set_visible(False)
+axis.legend(frameon=False, fontsize=8)
+st.pyplot(fig)
+plt.close(fig)
 
-with right:
-    st.subheader("Fundamento")
+with st.expander("¿De dónde sale esta recomendación?"):
+    st.write(
+        f"Caso SiAR: {case.crop} · {case.station_code} {case.station_name} "
+        f"({case.province}, {case.community}). Datos del {first_day:%d/%m/%Y} "
+        f"al {last_day:%d/%m/%Y} "
+        f"({metadata.get('record_count', len(history))} registros)."
+    )
     method = summary["main_method"]
     st.markdown(f"**Método principal:** {METHOD_LABELS.get(method, 'sin método')}")
     st.markdown(f"**Eficiencia aplicada:** {fmt_es(summary['efficiency'] * 100, 0)} %")
@@ -424,8 +401,36 @@ with right:
         f"{metadata.get('retrieved_at', 'sin fecha')}"
     )
     st.markdown(f"**Último dato observado:** {daily['data_last_observed'].iat[0] or 'ninguno'}")
+    if case.campaign_year == 2025 and case.crop in {"Maíz", "Algodón"}:
+        st.caption(
+            "Este caso tiene una evaluación temporal predictiva adicional, independiente "
+            "por cultivo; no acredita ahorro ni precisión en campo."
+        )
+    st.caption(
+        "El CSV SiAR identifica cultivo y estación, pero no acredita el sistema de "
+        "producción concreto (por ejemplo, aire libre o invernadero)."
+    )
+    st.caption(
+        "Para cultivos activos, el botón consulta SiAR y AEMET. SiAR se usa en memoria "
+        "y no altera el CSV de GitHub. La previsión AEMET corresponde al municipio, "
+        "no a la parcela, y solo se aplica a fechas futuras compatibles."
+    )
 
-st.subheader("Detalle por día")
+if live_forecast is not None:
+    with st.expander("Ver previsión recibida de AEMET"):
+        if issue != tomorrow or not live_case or use_scenario:
+            st.info("Esta previsión se muestra como referencia, pero no se aplica al cálculo histórico o al escenario manual.")
+        visible = live_forecast[[
+            "date", "precipitation_probability_pct", "precipitation_mm",
+            "precipitation_hours_covered", "precipitation_amount_status",
+        ]].copy()
+        visible["date"] = visible["date"].dt.strftime("%d/%m/%Y")
+        st.dataframe(visible, hide_index=True, width="stretch")
+        st.caption(
+            f"Emisión AEMET: {live_forecast['issued_at'].iat[0]}; "
+            f"municipio {case.aemet_municipality_code}."
+        )
+
 table = pd.DataFrame(
     {
         "Fecha": daily["date"].dt.strftime("%d/%m/%Y"),
@@ -443,9 +448,8 @@ table = pd.DataFrame(
         "Avisos": daily["warnings"],
     }
 )
-st.dataframe(table, hide_index=True, width="stretch")
-
-with st.expander("Explicación de cada recomendación y reglas aplicadas"):
+with st.expander("Ver tabla detallada y reglas de cálculo"):
+    st.dataframe(table, hide_index=True, width="stretch")
     for _, row in daily.iterrows():
         st.markdown(f"- {row['explanation']}  \n  *Reglas:* {row['rules_applied']}")
 
