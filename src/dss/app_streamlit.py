@@ -60,6 +60,10 @@ st.caption(
     "Prototipo del TFM. La recomendación es orientativa y debe contrastarse con "
     "el estado real de la parcela y el criterio técnico."
 )
+st.caption(
+    "Demostración retrospectiva del pimiento en Almería (campaña 2025). "
+    "Utiliza el CSV SiAR versionado; no consulta APIs ni requiere tokens."
+)
 
 with st.sidebar:
     st.header("Caso analizado")
@@ -124,7 +128,7 @@ for warning in result.warnings:
     st.warning(warning)
 
 col1, col2, col3, col4 = st.columns(4)
-col1.metric("Necesidad neta del horizonte", f"{fmt_es(summary['net_need_total_mm'])} mm")
+col1.metric("Necesidad neta", f"{fmt_es(summary['net_need_total_mm'])} mm")
 col2.metric("Dosis bruta propuesta", f"{fmt_es(summary['gross_dose_total_mm'])} mm")
 col3.metric(
     "Volumen estimado",

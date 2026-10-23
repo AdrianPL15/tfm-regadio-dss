@@ -86,8 +86,7 @@ Para reproducir el entorno de Python se puede usar indistintamente `environment.
 12. Construir el conjunto modelable en `data/processed` con `python -m src.features.feature_engineering` y generar el análisis exploratorio con `python -m src.analysis.build_eda_4_2`.
 13. Entrenar y comparar Persistencia, Ridge, Random Forest, KNN, SVR y XGBoost con `python -m src.models.train_evaluate`.
 14. Obtener una recomendación de riego con `python -m src.dss.recommend --fecha 2025-06-28 --horizonte 7 --superficie 1.5`. La salida diaria y el resumen se guardan en CSV y JSON en `results/reports`. Este paso puede ejecutarse sin nuevas credenciales utilizando el CSV oficial versionado.
-15. Abrir la aplicación de demostración con `streamlit run src/dss/app_streamlit.py`.
-    Si no se dispone de Streamlit, abrir la [demostración local sin dependencia de presentación](docs/DEMO_TFM.md) con `python -m scripts.demo_local`; utiliza el mismo motor y permite probar el caso piloto en el navegador.
+15. Abrir la aplicación de demostración con `streamlit run src/dss/app_streamlit.py`. Para compartirla mediante un enlace público, seguir la [guía de despliegue en Streamlit Community Cloud](docs/STREAMLIT_DESPLIEGUE.md). La interfaz utiliza el CSV piloto versionado y no requiere tokens. Si no se dispone de Streamlit, abrir la [demostración local](docs/DEMO_TFM.md) con `python -m scripts.demo_local`; utiliza el mismo motor y permite probar el caso piloto en el navegador.
 16. Regenerar la validación del sistema, sus tablas y figuras con `python -m src.analysis.build_validation_5_3` y el esquema del motor con `python -m src.visualization.build_dss_visual`.
 17. Ejecutar las pruebas automáticas con `python -m unittest discover -s tests`.
 
