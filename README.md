@@ -2,7 +2,7 @@
 
 Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apoyo a la decisión (DSS) orientado a estimar las necesidades de riego de distintos tipos de cultivo a partir de variables meteorológicas, agrometeorológicas e hidrológicas, con el fin de ofrecer recomendaciones de riego comprensibles y trazables para agricultores, cooperativas y gestores de explotaciones.
 
-La visión del producto permite que el usuario elija ubicación, cultivo y periodo para determinar las fuentes y los datos necesarios. El prototipo actual integra SiAR y AEMET mediante una ETL en Python con almacenamiento local por capas, pero la aplicación trabaja con un caso fijo: pimiento en la estación `AL01` La Mojonera (Almería), durante la campaña de 2025. Se plantea como piloto **al aire libre**, pero la correspondencia del CSV de SiAR con ese sistema de cultivo queda pendiente de documentar con la fuente específica del equipo. La extracción climática admite estación y periodo; la selección automática de varios CSV de cultivo aún no está implementada. La incorporación del Boletín Hidrológico del MITECO, la persistencia en MySQL y el cuadro de mando forman parte de la arquitectura objetivo. El sistema está pensado para apoyar, y no sustituir, el criterio agronómico del usuario final.
+La visión del producto permite que el usuario elija ubicación, cultivo y periodo para determinar las fuentes y los datos necesarios. El prototipo actual integra SiAR y AEMET mediante una ETL en Python con almacenamiento local por capas. La aplicación de demostración ofrece tres combinaciones versionadas de SiAR de 2025: pimiento en `AL01` La Mojonera (Almería), maíz en `Z06` Ejea de los Caballeros (Zaragoza) y algodón en `BA08` Don Benito (Badajoz). **No** hay aún selección automática para cualquier estación/cultivo de España ni evaluación de los modelos en los casos nuevos; las métricas del TFM pertenecen al piloto pimiento–AL01. Su encuadre como cultivo al aire libre sigue pendiente de documentar con la fuente específica del equipo. La incorporación del Boletín Hidrológico del MITECO, la persistencia en MySQL y el cuadro de mando forman parte de la arquitectura objetivo. El sistema está pensado para apoyar, y no sustituir, el criterio agronómico del usuario final.
 
 ## Empezar por aquí
 
@@ -12,7 +12,7 @@ La visión del producto permite que el usuario elija ubicación, cultivo y perio
 | Probar el prototipo | [Demo pública en Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía de uso y despliegue](docs/STREAMLIT_DESPLIEGUE.md); como alternativa, [demo local](docs/DEMO_TFM.md) |
 | Ver qué datos entraron y cómo se transformaron | [Guía de reproducción](docs/REPRODUCCION_PILOTO.md) y [auditoría de coherencia](docs/AUDITORIA_COHERENCIA_2026-10-22.md) |
 
-La demo pública se comprobó el 23/10/2026 desde un navegador sin iniciar sesión en Streamlit. Utiliza el caso piloto fijo y datos versionados; no solicita claves de SiAR ni AEMET.
+La demo pública se comprobó el 23/10/2026 desde un navegador sin iniciar sesión en Streamlit. La ampliación a tres casos queda descrita en [datos y alcance de la demo](docs/DEMO_CASOS_SIAR_2025.md); utiliza CSV versionados y no solicita claves de SiAR ni AEMET.
 
 ## Autoría
 
@@ -96,7 +96,7 @@ Para reproducir el entorno de Python se puede usar indistintamente `environment.
 12. Construir el conjunto modelable en `data/processed` con `python -m src.features.feature_engineering` y generar el análisis exploratorio con `python -m src.analysis.build_eda_4_2`.
 13. Entrenar y comparar Persistencia, Ridge, Random Forest, KNN, SVR y XGBoost con `python -m src.models.train_evaluate`.
 14. Obtener una recomendación de riego con `python -m src.dss.recommend --fecha 2025-06-28 --horizonte 7 --superficie 1.5`. La salida diaria y el resumen se guardan en CSV y JSON en `results/reports`. Este paso puede ejecutarse sin nuevas credenciales utilizando el CSV oficial versionado.
-15. Abrir la aplicación de demostración con `streamlit run src/dss/app_streamlit.py`. Para compartirla mediante un enlace público, seguir la [guía de despliegue en Streamlit Community Cloud](docs/STREAMLIT_DESPLIEGUE.md). La interfaz utiliza el CSV piloto versionado y no requiere tokens. Si no se dispone de Streamlit, abrir la [demostración local](docs/DEMO_TFM.md) con `python -m scripts.demo_local`; utiliza el mismo motor y permite probar el caso piloto en el navegador.
+15. Abrir la aplicación de demostración con `streamlit run src/dss/app_streamlit.py`. Para compartirla mediante un enlace público, seguir la [guía de despliegue en Streamlit Community Cloud](docs/STREAMLIT_DESPLIEGUE.md). La interfaz permite escoger entre tres CSV SiAR versionados y no requiere tokens. Si no se dispone de Streamlit, abrir la [demostración local](docs/DEMO_TFM.md) con `python -m scripts.demo_local`; utiliza el mismo motor y permite probar el caso piloto en el navegador.
 16. Regenerar la validación del sistema, sus tablas y figuras con `python -m src.analysis.build_validation_5_3` y el esquema del motor con `python -m src.visualization.build_dss_visual`.
 17. Ejecutar las pruebas automáticas con `python -m unittest discover -s tests`.
 

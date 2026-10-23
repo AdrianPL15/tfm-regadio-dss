@@ -7,8 +7,8 @@
 credenciales/
 secrets/
 
-# Datos (solo se versiona una instantánea pública y acotada del piloto,
-# añadida explícitamente para reproducibilidad; el resto sigue excluido)
+# Datos (solo se versionan instantáneas públicas y acotadas de los casos
+# de demostración, añadidas explícitamente para reproducibilidad)
 data/raw/*
 data/interim/*
 data/processed/*
@@ -19,6 +19,10 @@ data/external/*
 !data/external/.gitkeep
 !data/external/siar_necesidades_pimiento_AL01_2025.csv
 !data/external/siar_necesidades_pimiento_AL01_2025.metadata.json
+!data/external/siar_necesidades_maiz_Z06_2025.csv
+!data/external/siar_necesidades_maiz_Z06_2025.metadata.json
+!data/external/siar_necesidades_algodon_BA08_2025.csv
+!data/external/siar_necesidades_algodon_BA08_2025.metadata.json
 
 # Modelos entrenados (pueden pesar mucho, se gestionan aparte)
 models/*
