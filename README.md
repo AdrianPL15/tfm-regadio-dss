@@ -4,6 +4,16 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 
 La visión del producto permite que el usuario elija ubicación, cultivo y periodo para determinar las fuentes y los datos necesarios. El prototipo actual integra SiAR y AEMET mediante una ETL en Python con almacenamiento local por capas, pero la aplicación trabaja con un caso fijo: pimiento en la estación `AL01` La Mojonera (Almería), durante la campaña de 2025. Se plantea como piloto **al aire libre**, pero la correspondencia del CSV de SiAR con ese sistema de cultivo queda pendiente de documentar con la fuente específica del equipo. La extracción climática admite estación y periodo; la selección automática de varios CSV de cultivo aún no está implementada. La incorporación del Boletín Hidrológico del MITECO, la persistencia en MySQL y el cuadro de mando forman parte de la arquitectura objetivo. El sistema está pensado para apoyar, y no sustituir, el criterio agronómico del usuario final.
 
+## Empezar por aquí
+
+| Si quieres... | Abre... |
+|---|---|
+| Leer la versión candidata de la memoria | [PDF revisado](docs/memoria/TFM_revision_coherencia_2026-10.pdf) o [Word editable](docs/memoria/TFM_revision_coherencia_2026-10.docx) |
+| Probar el prototipo | [Aplicación Streamlit](src/dss/app_streamlit.py) y [guía de publicación](docs/STREAMLIT_DESPLIEGUE.md); como alternativa, [demo local](docs/DEMO_TFM.md) |
+| Ver qué datos entraron y cómo se transformaron | [Guía de reproducción](docs/REPRODUCCION_PILOTO.md) y [auditoría de coherencia](docs/AUDITORIA_COHERENCIA_2026-10-22.md) |
+
+La URL pública de Streamlit se añadirá solo después de verificar el despliegue desde una sesión sin acceso al repositorio.
+
 ## Autoría
 
 Luis Moreno Díaz, Adrián Pérez Lombal, Manuel Ramos Alascio y Alicia Santamaría Román. Máster en Data Science, curso 2025 2026.
