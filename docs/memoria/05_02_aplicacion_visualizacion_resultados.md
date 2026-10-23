@@ -34,17 +34,26 @@ repositorio que lo demuestre.
 ## 5.2.2. Organización de la interfaz
 
 La pantalla se divide en un panel lateral de entrada y un área principal de
-resultados. El panel lateral agrupa los controles en tres bloques. En el
-primero se muestran el cultivo y la estación del caso analizado; están
-bloqueados porque el piloto valida una sola combinación, aunque el texto
-recuerda que el motor admite otras fuentes con el mismo formato. El segundo
+resultados. El panel lateral agrupa los controles en cuatro bloques. En el
+primero se muestran comunidad, provincia, cultivo y estación de las tres
+combinaciones con CSV versionado. Esta selección permite recorrer distintos
+casos, pero no genera automáticamente fuentes para todas las zonas. El segundo
 bloque recoge la consulta: el modo de planificación o seguimiento, la fecha de
 emisión y el horizonte de uno a siete días. El tercero describe la parcela: el
 sistema de riego, la eficiencia, que se rellena con el valor orientativo del
 sistema pero puede modificarse, la superficie y, de manera opcional, una
-dotación semanal. Una casilla final permite superponer la referencia SiAR
+dotación semanal. El cuarto permite explorar el escenario de lluvia. Una
+casilla adicional permite superponer la referencia SiAR
 calculada a posteriori, algo que solo tiene sentido en una demostración
 retrospectiva como la de este trabajo.
+
+La ampliación AEMET añade una consulta opcional de la predicción municipal
+actual. Se presenta separada de las dosis históricas porque no coincide con
+la campaña de 2025. Para ilustrar cómo afectaría la lluvia a la dosis sin
+atribuir a AEMET una predicción inexistente de aquel año, el usuario puede
+definir un escenario manual de cantidad y fracción hipotética aprovechable.
+La pantalla lo distingue de los datos observados y advierte que necesita
+validación agronómica.
 
 El área principal sigue el orden en el que un técnico suele leer una
 recomendación. Arriba aparecen cuatro indicadores: la necesidad neta del
@@ -142,11 +151,16 @@ memoria.
 
 La aplicación es un prototipo de demostración. No dispone de usuarios ni de
 control de acceso, no guarda un histórico de consultas por parcela y lee la
-fuente desde un archivo local en lugar de una base de datos. Tampoco descarga
-por sí misma la predicción de AEMET; la vía de ET0 prevista está implementada en
-el motor y se ha probado con datos de ejemplo, pero la interfaz trabaja con la
-vía por defecto. Estas carencias no impiden demostrar el funcionamiento del
-sistema, aunque sí condicionan su uso real. Por último, la interfaz no se ha
+fuente SiAR desde un archivo local en lugar de una base de datos. La ampliación
+posterior permite consultar AEMET actual si se configura una clave de acceso y
+mostrar probabilidad y cantidad horaria disponible. La predicción actual se
+separa de la campaña histórica de 2025; para ella solo se ofrece un escenario
+manual de lluvia, identificado como hipotético. La vía de ET0 prevista está
+implementada en el motor, pero no se calcula automáticamente con la temperatura
+de AEMET. Para una dosis operativa en directo harían falta SiAR y Kc vigentes,
+además de validar cómo se estima la lluvia efectiva. Estas carencias no impiden
+demostrar el funcionamiento del sistema, aunque sí condicionan su uso real.
+Por último, la interfaz no se ha
 evaluado con agricultores ni técnicos. La literatura señala que la facilidad de
 uso y la relevancia percibida son determinantes para que una herramienta de
 este tipo se adopte (Rose et al., 2016), por lo que esa evaluación con usuarios

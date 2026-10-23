@@ -8,6 +8,7 @@ Se ejecuta desde la raíz del repositorio con:
 from __future__ import annotations
 
 from datetime import date, timedelta
+import os
 from pathlib import Path
 import sys
 
@@ -27,6 +28,8 @@ from src.dss.config import (  # noqa: E402
     RecommendationRequest,
 )
 from src.dss.data_access import load_case  # noqa: E402
+from src.dss.aemet_forecast import fetch_live_forecast, require_current_forecast  # noqa: E402
+from src.data.aemet_client import AEMETClient, AEMETError  # noqa: E402
 from src.dss.engine import METHOD_LABELS, fmt_es, recommend  # noqa: E402
 
 
@@ -56,7 +59,8 @@ st.caption(
 )
 st.caption(
     "Demostración retrospectiva con tres combinaciones reales de SiAR de 2025. "
-    "Utiliza CSV versionados; no consulta APIs ni requiere tokens."
+    "Las dosis históricas usan CSV versionados. La consulta AEMET actual es "
+    "opcional y no se mezcla con fechas de 2025."
 )
 
 with st.sidebar:
@@ -125,6 +129,69 @@ with st.sidebar:
         value=params.get("referencia") == "1",
     )
 
+    st.header("Lluvia prevista")
+    use_scenario = st.checkbox("Explorar un escenario de lluvia", value=False)
+    scenario_amount = 0.0
+    scenario_date = issue
+    rain_fraction = None
+    if use_scenario:
+        st.caption("Introducción manual para la campaña de 2025; no es una predicción AEMET histórica.")
+        scenario_date = st.selectbox(
+            "Día con lluvia hipotética",
+            [issue + timedelta(days=offset) for offset in range(horizon)],
+            format_func=lambda value: value.strftime("%d/%m/%Y"),
+        )
+        scenario_amount = st.number_input("Lluvia hipotética (mm)", min_value=0.0, value=8.0, step=0.5)
+        rain_fraction = st.slider(
+            "Fracción aprovechable hipotética (%)", 0, 100, 50, 5
+        ) / 100
+        st.caption("Este porcentaje es un supuesto editable, no una calibración de la parcela.")
+
+st.subheader("Predicción municipal AEMET actual")
+st.caption(
+    "La predicción corresponde al municipio, no a la estación SiAR ni a la parcela. "
+    "No se mezcla con las series retrospectivas de 2025."
+)
+if st.button("Consultar AEMET ahora"):
+    try:
+        try:
+            cloud_key = st.secrets.get("AEMET_API_KEY")
+        except (FileNotFoundError, KeyError):
+            cloud_key = None
+        provider = AEMETClient(api_key=cloud_key or os.getenv("AEMET_API_KEY"))
+        st.session_state[f"aemet_{case.station_code}"] = fetch_live_forecast(
+            case.aemet_municipality_code, client=provider
+        )
+    except (AEMETError, ValueError) as error:
+        st.session_state.pop(f"aemet_{case.station_code}", None)
+        st.error(f"No se pudo obtener la predicción: {error}")
+
+live_forecast = st.session_state.get(f"aemet_{case.station_code}")
+forecast_input = None
+if live_forecast is not None:
+    visible = live_forecast[[
+        "date", "precipitation_probability_pct", "precipitation_mm",
+        "precipitation_hours_covered", "precipitation_amount_status",
+    ]].copy()
+    visible["date"] = visible["date"].dt.strftime("%d/%m/%Y")
+    st.dataframe(visible, hide_index=True, width="stretch")
+    st.caption(f"Emisión AEMET: {live_forecast['issued_at'].iat[0]}; municipio {case.aemet_municipality_code}.")
+    if issue == date.today() and first_day <= issue <= last_day and not use_scenario:
+        try:
+            require_current_forecast(live_forecast, issue)
+            forecast_input = live_forecast
+        except ValueError as error:
+            st.warning(str(error))
+    else:
+        st.info("La fecha elegida no coincide con una campaña SiAR vigente: se muestra AEMET, pero no se usa para calcular la dosis histórica.")
+
+if use_scenario:
+    forecast_input = pd.DataFrame({
+        "date": [pd.Timestamp(scenario_date)],
+        "precipitation_mm": [scenario_amount],
+        "source": ["Escenario manual hipotético"],
+    })
+
 request = RecommendationRequest(
     issue_date=issue,
     horizon_days=horizon,
@@ -133,6 +200,7 @@ request = RecommendationRequest(
     area_ha=area if area > 0 else None,
     weekly_allocation_mm=allocation,
     mode=mode,
+    rain_effective_fraction=rain_fraction if mode == "planificacion" else None,
     case=case,
 )
 
@@ -144,9 +212,8 @@ st.info(
 )
 if case != DEMO_CASES[0]:
     st.caption(
-        "Este caso adicional demuestra el funcionamiento con otros datos SiAR. "
-        "Las métricas publicadas de evaluación del TFM corresponden únicamente "
-        "al piloto de pimiento AL01; no acreditan precisión para este cultivo."
+        "Este caso dispone de una evaluación temporal predictiva adicional, "
+        "independiente por cultivo; no acredita ahorro ni precisión en campo."
     )
 st.caption(
     "El CSV SiAR identifica cultivo y estación, pero no acredita el sistema de "
@@ -154,7 +221,7 @@ st.caption(
 )
 
 try:
-    result = recommend(request, history=history, metadata=metadata)
+    result = recommend(request, history=history, metadata=metadata, forecast=forecast_input)
 except ValueError as error:
     st.error(str(error))
     st.stop()
@@ -167,7 +234,10 @@ for warning in result.warnings:
 
 col1, col2, col3, col4 = st.columns(4)
 col1.metric("Necesidad neta", f"{fmt_es(summary['net_need_total_mm'])} mm")
-col2.metric("Dosis bruta propuesta", f"{fmt_es(summary['gross_dose_total_mm'])} mm")
+col2.metric(
+    "Dosis bruta condicionada" if use_scenario else "Dosis bruta propuesta",
+    f"{fmt_es(summary['gross_dose_total_mm'])} mm",
+)
 col3.metric(
     "Volumen estimado",
     f"{fmt_es(summary['volume_total_m3'], 0)} m³" if summary["volume_total_m3"] else "sin superficie",
@@ -217,6 +287,8 @@ table = pd.DataFrame(
         "Kc": daily["kc"].map(lambda v: fmt_es(v, 2)),
         "ET0 usada (mm)": daily["et0_used_mm"].map(lambda v: fmt_es(v, 2)),
         "Necesidad neta (mm)": daily["net_need_mm"].map(lambda v: fmt_es(v, 2)),
+        "Necesidad sin lluvia hipotética (mm)": daily["base_need_before_rain_mm"].map(lambda v: fmt_es(v, 2)),
+        "Lluvia prevista/hipotética (mm)": daily["precipitation_forecast_mm"].map(lambda v: fmt_es(v, 2)),
         "Dosis bruta (mm)": daily["gross_dose_mm"].map(lambda v: fmt_es(v, 2)),
         "Volumen (m³)": daily["volume_m3"].map(lambda v: fmt_es(v, 0)),
         "Confianza": daily["confidence"],

@@ -53,6 +53,10 @@ DAILY_COLUMNS = [
     "et0_used_mm",
     "et0_origin",
     "precipitation_forecast_mm",
+    "base_need_before_rain_mm",
+    "effective_rain_scenario_mm",
+    "rain_scenario_fraction",
+    "forecast_issued_at",
     "net_need_mm",
     "method",
     "persistence_baseline_mm",
@@ -303,6 +307,12 @@ def _explain(row: dict[str, Any], efficiency: float, area_ha: float | None) -> s
         f"{origin}. Con una eficiencia del {fmt_es(efficiency * 100, 0)} % la dosis "
         f"bruta propuesta es de {fmt_es(row['gross_dose_mm'])} mm"
     )
+    if pd.notna(row["effective_rain_scenario_mm"]) and row["effective_rain_scenario_mm"] > 0:
+        text += (
+            f". Escenario condicionado: si se cumple la lluvia prevista y el "
+            f"{fmt_es(row['rain_scenario_fraction'] * 100, 0)} % resulta aprovechable, "
+            f"se descuentan {fmt_es(row['effective_rain_scenario_mm'])} mm"
+        )
     if area_ha is not None and pd.notna(row["volume_m3"]):
         text += f", unos {fmt_es(row['volume_m3'], 0)} m3 para {fmt_es(area_ha, 2)} ha"
     if row["allocation_factor"] < 1:
@@ -333,6 +343,9 @@ def recommend(
 
     efficiency = request.resolved_efficiency()
     issue = pd.Timestamp(request.issue_date).normalize()
+    if forecast is not None and "issued_at" in forecast:
+        if (forecast["issued_at"].dt.normalize() > issue).any():
+            raise ValueError("La predicción se emitió después de la consulta; no puede utilizarse retrospectivamente.")
     known = _observed_until(history, issue)
     indexed = history.set_index("date")
     forecast_indexed = forecast.set_index("date") if forecast is not None else None
@@ -377,6 +390,7 @@ def recommend(
             net = 0.0
             rules.append("R4 necesidad negativa limitada a 0 mm")
         estimate["net_need_mm"] = net
+        base_need = net
 
         et0_used = estimate["et0_used_mm"]
         if pd.notna(et0_used) and not et0_low <= et0_used <= et0_high:
@@ -387,18 +401,34 @@ def recommend(
             rules.append("R3 aviso de extrapolación")
 
         rain_mm = np.nan
+        effective_rain = np.nan
+        forecast_issued_at = None
         if forecast_row is not None:
             rain_mm = forecast_row.get("precipitation_mm", np.nan)
+            issued = forecast_row.get("issued_at", pd.NaT)
+            if pd.notna(issued):
+                forecast_issued_at = pd.Timestamp(issued).isoformat()
             rain_prob = forecast_row.get("precipitation_probability_pct", np.nan)
             rain_expected = (pd.notna(rain_mm) and rain_mm >= RAIN_AMOUNT_THRESHOLD_MM) or (
                 pd.notna(rain_prob) and rain_prob >= RAIN_PROBABILITY_THRESHOLD_PCT
             )
             if rain_expected and request.mode == "planificacion":
-                warnings.append(
-                    "Se prevé lluvia relevante; conviene aplazar el riego y "
-                    "revisar la dosis cuando se conozca la precipitación real."
-                )
+                warnings.append("Se prevé lluvia relevante; conviene aplazar el riego, revisar antes de regar y comprobar la lluvia real.")
                 rules.append("R5 lluvia prevista: revisar antes de regar")
+            if (
+                request.mode == "planificacion"
+                and request.rain_effective_fraction is not None
+                and pd.notna(rain_mm)
+                and pd.notna(net)
+            ):
+                effective_rain = min(net, float(rain_mm) * request.rain_effective_fraction)
+                net = max(0.0, net - effective_rain)
+                estimate["net_need_mm"] = net
+                rules.append("R5 escenario condicionado de precipitación efectiva")
+                warnings.append(
+                    "Dosis condicionada a una fracción efectiva hipotética de la lluvia prevista; "
+                    "no es una estimación validada para la parcela. Recalcular tras la lluvia real."
+                )
 
         if request.mode == "planificacion" and horizon_day > VALIDATED_HORIZON_DAYS:
             expected = expected_errors.get(horizon_day)
@@ -418,6 +448,10 @@ def recommend(
                 "horizon_day": horizon_day,
                 **estimate,
                 "precipitation_forecast_mm": rain_mm,
+                "base_need_before_rain_mm": base_need,
+                "effective_rain_scenario_mm": effective_rain,
+                "rain_scenario_fraction": request.rain_effective_fraction,
+                "forecast_issued_at": forecast_issued_at,
                 "gross_dose_mm": gross,
                 "allocation_factor": 1.0,
                 "rules": rules,

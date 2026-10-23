@@ -150,6 +150,35 @@ class RecommendTests(unittest.TestCase):
         self.assertAlmostEqual(base.daily["gross_dose_mm"].iat[1],
                                rainy.daily["gross_dose_mm"].iat[1])
 
+    def test_explicit_rain_scenario_changes_dose_without_changing_siar_history(self):
+        forecast = pd.DataFrame({
+            "date": ["2025-06-21"], "precipitation_mm": [12.0],
+            "precipitation_probability_pct": [80],
+            "issued_at": ["2025-06-20T07:00:00"],
+        })
+        base = run(self.history, issue_date=date(2025, 6, 20), horizon_days=2)
+        adjusted = run(
+            self.history, issue_date=date(2025, 6, 20), horizon_days=2,
+            forecast=forecast, rain_effective_fraction=0.25,
+        )
+        self.assertAlmostEqual(adjusted.daily["base_need_before_rain_mm"].iat[1],
+                               base.daily["net_need_mm"].iat[1])
+        self.assertAlmostEqual(adjusted.daily["effective_rain_scenario_mm"].iat[1], 3.0)
+        self.assertAlmostEqual(adjusted.daily["net_need_mm"].iat[1],
+                               base.daily["net_need_mm"].iat[1] - 3.0)
+        self.assertLess(adjusted.daily["gross_dose_mm"].iat[1],
+                        base.daily["gross_dose_mm"].iat[1])
+        self.assertIn("hipotética", adjusted.daily["warnings"].iat[1])
+        self.assertAlmostEqual(self.history.loc[20, "net_need_mm"], 4.5)
+
+    def test_rejects_forecast_issued_after_historical_query(self):
+        forecast = pd.DataFrame({
+            "date": ["2025-06-21"], "precipitation_mm": [12.0],
+            "issued_at": ["2026-10-23T07:00:00"],
+        })
+        with self.assertRaises(ValueError):
+            run(self.history, issue_date=date(2025, 6, 20), forecast=forecast)
+
     def test_forecast_et0_has_priority_and_flags_extrapolation(self):
         forecast = pd.DataFrame({"date": ["2025-06-20"], "et0_mm": [12.0]})
         result = run(self.history, issue_date=date(2025, 6, 20), horizon_days=1,

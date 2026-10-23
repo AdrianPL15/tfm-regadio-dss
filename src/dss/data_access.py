@@ -35,6 +35,10 @@ OFFICIAL_CSV_COLUMNS = {
 }
 
 FORECAST_COLUMNS = {"date", "et0_mm", "precipitation_mm", "precipitation_probability_pct"}
+FORECAST_TRACE_COLUMNS = (
+    "issued_at", "hourly_issued_at", "municipality_code", "source",
+    "precipitation_hours_covered", "precipitation_amount_status",
+)
 
 
 def load_crop_needs(path: Path) -> pd.DataFrame:
@@ -113,8 +117,21 @@ def normalise_forecast(forecast: pd.DataFrame | None) -> pd.DataFrame | None:
         return None
     result = forecast.copy()
     result["date"] = pd.to_datetime(result["date"]).dt.normalize()
+    if result["date"].isna().any() or result["date"].duplicated().any():
+        raise ValueError("La predicción contiene fechas inválidas o duplicadas.")
     for column in FORECAST_COLUMNS.difference({"date"}):
         if column not in result.columns:
             result[column] = pd.NA
         result[column] = pd.to_numeric(result[column], errors="coerce")
-    return result[sorted(FORECAST_COLUMNS)].drop_duplicates("date", keep="last")
+    for column in ("et0_mm", "precipitation_mm"):
+        if (result[column].dropna() < 0).any():
+            raise ValueError(f"La predicción contiene valores negativos en {column}.")
+    probability = result["precipitation_probability_pct"].dropna()
+    if ((probability < 0) | (probability > 100)).any():
+        raise ValueError("La probabilidad prevista debe estar entre 0 y 100 %.")
+    if "issued_at" in result:
+        result["issued_at"] = pd.to_datetime(result["issued_at"], errors="raise")
+        if (result["issued_at"].dt.normalize() > result["date"]).any():
+            raise ValueError("La predicción se emitió después de su fecha válida.")
+    columns = sorted(FORECAST_COLUMNS) + [name for name in FORECAST_TRACE_COLUMNS if name in result]
+    return result[columns].sort_values("date").reset_index(drop=True)
