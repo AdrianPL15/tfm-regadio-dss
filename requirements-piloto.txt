@@ -1,0 +1,13 @@
+# Versiones principales comprobadas localmente el 22/10/2026.
+# Entorno mínimo para ETL, modelado, validación y demo Streamlit.
+numpy==2.5.3
+pandas==3.0.6
+scipy==1.18.1
+scikit-learn==1.9.1
+xgboost==3.4.1
+matplotlib==3.11.2
+seaborn==0.13.2
+joblib==1.6.0
+requests==2.34.2
+python-dotenv==1.2.3
+streamlit==1.66.0

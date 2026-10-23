@@ -61,13 +61,14 @@ st.caption(
     "el estado real de la parcela y el criterio técnico."
 )
 st.caption(
-    "Demostración retrospectiva del pimiento al aire libre en Almería (campaña 2025). "
+    "Demostración retrospectiva del pimiento en Almería (campaña 2025). "
     "Utiliza el CSV SiAR versionado; no consulta APIs ni requiere tokens."
 )
 
 with st.sidebar:
     st.header("Caso analizado")
     st.selectbox("Cultivo", [f"{case.crop} ({case.production_system.lower()})"], disabled=True)
+    st.caption("Sistema de cultivo del CSV pendiente de acreditación documental.")
     st.selectbox("Estación SiAR", [f"{case.station_code} {case.station_name} ({case.province})"],
                  disabled=True)
     st.caption("El piloto valida una combinación; el motor admite otras fuentes con el mismo formato.")

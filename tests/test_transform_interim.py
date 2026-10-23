@@ -1,9 +1,14 @@
 """Pruebas de normalización de las tablas interim."""
 
 import unittest
+from pathlib import Path
+from tempfile import TemporaryDirectory
 
 from src.data.transform_interim import (
     _calendar_gaps,
+    _select_crop_needs_file,
+    _load_siar_weather,
+    _validate_case_alignment,
     normalize_aemet_daily,
     normalize_aemet_hourly,
     normalize_siar_crop_needs,
@@ -12,6 +17,49 @@ from src.data.transform_interim import (
 
 
 class TransformInterimTests(unittest.TestCase):
+    def test_rejects_incompatible_station_or_campaign(self):
+        weather = [{"station_code": "AL01", "observed_date": "2025-05-01"}]
+        crop = [{"station_code": "AL02", "observed_date": "2025-05-01"}]
+        with self.assertRaisesRegex(ValueError, "estación"):
+            _validate_case_alignment(weather, crop)
+        crop[0]["station_code"] = "AL01"
+        crop[0]["observed_date"] = "2024-05-01"
+        with self.assertRaisesRegex(ValueError, "fechas"):
+            _validate_case_alignment(weather, crop)
+
+    def test_siar_raw_selection_requires_explicit_choice_when_ambiguous(self):
+        with TemporaryDirectory(dir=Path(__file__).resolve().parent) as folder:
+            root = Path(folder)
+            first = root / "siar/weather/daily/station=AL01/first.json"
+            second = root / "siar/weather/daily/station=AL02/second.json"
+            for path in (first, second):
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text('{"data": []}', encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "--siar-weather-file"):
+                _load_siar_weather(root, None)
+            document, selected = _load_siar_weather(root, first)
+            self.assertEqual(document["data"], [])
+            self.assertEqual(selected, first)
+
+    def test_crop_csv_selection_requires_explicit_choice_when_ambiguous(self):
+        with TemporaryDirectory(dir=Path(__file__).resolve().parent) as folder:
+            root = Path(folder)
+            first = root / "siar_necesidades_pimiento_AL01_2025.csv"
+            second = root / "siar_necesidades_tomate_AL01_2025.csv"
+            for path in (first, second):
+                path.write_text("Fecha;Kc\n", encoding="utf-8")
+                path.with_suffix(".metadata.json").write_text("{}", encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "varios CSV"):
+                _select_crop_needs_file(root, None)
+            self.assertEqual(_select_crop_needs_file(root, first), first)
+
+    def test_crop_csv_selection_checks_metadata(self):
+        with TemporaryDirectory(dir=Path(__file__).resolve().parent) as folder:
+            path = Path(folder) / "siar_necesidades_pimiento_AL01_2025.csv"
+            path.write_text("Fecha;Kc\n", encoding="utf-8")
+            with self.assertRaisesRegex(FileNotFoundError, "metadatos"):
+                _select_crop_needs_file(path.parent, path)
+
     def test_detects_missing_calendar_dates(self):
         rows = [
             {"observed_date": "2025-07-17"},

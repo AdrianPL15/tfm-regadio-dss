@@ -28,4 +28,4 @@ La rama principal contiene también `environment.yml` y `requirements.txt` para 
 
 Cuando esas comprobaciones pasen, colocar la URL pública en la primera pantalla del `README.md` y en el anexo de la memoria. No se debe inventar la URL antes de que Streamlit la confirme.
 
-**Alcance:** el prototipo es retrospectivo y se limita al pimiento al aire libre en la estación AL01 durante 2025. La referencia SiAR no es riego real observado. No demuestra ahorro de agua ni validez agronómica fuera del piloto.
+**Alcance:** el prototipo es retrospectivo y se limita al pimiento en la estación AL01 durante 2025. Su encuadre como cultivo al aire libre queda pendiente de acreditar para el CSV empleado. La referencia SiAR no es riego real observado. No demuestra ahorro de agua ni validez agronómica fuera del piloto.

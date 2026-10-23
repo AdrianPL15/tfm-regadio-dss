@@ -63,7 +63,7 @@ def build_visual(interim_root: Path, processed_path: Path, output: Path) -> Path
     forecast_axis = figure.add_subplot(grid[1, 1])
 
     figure.suptitle(
-        "ETL parametrizable y volumen de datos del piloto",
+        "ETL y volumen de datos del piloto",
         fontsize=18, weight="bold", color="#172033",
     )
 
@@ -71,7 +71,7 @@ def build_visual(interim_root: Path, processed_path: Path, output: Path) -> Path
     flow.set_ylim(0, 1)
     flow.axis("off")
     nodes = [
-        (0.010, "Selección", "ubicación · cultivo\nperiodo · horizonte", "#334155"),
+        (0.010, "Caso piloto", "ubicación · cultivo\nperiodo · horizonte", "#334155"),
         (0.210, "Fuentes y raw", "SiAR API y CSV\nAEMET OpenData", "#2F6B9A"),
         (0.410, "Transformación", "tipos · unidades\ncalidad · trazabilidad", "#C56A1A"),
         (0.610, "Capa interim", f"{len(siar)} clima · {len(crop_needs)} riego\n{len(daily)} días · {len(hourly)} horas", "#6A4C93"),
@@ -136,7 +136,7 @@ def build_visual(interim_root: Path, processed_path: Path, output: Path) -> Path
     figure.text(
         0.5, 0.02,
         "Configuración actual: pimiento · Almería · estación AL01 · 01/05–30/09/2025. "
-        "La selección del usuario cambia cultivo, ubicación, estación y periodo.",
+        "La selección por el usuario aún no está disponible en la interfaz.",
         ha="center", fontsize=9, color="#596579",
     )
     output.parent.mkdir(parents=True, exist_ok=True)

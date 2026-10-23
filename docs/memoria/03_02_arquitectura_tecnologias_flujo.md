@@ -91,9 +91,11 @@ relacionarlas mediante fecha de emisión, fecha válida y horizonte.
 Los procesos se ejecutan mediante módulos independientes y generan salidas
 deterministas a partir de datos y parámetros conocidos. Las pruebas automáticas
 cubren construcción de consultas, protección de credenciales, escritura raw,
-normalización, calidad, características y evaluación temporal. Las figuras y
-resúmenes de la memoria se regeneran desde los mismos archivos que consume el
-modelado.
+normalización, calidad, características, evaluación temporal y reglas del motor
+de recomendación, incluida la comprobación de que la planificación no utiliza
+información posterior a la fecha de emisión. En total, el proyecto dispone de
+sesenta y una pruebas. Las figuras y resúmenes de la memoria se regeneran
+desde los mismos archivos que consume el modelado.
 
 La separación por capas permite sustituir progresivamente el almacenamiento
 local por Parquet, almacenamiento de objetos o MySQL sin cambiar el significado

@@ -17,6 +17,14 @@ Las fases de trabajo son:
 | Sistema de recomendación | Reglas agronómicas, parámetros de parcela y explicación | Prototipo del DSS y salidas diaria y semanal. |
 | Validación y documentación | Revisión funcional, limitaciones y reproducibilidad | Pruebas, memoria, manual de ejecución y conclusiones. |
 
+El historial de Git permite situar los hitos ejecutados: documentación de
+fuentes y ETL el 24/09/2026; análisis y modelado entre el 28/09 y el 07/10;
+motor de recomendación y validación el 12/10; conclusiones entre el 15 y el
+17/10; revisión de coherencia y reproducción independiente el 22/10. Son
+fechas de integración comprobables, no una asignación individual de tareas ni
+un cronograma contractual. La publicación de una demo accesible por enlace y
+una validación agronómica externa quedan fuera de esos hitos completados.
+
 El desarrollo se organiza mediante Git y GitHub para mantener trazabilidad
 sobre el código, la documentación y las evidencias reproducibles. La rama
 `main` representa la versión integrada del proyecto. Cada bloque de trabajo se
@@ -55,8 +63,10 @@ incluido credenciales. Los cambios que afecten a la memoria deben mantener la
 correspondencia entre texto, tablas, figuras y evidencias del repositorio.
 
 Las credenciales se almacenan únicamente en `.env`, excluido de Git. Los datos
-raw, las tablas completas generadas y los modelos serializados también quedan
-fuera del control de versiones. Se versionan el código, los esquemas, las
-muestras ligeras, las métricas, las figuras y los datos públicos que el equipo
-haya aprobado expresamente. Las instrucciones operativas completas se mantienen
+raw, las tablas completas generadas y los modelos serializados quedan fuera
+del control de versiones salvo una instantánea acotada de entradas públicas
+del piloto, conservada para poder reconstruir la ETL sin tokens. Se versionan
+también el código, los esquemas, las métricas y las figuras. La composición,
+procedencia y condiciones de esa instantánea se documentan en
+`docs/REPRODUCCION_PILOTO.md`. Las instrucciones operativas completas se mantienen
 en `CONTRIBUTING.md` y `ORGANIZACION_Y_VERSIONADO.md`.

@@ -17,7 +17,7 @@ El piloto utiliza el cultivo de pimiento y la estación SiAR `AL01` La Mojonera,
 | Filas con estado `WARN` | 2 |
 | Valores válidos de la variable objetivo | 148 |
 
-Los tres días ausentes se conservan como huecos de calendario. No se rellenan automáticamente porque una interpolación podría crear condiciones meteorológicas y necesidades de riego que no fueron observadas. El cálculo de retardos reindexa cada serie a frecuencia diaria antes de aplicar `shift`, por lo que una observación separada por un hueco no se trata como si perteneciera al día inmediatamente anterior. Las dos filas `WARN` presentan ausencia de ET0 y de las magnitudes derivadas; se mantienen para trazabilidad, pero deberán excluirse o tratarse dentro de cada partición de entrenamiento.
+Los tres días ausentes se conservan como huecos de calendario. No se rellenan automáticamente porque una interpolación podría crear condiciones meteorológicas y necesidades de riego que no fueron observadas. El cálculo de retardos reindexa cada serie a frecuencia diaria antes de aplicar `shift`, por lo que una observación separada por un hueco no se trata como si perteneciera al día inmediatamente anterior. Las dos filas `WARN` (21 y 22 de julio) carecen de ET0 y de las magnitudes derivadas; la del 21 también carece de temperatura y humedad medias. Por eso estas dos variables tienen 149 valores válidos en la Tabla 4.11. Los registros se mantienen para trazabilidad, pero se excluyen del entrenamiento si falta la variable objetivo.
 
 ![Controles de completitud y continuidad](../images/eda_quality_4_2.png)
 
@@ -80,13 +80,13 @@ Para que la evaluación sea realista se distingue entre información conocida de
 | Derivadas contemporáneas del objetivo | ETc, precipitación efectiva usada por SiAR, necesidad neta reconstruida | Solo diagnóstico; excluir del entrenamiento predictivo |
 | Calidad y trazabilidad | estados, incidencias, fichero y fecha de ingesta | Auditoría; no predictores |
 
-El catálogo `docs/data_samples/feature_catalog_4_2.csv` documenta las 88 columnas, su tipo, disponibilidad, porcentaje de ausencias, función y riesgo de fuga. Este control será la base para seleccionar las variables del apartado 4.3. También evita que un buen resultado aparente provenga de introducir en el modelo componentes que determinan algebraicamente la etiqueta.
+El catálogo `docs/data_samples/feature_catalog_4_2.csv` documenta las 88 columnas, su tipo, disponibilidad, porcentaje de ausencias, función y riesgo de fuga. Este control sirvió para seleccionar las variables del apartado 4.3. También evita que un buen resultado aparente provenga de introducir en el modelo componentes que determinan algebraicamente la etiqueta.
 
 La muestra AEMET disponible no se incorpora al entrenamiento: corresponde a una predicción emitida en septiembre de 2026 y no coincide temporalmente con el ciclo SiAR de 2025. Sirve como prueba de integración del sistema operacional. Para entrenar un modelo de recomendación futura será necesario obtener predicciones meteorológicas históricas emitidas antes de cada fecha objetivo o definir un escenario de prototipo retrospectivo basado exclusivamente en observaciones SiAR.
 
 ## 4.2.6. Estrategia de preparación para el modelado
 
-La división de entrenamiento, validación y prueba debe respetar el orden temporal. Una partición aleatoria mezclaría días muy próximos de la misma campaña y produciría una estimación optimista del error. En este piloto se propone entrenar con el tramo inicial y evaluar con fechas posteriores; cuando se amplíe el histórico, deberán reservarse campañas completas y, posteriormente, estaciones completas para medir generalización temporal y espacial.
+La división de entrenamiento, validación y prueba debe respetar el orden temporal. Una partición aleatoria mezclaría días muy próximos de la misma campaña y produciría una estimación optimista del error. En este piloto se entrenó con el tramo inicial y se evaluó con fechas posteriores; cuando se amplíe el histórico, deberán reservarse campañas completas y, posteriormente, estaciones completas para medir generalización temporal y espacial.
 
 Las imputaciones y escalados se ajustarán únicamente con el conjunto de entrenamiento. Las filas sin objetivo no pueden utilizarse para supervisar el modelo. Los retardos generarán ausencias esperadas al inicio de la serie y después de huecos del calendario; dichas ausencias se tratarán mediante un `Pipeline` reproducible, sin reemplazarlas por cero salvo que el significado agronómico lo justifique.
 

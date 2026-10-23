@@ -12,8 +12,9 @@ calendario de cultivo y los datos que se consultan. Para validar el flujo se fij
 un piloto reproducible de pimiento al aire libre en Almería, estación `AL01` La
 Mojonera, entre mayo y septiembre de 2025. La web de SiAR identifica el cultivo
 como `Pimiento` sin declarar el sistema productivo; su tratamiento como aire
-libre es una decisión de alcance del piloto, coherente con el uso de
-meteorología y precipitación exterior.
+libre es una hipótesis de alcance del piloto, coherente con el uso de
+meteorología y precipitación exterior, pero pendiente de acreditación para el
+CSV concreto empleado.
 
 ## 3.1.1. Fuentes incorporadas
 
@@ -84,8 +85,10 @@ en el apartado 4.2.
 Las credenciales se leen desde variables de entorno y no se incluyen en Git,
 los datos ni los mensajes de error. Cada extracción guarda los parámetros de la
 consulta, la fecha de ingesta y el número de registros. Los archivos raw y las
-tablas completas generadas se mantienen fuera del control de versiones; se
-versionan código, esquemas, metadatos, muestras ligeras, métricas y figuras
+tablas completas generadas se excluyen por defecto del control de versiones.
+Como excepción documentada, se conserva una instantánea pública y acotada de
+las entradas del piloto para reproducirlo sin tokens. Se versionan además
+código, esquemas, metadatos, muestras ligeras, métricas y figuras
 reproducibles.
 
 El conjunto actual permite validar el recorrido técnico, pero no demostrar una

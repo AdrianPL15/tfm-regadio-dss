@@ -42,7 +42,7 @@ def _box(
         title,
         ha="center",
         va="center",
-        fontsize=10.5,
+        fontsize=12.5,
         fontweight="bold",
         color="#17324D" if implemented else "#4D4D4D",
     )
@@ -52,7 +52,7 @@ def _box(
         detail,
         ha="center",
         va="center",
-        fontsize=8.4,
+        fontsize=10.5,
         color="#334E68" if implemented else "#666666",
         linespacing=1.25,
     )
@@ -76,7 +76,9 @@ def _arrow(axis, start: tuple[float, float], end: tuple[float, float], *, dashed
 
 def build_visual(output: Path = DEFAULT_OUTPUT) -> Path:
     """Construye y guarda la figura de arquitectura."""
-    figure, axis = plt.subplots(figsize=(15.5, 8.7))
+    # Una página A4 reduce la figura a unos 15 cm de ancho. Dos filas permiten
+    # mantener el texto de las cajas legible al imprimir la memoria.
+    figure, axis = plt.subplots(figsize=(9, 6))
     figure.patch.set_facecolor("white")
     axis.set_xlim(0, 1)
     axis.set_ylim(0, 1)
@@ -84,60 +86,62 @@ def build_visual(output: Path = DEFAULT_OUTPUT) -> Path:
 
     axis.text(
         0.5,
-        0.955,
+        0.965,
         "Arquitectura del DSS de riego y estado de implementación",
         ha="center",
         va="center",
-        fontsize=18,
+        fontsize=17,
         fontweight="bold",
         color="#17324D",
     )
     axis.text(
         0.5,
-        0.91,
-        "Piloto actual: pimiento al aire libre · Almería · estación SiAR AL01",
+        0.925,
+        "Piloto actual: pimiento · Almería · estación SiAR AL01",
         ha="center",
         va="center",
-        fontsize=10.5,
+        fontsize=11.5,
         color="#52697A",
     )
 
-    xs = [0.035, 0.205, 0.375, 0.545, 0.715, 0.855]
-    widths = [0.13, 0.13, 0.13, 0.13, 0.11, 0.11]
-    y = 0.59
-    h = 0.20
-    boxes = [
-        ("Configuración", "cultivo · ubicación\nperiodo · estación"),
-        ("Fuentes", "SiAR API · SiAR CSV\nAEMET OpenData"),
-        ("Ingesta Python", "autenticación · cuotas\ntrazabilidad"),
-        ("Capas de datos", "raw / external\ninterim / processed"),
-        ("Análisis y ML", "variables · EDA\nseis enfoques"),
-        ("Evidencias", "métricas · CSV\nfiguras · memoria"),
+    h = 0.14
+    width = 0.25
+    top_y, mid_y = 0.68, 0.43
+    positions = [0.045, 0.375, 0.705]
+    top_boxes = [
+        ("1. Caso piloto", "pimiento · AL01\nperiodo definido"),
+        ("2. Fuentes", "SiAR clima y cultivo\nAEMET: integración"),
+        ("3. Ingesta Python", "descarga · metadatos\ntrazabilidad"),
     ]
-    for x, width, (title, detail) in zip(xs, widths, boxes):
-        _box(axis, x, y, width, h, title, detail, implemented=True)
-    for index in range(len(xs) - 1):
-        _arrow(
-            axis,
-            (xs[index] + widths[index], y + h / 2),
-            (xs[index + 1], y + h / 2),
-        )
+    middle_boxes = [
+        ("6. Evidencias", "métricas · CSV\nfiguras · memoria"),
+        ("5. Análisis y ML", "variables · EDA\nseis enfoques"),
+        ("4. Capas de datos", "raw / external\ninterim / processed"),
+    ]
+    for x, (title, detail) in zip(positions, top_boxes):
+        _box(axis, x, top_y, width, h, title, detail, implemented=True)
+    for x, (title, detail) in zip(positions, middle_boxes):
+        _box(axis, x, mid_y, width, h, title, detail, implemented=True)
+    for left, right in ((0, 1), (1, 2)):
+        _arrow(axis, (positions[left] + width, top_y + h / 2), (positions[right], top_y + h / 2))
+        _arrow(axis, (positions[right], mid_y + h / 2), (positions[left] + width, mid_y + h / 2))
+    _arrow(axis, (positions[2] + width / 2, top_y), (positions[2] + width / 2, mid_y + h))
 
     axis.text(
-        0.035,
-        0.835,
+        0.045,
+        0.855,
         "PROTOTIPO IMPLEMENTADO",
-        fontsize=10,
+        fontsize=12,
         fontweight="bold",
         color="#22577A",
     )
 
-    future_y = 0.20
+    future_y = 0.11
     future_boxes = [
-        (0.23, 0.16, "Orquestación", "Apache Hop\ncargas programadas", False),
-        (0.43, 0.16, "Persistencia", "MySQL / Parquet\nmetadatos y resultados", False),
-        (0.63, 0.16, "Motor DSS", "reglas · ET0 × Kc\ndosis y explicación", True),
-        (0.83, 0.13, "Presentación", "Streamlit · CSV\nPower BI opcional", True),
+        (0.035, 0.20, "Orquestación", "Apache Hop\ncargas programadas", False),
+        (0.280, 0.20, "Persistencia", "MySQL / Parquet\nmetadatos", False),
+        (0.525, 0.20, "Motor DSS", "reglas · ET0 × Kc\ndosis y explicación", True),
+        (0.770, 0.20, "Presentación", "Streamlit · CSV\nPower BI opcional", True),
     ]
     for x, width, title, detail, implemented in future_boxes:
         _box(axis, x, future_y, width, h, title, detail, implemented=implemented)
@@ -150,37 +154,19 @@ def build_visual(output: Path = DEFAULT_OUTPUT) -> Path:
             (next_x, future_y + h / 2),
             dashed=not (done and next_done),
         )
-    _arrow(axis, (0.585, y), (0.51, future_y + h), dashed=True)
-    _arrow(axis, (0.635, y), (0.70, future_y + h), dashed=False)
-
     axis.text(
-        0.035,
-        0.445,
+        0.045,
+        0.345,
         "SISTEMA DE RECOMENDACIÓN Y ARQUITECTURA OBJETIVO",
-        fontsize=10,
+        fontsize=12,
         fontweight="bold",
         color="#6C757D",
     )
     axis.text(
-        0.035,
-        0.12,
-        "Implementado",
-        fontsize=9.5,
-        fontweight="bold",
-        color="#22577A",
+        0.5, 0.055,
+        "Azul: implementado   ·   Gris discontinuo: previsto",
+        ha="center", va="center", fontsize=10.5, color="#52697A",
     )
-    axis.plot([0.035, 0.10], [0.085, 0.085], color="#22577A", linewidth=2)
-    axis.text(0.13, 0.082, "Flujo reproducible disponible en el repositorio", fontsize=9, va="center", color="#52697A")
-    axis.text(
-        0.55,
-        0.12,
-        "Previsto",
-        fontsize=9.5,
-        fontweight="bold",
-        color="#6C757D",
-    )
-    axis.plot([0.55, 0.615], [0.085, 0.085], color="#6C757D", linewidth=2, linestyle="--")
-    axis.text(0.645, 0.082, "Diseño pendiente de implementación y validación", fontsize=9, va="center", color="#666666")
 
     output.parent.mkdir(parents=True, exist_ok=True)
     figure.savefig(output, dpi=220, bbox_inches="tight", facecolor="white")

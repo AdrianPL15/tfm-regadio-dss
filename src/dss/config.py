@@ -1,7 +1,8 @@
 """Parámetros, constantes y casos de uso del motor de recomendación.
 
-Los valores por defecto describen el piloto reproducible del TFM: pimiento al
-aire libre en la estación SiAR AL01 La Mojonera durante la campaña de 2025.
+Los valores por defecto describen el piloto reproducible del TFM: pimiento en
+la estación SiAR AL01 La Mojonera durante la campaña de 2025. Su encuadre como
+cultivo al aire libre es una hipótesis pendiente de acreditar para este CSV.
 Cualquier otro caso se define creando un ``CropCase`` distinto, sin modificar
 la lógica del motor.
 """
