@@ -81,12 +81,13 @@ consultar las APIs.
 5. Ejecutar el flujo documentado y las pruebas en un entorno reproducible,
    registrar versiones de dependencias y comprobar que no se versionan tokens,
    credenciales ni datos sensibles.
-6. Comprobar y publicar la aplicación Streamlit con un enlace accesible para
-   el tutor. La demostración local sin dependencia de las APIs ya tiene guía
-   en `docs/DEMO_TFM.md`, pero no equivale a un despliegue público.
-7. Integrar la rama de revisión en `main` tras comprobar el estado remoto y
-   revisar la misma versión de Word y PDF; después, crear el fork para el
-   despliegue y mantener identificado el repositorio de origen.
+6. Incorporar al anexo de la memoria final el
+   [enlace público de Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/),
+   ya comprobado sin iniciar sesión el 23/10/2026. Abrir y revisar también el
+   CSV descargado desde la app; la guía está en `docs/STREAMLIT_DESPLIEGUE.md`.
+7. La rama de revisión ya se integró en `main` mediante la PR #8 y se creó el
+   fork `AdrianPL15/tfm-regadio-dss` para el despliegue. Mantener identificados
+   ambos repositorios y sincronizar el fork si `main` original cambia.
 
 Las prioridades posteriores a la entrega son ampliar campañas y estaciones,
 archivar previsiones por fecha de emisión, incorporar datos de suelo y riego
