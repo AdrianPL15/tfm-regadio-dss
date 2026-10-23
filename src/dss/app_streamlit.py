@@ -27,9 +27,10 @@ from src.dss.config import (  # noqa: E402
     CropCase,
     RecommendationRequest,
 )
-from src.dss.data_access import load_case  # noqa: E402
+from src.dss.data_access import load_case, load_crop_needs_bytes  # noqa: E402
 from src.dss.aemet_forecast import fetch_live_forecast, require_current_forecast  # noqa: E402
 from src.data.aemet_client import AEMETClient, AEMETError  # noqa: E402
+from src.data.refresh_siar_crop_needs import SiARRefreshError, fetch_validated_case  # noqa: E402
 from src.dss.engine import METHOD_LABELS, fmt_es, recommend  # noqa: E402
 from src.dss.live_calendar import extend_recent_kc  # noqa: E402
 
@@ -96,9 +97,38 @@ with st.sidebar:
         "automáticamente todas las zonas y cultivos de SiAR."
     )
 
+    snapshot_key = f"siar_{case.station_code}_{case.crop}_{case.campaign_year}"
+    aemet_key = f"aemet_{case.station_code}"
+    generate = st.button("Actualizar fuentes y generar recomendación", type="primary")
+    if generate:
+        st.session_state.pop(snapshot_key, None)
+        st.session_state.pop(aemet_key, None)
+
     history, metadata = _load(
         str(_absolute(case.source_file)), str(_absolute(case.metadata_file))
     )
+    if generate and case.campaign_year == date.today().year:
+        try:
+            with st.spinner("Consultando necesidades hídricas en SiAR…"):
+                content, fresh_metadata, additions = fetch_validated_case(
+                    metadata, _absolute(case.source_file).read_bytes(), date.today()
+                )
+                fresh_history = load_crop_needs_bytes(
+                    content, f"SiAR web: {case.crop} {case.station_code}"
+                )
+            st.session_state[snapshot_key] = (fresh_history, fresh_metadata)
+            st.success(
+                f"SiAR consultado: {len(additions)} jornadas nuevas; "
+                f"última observación {fresh_metadata['last_returned_date']}."
+            )
+        except (SiARRefreshError, OSError, ValueError) as error:
+            st.warning(
+                "No se pudo validar la descarga de SiAR. Se utilizará la "
+                f"instantánea guardada: {error}"
+            )
+    if snapshot_key in st.session_state:
+        history, metadata = st.session_state[snapshot_key]
+
     first_day = history["date"].min().date()
     last_day = history["date"].max().date()
     tomorrow = date.today() + timedelta(days=1)
@@ -108,6 +138,23 @@ with st.sidebar:
         and 0 <= (date.today() - last_day).days <= 2
         and float(history["kc"].iloc[-1]) > 0
     )
+    issue_key = f"fecha_{case.station_code}_{case.crop}_{case.campaign_year}"
+    if generate and live_case:
+        st.session_state[issue_key] = tomorrow
+    if generate and case.campaign_year == date.today().year and tomorrow.month in metadata.get("active_months", []):
+        try:
+            with st.spinner("Consultando la previsión municipal de AEMET…"):
+                try:
+                    cloud_key = st.secrets.get("AEMET_API_KEY")
+                except (FileNotFoundError, KeyError):
+                    cloud_key = None
+                provider = AEMETClient(api_key=cloud_key or os.getenv("AEMET_API_KEY"))
+                st.session_state[aemet_key] = fetch_live_forecast(
+                    case.aemet_municipality_code, client=provider
+                )
+            st.success("Previsión AEMET recibida.")
+        except (AEMETError, ValueError) as error:
+            st.warning(f"AEMET no está disponible; se mostrará la dosis base: {error}")
     active_dates = history.loc[history["kc"].gt(0), "date"]
     historical_example = active_dates.max().date() if not active_dates.empty else last_day
 
@@ -124,7 +171,7 @@ with st.sidebar:
         min_value=first_day,
         max_value=last_day + timedelta(days=MAX_HORIZON_DAYS),
         format="DD/MM/YYYY",
-        key=f"fecha_{case.station_code}_{case.crop}_{case.campaign_year}",
+        key=issue_key,
     )
     horizon = st.slider(
         "Horizonte orientativo (días)", 1, MAX_HORIZON_DAYS,
@@ -181,27 +228,14 @@ with st.sidebar:
         ) / 100
         st.caption("La fracción es orientativa. Solo se descuenta si AEMET cubre las 24 horas de mañana con mm numéricos.")
 
-st.subheader("Predicción municipal AEMET actual")
+st.subheader("Fuentes actuales: SiAR y AEMET")
 st.caption(
-    "La predicción corresponde al municipio, no a la estación SiAR ni a la parcela. "
-    "Solo se aplica al horizonte futuro de un cultivo en ciclo con SiAR 2026 reciente. "
-    "AEMET se renueva al pulsar el botón; los CSV SiAR de esta demo no se actualizan solos."
+    "El botón de la izquierda consulta SiAR y AEMET para la combinación seleccionada. "
+    "SiAR se usa en memoria y no altera el CSV versionado en GitHub. La predicción "
+    "AEMET corresponde al municipio, no a la estación SiAR ni a la parcela. "
+    "Solo se aplica al horizonte futuro de un cultivo en ciclo con SiAR reciente."
 )
-if st.button("Consultar AEMET ahora"):
-    try:
-        try:
-            cloud_key = st.secrets.get("AEMET_API_KEY")
-        except (FileNotFoundError, KeyError):
-            cloud_key = None
-        provider = AEMETClient(api_key=cloud_key or os.getenv("AEMET_API_KEY"))
-        st.session_state[f"aemet_{case.station_code}"] = fetch_live_forecast(
-            case.aemet_municipality_code, client=provider
-        )
-    except (AEMETError, ValueError) as error:
-        st.session_state.pop(f"aemet_{case.station_code}", None)
-        st.error(f"No se pudo obtener la predicción: {error}")
-
-live_forecast = st.session_state.get(f"aemet_{case.station_code}")
+live_forecast = st.session_state.get(aemet_key)
 forecast_input = None
 if live_forecast is not None:
     visible = live_forecast[[
@@ -224,7 +258,7 @@ if live_forecast is not None:
     else:
         st.info("Esta fecha no es mañana dentro de un ciclo SiAR vigente: AEMET se muestra, pero no se aplica al cálculo histórico.")
 elif live_case and issue == tomorrow and not use_scenario:
-    st.info("Pulsa «Consultar AEMET ahora» para considerar la previsión de lluvia de mañana; mientras tanto se muestra la dosis base.")
+    st.info("Pulsa «Actualizar fuentes y generar recomendación» para considerar la previsión de lluvia de mañana; mientras tanto se muestra la dosis base.")
 
 if use_scenario:
     forecast_input = pd.DataFrame({

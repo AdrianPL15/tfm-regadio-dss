@@ -8,8 +8,9 @@ import unittest
 from unittest.mock import patch
 
 from src.data.refresh_siar_crop_needs import (
-    CASES, SiARRefreshError, compare_rows, parse_csv, refresh,
+    CASES, SiARRefreshError, compare_rows, fetch_validated_case, parse_csv, refresh,
 )
+from src.dss.data_access import load_crop_needs_bytes
 
 
 META = {
@@ -45,6 +46,15 @@ class RefreshSiARTests(unittest.TestCase):
             compare_rows({date(2026, 1, 1): first, date(2026, 1, 3): third},
                          {date(2026, 1, 1): first, date(2026, 1, 2): second,
                           date(2026, 1, 3): third})
+
+    def test_live_case_uses_download_in_memory(self):
+        with patch("src.data.refresh_siar_crop_needs.download_csv", return_value=NEW):
+            content, metadata, additions = fetch_validated_case(META, OLD, date(2026, 1, 2))
+        history = load_crop_needs_bytes(content, "SiAR web")
+        self.assertEqual(metadata["last_returned_date"], "2026-01-02")
+        self.assertEqual(metadata["record_count"], 2)
+        self.assertEqual(additions, [date(2026, 1, 2)])
+        self.assertEqual(history["date"].max().date(), date(2026, 1, 2))
 
     def test_all_cases_are_validated_before_any_write(self):
         with tempfile.TemporaryDirectory() as directory:

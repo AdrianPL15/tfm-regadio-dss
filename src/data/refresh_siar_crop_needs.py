@@ -68,8 +68,13 @@ def _station_details(session: requests.Session, form: BeautifulSoup, metadata: d
     if not re.fullmatch(r"\d+_\d+", station_value):
         raise SiARRefreshError("Identificador de estación SiAR inesperado.")
     station_id, province_id = station_value.split("_")
-    details = _get(session, "necesidadesHidricasRest/obtenerDatosEstacion",
-                   params={"idProvincia": province_id, "idEstacion": station_id}).json()
+    try:
+        details = _get(session, "necesidadesHidricasRest/obtenerDatosEstacion",
+                       params={"idProvincia": province_id, "idEstacion": station_id}).json()
+    except requests.exceptions.JSONDecodeError as exc:
+        raise SiARRefreshError("SiAR no devolvió datos de estación válidos.") from exc
+    if not isinstance(details, dict):
+        raise SiARRefreshError("Formato de estación SiAR inesperado.")
     if str(details.get("idEstacion")) != station_id or str(details.get("idProvincia")) != province_id:
         raise SiARRefreshError(f"Identidad de estación inconsistente para {code}.")
     if details.get("comarca") != metadata["region"] or details.get("provincia") != metadata["province"]:
@@ -80,8 +85,13 @@ def _station_details(session: requests.Session, form: BeautifulSoup, metadata: d
 
 
 def _crop_details(session: requests.Session, metadata: dict, comarca_id: int) -> dict:
-    crops = _get(session, "necesidadesHidricasRest/obtenerCultivosXComarca",
-                 params={"idComarca": comarca_id}).json()
+    try:
+        crops = _get(session, "necesidadesHidricasRest/obtenerCultivosXComarca",
+                     params={"idComarca": comarca_id}).json()
+    except requests.exceptions.JSONDecodeError as exc:
+        raise SiARRefreshError("SiAR no devolvió un catálogo de cultivos válido.") from exc
+    if not isinstance(crops, list) or any(not isinstance(item, dict) for item in crops):
+        raise SiARRefreshError("Formato de cultivos SiAR inesperado.")
     matching = [item for item in crops if item.get("cultivo") == metadata["crop"]]
     if len(matching) != 1:
         raise SiARRefreshError(f"No se encontró un cultivo único: {metadata['crop']}.")
@@ -196,6 +206,19 @@ def compare_rows(old: dict[date, tuple[str, ...]], new: dict[date, tuple[str, ..
     if additions and additions[0] <= max(old):
         raise SiARRefreshError("SiAR añadió una fecha dentro del histórico: revisión manual necesaria.")
     return additions
+
+
+def fetch_validated_case(metadata: dict, old_content: bytes, today: date) -> tuple[bytes, dict, list[date]]:
+    """Devuelve una instantánea segura para la app, sin modificar el repositorio."""
+    old = parse_csv(old_content, metadata, today)
+    fresh = download_csv(metadata, today)
+    new = parse_csv(fresh, metadata, today)
+    additions = compare_rows(old, new)
+    updated = dict(metadata)
+    updated.update(retrieved_at=today.isoformat(), requested_end_date=today.isoformat(),
+                   first_returned_date=min(new).isoformat(),
+                   last_returned_date=max(new).isoformat(), record_count=len(new))
+    return fresh, updated, additions
 
 
 def _atomic_write(path: Path, content: bytes) -> None:
