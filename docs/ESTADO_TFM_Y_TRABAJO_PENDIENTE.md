@@ -75,21 +75,26 @@ consultar las APIs.
 1. Confirmar con el tutor que la portada, el resumen español, los índices y el
    anexo A de la versión de revisión cumplen las normas del máster; no se
    incluye abstract en inglés por decisión del equipo.
-2. Revisar la guía `docs/DEMO_TFM.md` y probar la demostración local desde un
-   clon limpio antes de la entrega final.
+2. La guía `docs/DEMO_TFM.md` ya incluye el recorrido público comprobado el
+   25/10/2026, la lectura del CSV y la alternativa retrospectiva local. Falta
+   repetir la instalación y la demo local desde un clon limpio en otro equipo.
 3. Revisar todas las referencias cruzadas, pies de tablas y figuras, citas,
    bibliografía, unidades, redondeos y ortografía. Confirmar el origen y la
    aplicabilidad al pimiento al aire libre del calendario y los coeficientes
    `Kc` utilizados por SiAR.
 4. Asegurar que el Word y el PDF finales representan la misma versión; revisar
    visualmente todas las páginas y evitar tablas partidas de forma incómoda.
-5. Ejecutar el flujo documentado y las pruebas en un entorno reproducible,
+5. Ejecutar el flujo documentado y la suite completa en un entorno reproducible,
    registrar versiones de dependencias y comprobar que no se versionan tokens,
-   credenciales ni datos sensibles.
-6. Incorporar al anexo de la memoria final el
-   [enlace público de Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/),
-   ya comprobado sin iniciar sesión el 23/10/2026. Abrir y revisar también el
-   CSV descargado desde la app; la guía está en `docs/STREAMLIT_DESPLIEGUE.md`.
+   credenciales ni datos sensibles. El 25/10 pasaron 33 pruebas focalizadas
+   del motor, AEMET, ETc y la demo local. La prueba de interfaz con `AppTest`
+   no concluyó en este entorno y queda por diagnosticar; la aplicación pública
+   sí se comprobó manualmente.
+6. El anexo de la memoria ya incluye el
+   [enlace público de Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/).
+   El 25/10/2026 se comprobó el CSV descargado: siete días, dosis y volumen
+   coherentes con los indicadores redondeados de la pantalla. El recorrido está
+   en `docs/DEMO_TFM.md`; verificarlo de nuevo el día de la presentación.
 7. La rama de revisión ya se integró en `main` mediante la PR #8 y se creó el
    fork `AdrianPL15/tfm-regadio-dss` para el despliegue. Mantener identificados
    ambos repositorios y sincronizar el fork si `main` original cambia.
