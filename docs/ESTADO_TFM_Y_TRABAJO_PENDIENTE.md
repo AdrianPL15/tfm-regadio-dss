@@ -1,25 +1,25 @@
 # Estado actual y trabajo pendiente del TFM
 
-Fecha de revisión: 23 de octubre de 2026
+Fecha de revisión: 24 de octubre de 2026
 
 ## 1. Diagnóstico general
 
-La memoria tiene contenido en los capítulos 1 a 6. El repositorio implementa
-una prueba de concepto para pimiento al aire libre en la estación SiAR `AL01`
-(La Mojonera, Almería) durante la campaña de mayo a septiembre de 2025. La ETL,
-la comparación de seis enfoques predictivos, el motor de recomendaciones y la
-aplicación Streamlit cuentan con código y evidencias. El conjunto oficial de
-necesidades tiene 150 fechas, de las que 148 son válidas para el análisis;
-existe un catálogo de 88 variables. La validación técnica documenta 13
-escenarios. Las 61 pruebas automáticas se ejecutaron correctamente en el
-entorno local del proyecto el 23/10/2026.
+La memoria tiene contenido en los capítulos 1 a 6. El piloto inicial de
+pimiento en `AL01` (La Mojonera, Almería) durante 2025 permanece como referencia
+de la ETL y del motor. La aplicación Streamlit admite ahora los nueve CSV SiAR
+descargados para tres estaciones, seis cultivos y campañas de 2025 o 2026. El
+experimento predictivo nuevo agrupa esos archivos en seis casos independientes:
+1776 filas de origen y 1584 jornadas completas y activas. La comparación
+temporal y el reajuste se documentan en `docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md`
+y en `docs/data_samples/model_retraining_2026.json`. No existe un modelo
+único que se haya generalizado a todos los cultivos.
 
 El piloto estima la necesidad neta calculada por SiAR y propone dosis diarias
 y semanales. No se ha medido el riego aplicado, el ahorro de agua ni la respuesta
 del cultivo. Tampoco se ha demostrado que el resultado se generalice a otras
-estaciones, campañas o cultivos. La selección dinámica de caso y la operación
-continua siguen siendo objetivos del producto, no funciones validadas del
-prototipo.
+estaciones, campañas o cultivos. La selección en la interfaz se limita a los
+casos ya descargados; la extracción arbitraria y la operación continua siguen
+siendo objetivos del producto, no funciones validadas del prototipo.
 
 ## 2. Estado por capítulo
 
@@ -28,10 +28,10 @@ prototipo.
 | 1. Introducción y objetivos | Redactado | Distinguir con claridad la visión de producto (elegir zona y cultivo) del piloto fijo realmente implementado. |
 | 2. Marco teórico y estado del arte | Redactado | Cotejar citas, referencias, DOI y formato final. |
 | 3. Metodología y arquitectura | Redactado | Verificar que las tecnologías previstas no se presentan como desplegadas. |
-| 4. Procesamiento y Machine Learning | Implementado y documentado para el piloto | Revisar reproducción de cifras y que los resultados no se describan como validación agronómica. |
+| 4. Procesamiento y Machine Learning | Piloto original y reentrenamiento independiente en seis casos documentados | Revisar reproducción de cifras y que los resultados no se describan como validación agronómica ni como mejora demostrada. |
 | 5. DSS y resultados | Implementado y documentado para el piloto | Validar con usuarios y datos de campo en una fase posterior; falta histórico de previsiones alineado. |
 | 6. Conclusiones | Redactado | Revisar con el equipo el grado de cumplimiento de objetivos y las afirmaciones de alcance. |
-| Elementos preliminares y anexos | Versión de revisión preparada | Portada, resumen en español, palabras clave, índices y anexo A están en `docs/memoria/TFM_revision_coherencia_2026-10.docx` y su PDF de 85 páginas. El abstract en inglés se eliminó por decisión del equipo; comprobar los requisitos formales antes de entregar. |
+| Elementos preliminares y anexos | Versión de revisión preparada | La memoria ampliada está en `docs/memoria/TFM_revision_reentrenamiento_2026-10-23.docx` y su PDF en `docs/memoria/TFM_revision_reentrenamiento_2026-10-24_revisado.pdf`. Se comprobaron los índices y las páginas modificadas; resta la lectura editorial completa de las 84 páginas. El abstract en inglés se eliminó por decisión del equipo. |
 
 ## 3. Qué demuestra el repositorio
 
@@ -40,9 +40,9 @@ prototipo.
   metadatos, descargado manualmente de la web de SiAR.
 - Capas `raw`, `interim` y `processed`, controles de calidad y trazabilidad.
 - Comparación temporal de Persistencia, Ridge, Random Forest, KNN, SVR y
-  XGBoost para la referencia de SiAR. La persistencia es la mejor línea base
-  del piloto; los cinco algoritmos de aprendizaje no la mejoran de forma
-  estable.
+  XGBoost para la referencia de SiAR. El nuevo experimento evalúa seis casos
+  por separado: persistencia se selecciona en cinco; Ridge se selecciona en
+  coliflor, pero no supera a persistencia en la prueba final.
 - Motor de recomendación con reglas, dosis neta y bruta, conversión opcional a
   volumen, advertencias y explicación; aplicación Streamlit y línea de comandos.
 - Validación técnica frente a SiAR, análisis por horizonte, 13 escenarios y
@@ -58,7 +58,7 @@ consultar las APIs.
 
 | Componente | Estado real del piloto | Tratamiento en la memoria |
 |---|---|---|
-| Elección de estación y cultivo | La extracción climática admite estación y periodo; la ETL de necesidades toma el CSV más recientemente modificado. La aplicación utiliza un caso fijo. | Presentar la selección dinámica como evolución, no como función actual. |
+| Elección de estación y cultivo | La aplicación permite elegir entre los nueve CSV verificados; no ofrece cualquier combinación nacional. El experimento predictivo agrupa campañas del mismo cultivo y estación. | Describir la selección limitada implementada y la libre selección como evolución. |
 | ET0 y lluvia previstas | No existe un histórico de emisiones alineado con la campaña de 2025; la previsión de ET0 puede suministrarse manualmente al motor. | No atribuir al piloto una validación predictiva con pronósticos históricos. |
 | Momento de riego | El motor estima cuánto regar y avisa ante lluvia; no calcula un balance hídrico del suelo. | No afirmar que decide el día óptimo de riego. |
 | Disponibilidad de agua | La dotación la introduce el usuario; MITECO no se integra como asignación parcelaria. | Declarar la limitación hidrológica. |

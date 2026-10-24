@@ -1,0 +1,3011 @@
+{
+  "experiment": "Reentrenamiento por cultivo y estación con campañas SiAR disponibles hasta el 22/10/2026",
+  "scope": "Seis modelos independientes; no se ha entrenado un modelo nacional compartido",
+  "target": "target_net_irrigation_need_mm",
+  "features": [
+    "crop_coefficient_kc",
+    "day_of_year_sin",
+    "day_of_year_cos",
+    "net_irrigation_need_mm_lag_1d",
+    "net_irrigation_need_mm_lag_3d",
+    "net_irrigation_need_mm_lag_7d",
+    "net_irrigation_need_mm_sum_3d",
+    "net_irrigation_need_mm_sum_7d",
+    "net_irrigation_need_mm_sum_14d"
+  ],
+  "selection": "MAE medio de tres cortes temporales; último 15 % activo reservado para prueba",
+  "source_rows_csv": 1776,
+  "valid_active_rows": 1584,
+  "cases": {
+    "pimiento_AL01": {
+      "crop": "Pimiento",
+      "station_code": "AL01",
+      "station_name": "La Mojonera",
+      "campaigns": [
+        2025,
+        2026
+      ],
+      "source_quality": [
+        {
+          "source_csv": "data/external/siar_necesidades_pimiento_AL01_2025.csv",
+          "source_metadata": "data/external/siar_necesidades_pimiento_AL01_2025.metadata.json",
+          "csv_rows": 150,
+          "calendar_rows": 153,
+          "complete_rows": 148,
+          "excluded_incomplete_rows": 5,
+          "active_complete_rows": 148,
+          "last_observed_date": "2025-09-30"
+        },
+        {
+          "source_csv": "data/external/siar_necesidades_pimiento_AL01_2026.csv",
+          "source_metadata": "data/external/siar_necesidades_pimiento_AL01_2026.metadata.json",
+          "csv_rows": 175,
+          "calendar_rows": 175,
+          "complete_rows": 174,
+          "excluded_incomplete_rows": 1,
+          "active_complete_rows": 152,
+          "last_observed_date": "2026-10-22"
+        }
+      ],
+      "active_rows_by_year": {
+        "2025": 148,
+        "2026": 152
+      },
+      "evaluation": {
+        "objective": "Anticipar la referencia diaria de necesidad neta de SiAR",
+        "input_stage": "processed_4_2",
+        "target": "target_net_irrigation_need_mm",
+        "data_start": "2025-05-01",
+        "data_end": "2026-09-30",
+        "valid_rows": 300,
+        "random_seed": 42,
+        "selection_method": "3-fold expanding-window temporal validation",
+        "selection_metric": "cross_validation.mae_mm_day.mean",
+        "selected_model": "persistence",
+        "selected_ml_candidate": "random_forest",
+        "test_best_model": "svr",
+        "features": [
+          "crop_coefficient_kc",
+          "day_of_year_sin",
+          "day_of_year_cos",
+          "net_irrigation_need_mm_lag_1d",
+          "net_irrigation_need_mm_lag_3d",
+          "net_irrigation_need_mm_lag_7d",
+          "net_irrigation_need_mm_sum_3d",
+          "net_irrigation_need_mm_sum_7d",
+          "net_irrigation_need_mm_sum_14d"
+        ],
+        "excluded_same_day_features": [
+          "et0_mm",
+          "et0_pm_mm",
+          "crop_evapotranspiration_etc_mm",
+          "effective_precipitation_mm",
+          "effective_precipitation_pm_mm",
+          "etc_estimated_from_weather_mm",
+          "net_irrigation_need_estimated_mm"
+        ],
+        "prediction_constraint": "Predicciones recortadas a un mínimo de 0 mm/día",
+        "model_definitions": {
+          "persistence": "Baseline de un día: la estimación de t es la necesidad observada en t-1; si falta, utiliza la mediana aprendida en entrenamiento.",
+          "ridge": "Regresión lineal regularizada con imputación y escalado.",
+          "random_forest": "Conjunto conservador de 300 árboles de regresión.",
+          "knn": "Regresión por siete vecinos próximos, distancia y variables escaladas.",
+          "svr": "Support Vector Regression con kernel RBF, imputación y escalado.",
+          "xgboost": "Gradient boosting de árboles con regularización y semilla fija."
+        },
+        "persistence_horizon": "one_step_ahead",
+        "split": {
+          "development_rows": 255,
+          "test_rows": 45,
+          "development_start": "2025-05-01",
+          "development_end": "2026-08-16",
+          "test_start": "2026-08-17",
+          "test_end": "2026-09-30"
+        },
+        "cross_validation": {
+          "summary": {
+            "persistence": {
+              "mae_mm_day": {
+                "mean": 0.501031746031746,
+                "std": 0.07104148495206279,
+                "min": 0.4269047619047619,
+                "max": 0.5968253968253967
+              },
+              "rmse_mm_day": {
+                "mean": 0.736123935950259,
+                "std": 0.036238344164235416,
+                "min": 0.6852206804762835,
+                "max": 0.7667204950047425
+              },
+              "r2": {
+                "mean": 0.4728073523492009,
+                "std": 0.287094785236109,
+                "min": 0.10301763934107588,
+                "max": 0.8028807185565859
+              },
+              "bias_mm_day": {
+                "mean": 0.010608465608465604,
+                "std": 0.04396072430576048,
+                "min": -0.05111111111111111,
+                "max": 0.047936507936507916
+              },
+              "weekly_mae_mm": {
+                "mean": 0.9074629629629629,
+                "std": 0.19949599216934774,
+                "min": 0.7494999999999995,
+                "max": 1.188888888888889
+              }
+            },
+            "ridge": {
+              "mae_mm_day": {
+                "mean": 1.0559467705136147,
+                "std": 0.8782189771771006,
+                "min": 0.37096873967556315,
+                "max": 2.2956574312148463
+              },
+              "rmse_mm_day": {
+                "mean": 1.271855382708485,
+                "std": 0.925282388360309,
+                "min": 0.5429300388721977,
+                "max": 2.5774461700548628
+              },
+              "r2": {
+                "mean": -0.25918280473705746,
+                "std": 1.0998056044987217,
+                "min": -1.7889927886350048,
+                "max": 0.7488674347591778
+              },
+              "bias_mm_day": {
+                "mean": 0.694814489795402,
+                "std": 1.1369158064423606,
+                "min": -0.2606546184248992,
+                "max": 2.292448777736779
+              },
+              "weekly_mae_mm": {
+                "mean": 5.854799948214509,
+                "std": 6.076182492735505,
+                "min": 1.2973902159275306,
+                "max": 14.442427299741706
+              }
+            },
+            "random_forest": {
+              "mae_mm_day": {
+                "mean": 0.5366692780814738,
+                "std": 0.13635657294748887,
+                "min": 0.36727797012046676,
+                "max": 0.7011747752482675
+              },
+              "rmse_mm_day": {
+                "mean": 0.7480874585578574,
+                "std": 0.1823903657841161,
+                "min": 0.5420402239853976,
+                "max": 0.9854902823459744
+              },
+              "r2": {
+                "mean": 0.5193757908310738,
+                "std": 0.22382532044788137,
+                "min": 0.2161676397199015,
+                "max": 0.7496899288641066
+              },
+              "bias_mm_day": {
+                "mean": 0.006031985068527396,
+                "std": 0.11705351033117369,
+                "min": -0.15799007527232609,
+                "max": 0.10740429650934895
+              },
+              "weekly_mae_mm": {
+                "mean": 2.290216398495765,
+                "std": 1.1689814219871997,
+                "min": 1.3966215652581557,
+                "max": 3.941543828412333
+              }
+            },
+            "knn": {
+              "mae_mm_day": {
+                "mean": 0.555025251330271,
+                "std": 0.1448213915233912,
+                "min": 0.38106067990143905,
+                "max": 0.7356136216751434
+              },
+              "rmse_mm_day": {
+                "mean": 0.7753089298906066,
+                "std": 0.17116807222292224,
+                "min": 0.5939056004392086,
+                "max": 1.0048176098234916
+              },
+              "r2": {
+                "mean": 0.4895708408573192,
+                "std": 0.21560506907282076,
+                "min": 0.19309617614418795,
+                "max": 0.6994960861488431
+              },
+              "bias_mm_day": {
+                "mean": 0.14947471858732772,
+                "std": 0.32262667042904525,
+                "min": -0.19866685483844165,
+                "max": 0.5789472209320184
+              },
+              "weekly_mae_mm": {
+                "mean": 2.3995492813920403,
+                "std": 1.1223772984018165,
+                "min": 1.5738085044499472,
+                "max": 3.98639169973558
+              }
+            },
+            "svr": {
+              "mae_mm_day": {
+                "mean": 0.6126173548931533,
+                "std": 0.1381227851129654,
+                "min": 0.507866604719197,
+                "max": 0.8077768884310558
+              },
+              "rmse_mm_day": {
+                "mean": 0.8143261571423492,
+                "std": 0.18647448452210239,
+                "min": 0.6666952101517069,
+                "max": 1.0773846693066274
+              },
+              "r2": {
+                "mean": 0.46289838533494576,
+                "std": 0.15376207619240476,
+                "min": 0.25468804266567113,
+                "max": 0.6213220987768209
+              },
+              "bias_mm_day": {
+                "mean": 0.07594471910499571,
+                "std": 0.22671443915074008,
+                "min": -0.228270575502365,
+                "max": 0.3157390032148023
+              },
+              "weekly_mae_mm": {
+                "mean": 2.890509047333252,
+                "std": 1.2546305147274313,
+                "min": 1.597894028516554,
+                "max": 4.589435387361194
+              }
+            },
+            "xgboost": {
+              "mae_mm_day": {
+                "mean": 0.5437201484801277,
+                "std": 0.15109927887614552,
+                "min": 0.38181099952213354,
+                "max": 0.7454454095023019
+              },
+              "rmse_mm_day": {
+                "mean": 0.782567378962784,
+                "std": 0.23984271788335107,
+                "min": 0.5496403733855086,
+                "max": 1.1125620306199464
+              },
+              "r2": {
+                "mean": 0.501985311679278,
+                "std": 0.1882661170695294,
+                "min": 0.282991444850058,
+                "max": 0.7426213352731553
+              },
+              "bias_mm_day": {
+                "mean": 0.19473394545297773,
+                "std": 0.3219001257959974,
+                "min": -0.17862230346316374,
+                "max": 0.6069854948255751
+              },
+              "weekly_mae_mm": {
+                "mean": 2.2747540277904927,
+                "std": 1.114309261250833,
+                "min": 1.2503561242421455,
+                "max": 3.8240086174011223
+              }
+            }
+          },
+          "folds": [
+            {
+              "fold": 1,
+              "train_rows": 66,
+              "validation_rows": 63,
+              "train_start": "2025-05-01",
+              "train_end": "2025-07-05",
+              "validation_start": "2025-07-06",
+              "validation_end": "2025-09-11",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.4269047619047619,
+                  "rmse_mm_day": 0.6852206804762835,
+                  "r2": 0.8028807185565859,
+                  "bias_mm_day": 0.034999999999999996,
+                  "weekly_mae_mm": 0.7494999999999995
+                },
+                "ridge": {
+                  "mae_mm_day": 2.2956574312148463,
+                  "rmse_mm_day": 2.5774461700548628,
+                  "r2": -1.7889927886350048,
+                  "bias_mm_day": 2.292448777736779,
+                  "weekly_mae_mm": 14.442427299741706
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.7011747752482675,
+                  "rmse_mm_day": 0.9854902823459744,
+                  "r2": 0.5922698039092134,
+                  "bias_mm_day": 0.06868173396855932,
+                  "weekly_mae_mm": 3.941543828412333
+                },
+                "knn": {
+                  "mae_mm_day": 0.7356136216751434,
+                  "rmse_mm_day": 1.0048176098234916,
+                  "r2": 0.5761202602789269,
+                  "bias_mm_day": 0.5789472209320184,
+                  "weekly_mae_mm": 3.98639169973558
+                },
+                "svr": {
+                  "mae_mm_day": 0.8077768884310558,
+                  "rmse_mm_day": 1.0773846693066274,
+                  "r2": 0.5126850145623452,
+                  "bias_mm_day": 0.14036572960254984,
+                  "weekly_mae_mm": 4.589435387361194
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.7454454095023019,
+                  "rmse_mm_day": 1.1125620306199464,
+                  "r2": 0.48034315491462076,
+                  "bias_mm_day": 0.6069854948255751,
+                  "weekly_mae_mm": 3.8240086174011223
+                }
+              }
+            },
+            {
+              "fold": 2,
+              "train_rows": 129,
+              "validation_rows": 63,
+              "train_start": "2025-05-01",
+              "train_end": "2025-09-11",
+              "validation_start": "2025-09-12",
+              "validation_end": "2026-06-14",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.4793650793650794,
+                  "rmse_mm_day": 0.756430632369751,
+                  "r2": 0.5125236991499409,
+                  "bias_mm_day": 0.047936507936507916,
+                  "weekly_mae_mm": 0.784
+                },
+                "ridge": {
+                  "mae_mm_day": 0.37096873967556315,
+                  "rmse_mm_day": 0.5429300388721977,
+                  "r2": 0.7488674347591778,
+                  "bias_mm_day": 0.05264931007432608,
+                  "weekly_mae_mm": 1.2973902159275306
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.36727797012046676,
+                  "rmse_mm_day": 0.5420402239853976,
+                  "r2": 0.7496899288641066,
+                  "bias_mm_day": 0.10740429650934895,
+                  "weekly_mae_mm": 1.5324838018168059
+                },
+                "knn": {
+                  "mae_mm_day": 0.38106067990143905,
+                  "rmse_mm_day": 0.5939056004392086,
+                  "r2": 0.6994960861488431,
+                  "bias_mm_day": 0.06814378966840642,
+                  "weekly_mae_mm": 1.6384476399905936
+                },
+                "svr": {
+                  "mae_mm_day": 0.507866604719197,
+                  "rmse_mm_day": 0.6666952101517069,
+                  "r2": 0.6213220987768209,
+                  "bias_mm_day": 0.3157390032148023,
+                  "weekly_mae_mm": 2.484197726122009
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.38181099952213354,
+                  "rmse_mm_day": 0.5496403733855086,
+                  "r2": 0.7426213352731553,
+                  "bias_mm_day": 0.15583864499652195,
+                  "weekly_mae_mm": 1.7498973417282104
+                }
+              }
+            },
+            {
+              "fold": 3,
+              "train_rows": 192,
+              "validation_rows": 63,
+              "train_start": "2025-05-01",
+              "train_end": "2026-06-14",
+              "validation_start": "2026-06-15",
+              "validation_end": "2026-08-16",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.5968253968253967,
+                  "rmse_mm_day": 0.7667204950047425,
+                  "r2": 0.10301763934107588,
+                  "bias_mm_day": -0.05111111111111111,
+                  "weekly_mae_mm": 1.188888888888889
+                },
+                "ridge": {
+                  "mae_mm_day": 0.5012141406504348,
+                  "rmse_mm_day": 0.6951899391983952,
+                  "r2": 0.2625769396646547,
+                  "bias_mm_day": -0.2606546184248992,
+                  "weekly_mae_mm": 1.8245823289742935
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.5415550888756874,
+                  "rmse_mm_day": 0.7167318693422,
+                  "r2": 0.2161676397199015,
+                  "bias_mm_day": -0.15799007527232609,
+                  "weekly_mae_mm": 1.3966215652581557
+                },
+                "knn": {
+                  "mae_mm_day": 0.5484014524142306,
+                  "rmse_mm_day": 0.7272035794091196,
+                  "r2": 0.19309617614418795,
+                  "bias_mm_day": -0.19866685483844165,
+                  "weekly_mae_mm": 1.5738085044499472
+                },
+                "svr": {
+                  "mae_mm_day": 0.5222085715292071,
+                  "rmse_mm_day": 0.6988985919687136,
+                  "r2": 0.25468804266567113,
+                  "bias_mm_day": -0.228270575502365,
+                  "weekly_mae_mm": 1.597894028516554
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.5039040364159477,
+                  "rmse_mm_day": 0.6854997328828971,
+                  "r2": 0.282991444850058,
+                  "bias_mm_day": -0.17862230346316374,
+                  "weekly_mae_mm": 1.2503561242421455
+                }
+              }
+            }
+          ]
+        },
+        "test": {
+          "persistence": {
+            "mae_mm_day": 0.39,
+            "rmse_mm_day": 0.6912581122690551,
+            "r2": 0.8346839595202702,
+            "bias_mm_day": 0.12777777777777777,
+            "weekly_mae_mm": 1.0185714285714287
+          },
+          "ridge": {
+            "mae_mm_day": 0.2934820126367482,
+            "rmse_mm_day": 0.4560980849345627,
+            "r2": 0.9280300815991522,
+            "bias_mm_day": 0.029222248216852483,
+            "weekly_mae_mm": 0.9679498825045788
+          },
+          "random_forest": {
+            "mae_mm_day": 0.275245996552943,
+            "rmse_mm_day": 0.4709238240608337,
+            "r2": 0.9232751873213512,
+            "bias_mm_day": 0.08072927137139299,
+            "weekly_mae_mm": 1.1315009397672007
+          },
+          "knn": {
+            "mae_mm_day": 0.2853717663271122,
+            "rmse_mm_day": 0.4442653917014539,
+            "r2": 0.931715917431037,
+            "bias_mm_day": 0.058657037730224154,
+            "weekly_mae_mm": 1.0476067654858021
+          },
+          "svr": {
+            "mae_mm_day": 0.2728919440838604,
+            "rmse_mm_day": 0.4440341695641816,
+            "r2": 0.9317869771313646,
+            "bias_mm_day": -0.06956598428761841,
+            "weekly_mae_mm": 0.8063878190188387
+          },
+          "xgboost": {
+            "mae_mm_day": 0.2763056112925211,
+            "rmse_mm_day": 0.4661244108296475,
+            "r2": 0.924831097794762,
+            "bias_mm_day": 0.03672684839036725,
+            "weekly_mae_mm": 0.9531157738821843
+          }
+        },
+        "decision": "Mantener la persistencia como referencia predictiva del piloto: ninguno de los cinco algoritmos de aprendizaje mejora su MAE medio de validación. Random Forest queda como mejor candidato de machine learning.",
+        "limitations": [
+          "Un solo ciclo, cultivo y estación no permiten demostrar generalización.",
+          "La etiqueta es una referencia calculada por SiAR, no riego real observado.",
+          "No se puede afirmar ahorro de agua sin sensores, riego aplicado y respuesta del cultivo.",
+          "La meteorología AEMET disponible no coincide temporalmente con el ciclo de entrenamiento."
+        ]
+      },
+      "final_refit": {
+        "model": "persistence",
+        "rows": 300,
+        "start": "2025-05-01",
+        "end": "2026-09-30",
+        "evaluated_on_refit": false,
+        "artifact": "models/retrained_2026/pimiento_AL01.joblib"
+      }
+    },
+    "coliflor_AL01": {
+      "crop": "Coliflor",
+      "station_code": "AL01",
+      "station_name": "La Mojonera",
+      "campaigns": [
+        2026
+      ],
+      "source_quality": [
+        {
+          "source_csv": "data/external/siar_necesidades_coliflor_AL01_2026.csv",
+          "source_metadata": "data/external/siar_necesidades_coliflor_AL01_2026.metadata.json",
+          "csv_rows": 144,
+          "calendar_rows": 144,
+          "complete_rows": 144,
+          "excluded_incomplete_rows": 0,
+          "active_complete_rows": 144,
+          "last_observed_date": "2026-10-22"
+        }
+      ],
+      "active_rows_by_year": {
+        "2026": 144
+      },
+      "evaluation": {
+        "objective": "Anticipar la referencia diaria de necesidad neta de SiAR",
+        "input_stage": "processed_4_2",
+        "target": "target_net_irrigation_need_mm",
+        "data_start": "2026-06-01",
+        "data_end": "2026-10-22",
+        "valid_rows": 144,
+        "random_seed": 42,
+        "selection_method": "3-fold expanding-window temporal validation",
+        "selection_metric": "cross_validation.mae_mm_day.mean",
+        "selected_model": "ridge",
+        "selected_ml_candidate": "ridge",
+        "test_best_model": "knn",
+        "features": [
+          "crop_coefficient_kc",
+          "day_of_year_sin",
+          "day_of_year_cos",
+          "net_irrigation_need_mm_lag_1d",
+          "net_irrigation_need_mm_lag_3d",
+          "net_irrigation_need_mm_lag_7d",
+          "net_irrigation_need_mm_sum_3d",
+          "net_irrigation_need_mm_sum_7d",
+          "net_irrigation_need_mm_sum_14d"
+        ],
+        "excluded_same_day_features": [
+          "et0_mm",
+          "et0_pm_mm",
+          "crop_evapotranspiration_etc_mm",
+          "effective_precipitation_mm",
+          "effective_precipitation_pm_mm",
+          "etc_estimated_from_weather_mm",
+          "net_irrigation_need_estimated_mm"
+        ],
+        "prediction_constraint": "Predicciones recortadas a un mínimo de 0 mm/día",
+        "model_definitions": {
+          "persistence": "Baseline de un día: la estimación de t es la necesidad observada en t-1; si falta, utiliza la mediana aprendida en entrenamiento.",
+          "ridge": "Regresión lineal regularizada con imputación y escalado.",
+          "random_forest": "Conjunto conservador de 300 árboles de regresión.",
+          "knn": "Regresión por siete vecinos próximos, distancia y variables escaladas.",
+          "svr": "Support Vector Regression con kernel RBF, imputación y escalado.",
+          "xgboost": "Gradient boosting de árboles con regularización y semilla fija."
+        },
+        "persistence_horizon": "one_step_ahead",
+        "split": {
+          "development_rows": 122,
+          "test_rows": 22,
+          "development_start": "2026-06-01",
+          "development_end": "2026-09-30",
+          "test_start": "2026-10-01",
+          "test_end": "2026-10-22"
+        },
+        "cross_validation": {
+          "summary": {
+            "persistence": {
+              "mae_mm_day": {
+                "mean": 0.32255555555555554,
+                "std": 0.1626157327665743,
+                "min": 0.13033333333333333,
+                "max": 0.5280000000000001
+              },
+              "rmse_mm_day": {
+                "mean": 0.5784097225231121,
+                "std": 0.13641836631668877,
+                "min": 0.4741096919490256,
+                "max": 0.7711160742715717
+              },
+              "r2": {
+                "mean": -0.19957512426595603,
+                "std": 0.13491676008344222,
+                "min": -0.3880018674136321,
+                "max": -0.07937483142026558
+              },
+              "bias_mm_day": {
+                "mean": -0.022777777777777775,
+                "std": 0.045302549460867224,
+                "min": -0.08633333333333333,
+                "max": 0.016
+              },
+              "weekly_mae_mm": {
+                "mean": 0.4953333333333338,
+                "std": 0.24040151598708526,
+                "min": 0.17200000000000076,
+                "max": 0.7480000000000004
+              }
+            },
+            "ridge": {
+              "mae_mm_day": {
+                "mean": 0.2643075234564935,
+                "std": 0.16050533266200948,
+                "min": 0.0475330640239364,
+                "max": 0.4310005678288205
+              },
+              "rmse_mm_day": {
+                "mean": 0.3730657632168201,
+                "std": 0.23028345549909157,
+                "min": 0.05624709652418946,
+                "max": 0.5967832441500254
+              },
+              "r2": {
+                "mean": 0.35355615805508883,
+                "std": 0.4597046962059081,
+                "min": -0.09375931136633131,
+                "max": 0.9857775532678927
+              },
+              "bias_mm_day": {
+                "mean": 0.0787665254851823,
+                "std": 0.09884749931913714,
+                "min": -0.02905575208683946,
+                "max": 0.20972965663256338
+              },
+              "weekly_mae_mm": {
+                "mean": 0.9001311531700367,
+                "std": 0.5145805320040915,
+                "min": 0.1743345125210367,
+                "max": 1.3089000871092507
+              }
+            },
+            "random_forest": {
+              "mae_mm_day": {
+                "mean": 1.0542153323883172,
+                "std": 0.919245898611515,
+                "min": 0.1836824412408579,
+                "max": 2.3256330186141025
+              },
+              "rmse_mm_day": {
+                "mean": 1.238819022848274,
+                "std": 0.8100613389195511,
+                "min": 0.5067417154644617,
+                "max": 2.367973769430675
+              },
+              "r2": {
+                "mean": -9.34352779912591,
+                "std": 12.643853786823033,
+                "min": -27.222311426176162,
+                "max": -0.15437632777234467
+              },
+              "bias_mm_day": {
+                "mean": -1.0180829797807773,
+                "std": 0.936265954451803,
+                "min": -2.3256330186141025,
+                "max": -0.1836824412408579
+              },
+              "weekly_mae_mm": {
+                "mean": 6.149643647709663,
+                "std": 5.5970662401598,
+                "min": 1.1020946474451474,
+                "max": 13.953798111684614
+              }
+            },
+            "knn": {
+              "mae_mm_day": {
+                "mean": 1.1939377814044996,
+                "std": 1.10888597198154,
+                "min": 0.18080501810573424,
+                "max": 2.7371399000580254
+              },
+              "rmse_mm_day": {
+                "mean": 1.3783722866728993,
+                "std": 0.9961886855207537,
+                "min": 0.50844829717373,
+                "max": 2.7730280008505823
+              },
+              "r2": {
+                "mean": -12.855463192024105,
+                "std": 17.5714079288507,
+                "min": -37.703239294663035,
+                "max": -0.16216473266490405
+              },
+              "bias_mm_day": {
+                "mean": -1.1578417718513403,
+                "std": 1.1271649035071192,
+                "min": -2.7371399000580254,
+                "max": -0.18080501810573424
+              },
+              "weekly_mae_mm": {
+                "mean": 6.996814670837644,
+                "std": 6.7367148760238225,
+                "min": 1.0848301086344054,
+                "max": 16.422839400348153
+              }
+            },
+            "svr": {
+              "mae_mm_day": {
+                "mean": 1.1058038970132624,
+                "std": 0.8704171314140138,
+                "min": 0.19693815275154353,
+                "max": 2.279202184285347
+              },
+              "rmse_mm_day": {
+                "mean": 1.2730405687111344,
+                "std": 0.7668576283971085,
+                "min": 0.5111539096002,
+                "max": 2.322379344352106
+              },
+              "r2": {
+                "mean": -9.195997406832475,
+                "std": 11.993731926857103,
+                "min": -26.145955047180006,
+                "max": -0.1745661250617503
+              },
+              "bias_mm_day": {
+                "mean": -1.0836744473994553,
+                "std": 0.8776749551530684,
+                "min": -2.279202184285347,
+                "max": -0.19693815275154353
+              },
+              "weekly_mae_mm": {
+                "mean": 6.502046684396731,
+                "std": 5.266049730918408,
+                "min": 1.181628916509261,
+                "max": 13.675213105712078
+              }
+            },
+            "xgboost": {
+              "mae_mm_day": {
+                "mean": 0.8393082866006427,
+                "std": 0.5214959771229033,
+                "min": 0.17674911240736643,
+                "max": 1.4511205576260886
+              },
+              "rmse_mm_day": {
+                "mean": 1.02365129411609,
+                "std": 0.4130888169495074,
+                "min": 0.504597441496171,
+                "max": 1.5153438500817547
+              },
+              "r2": {
+                "mean": -4.0935169174837585,
+                "std": 4.608007644051521,
+                "min": -10.557427739984398,
+                "max": -0.14462752703786008
+              },
+              "bias_mm_day": {
+                "mean": -0.8167591471539604,
+                "std": 0.5191474989733416,
+                "min": -1.4483111996650697,
+                "max": -0.17674911240736643
+              },
+              "weekly_mae_mm": {
+                "mean": 4.920394313414891,
+                "std": 3.1153345485617145,
+                "min": 1.0604946744441985,
+                "max": 8.689867197990417
+              }
+            }
+          },
+          "folds": [
+            {
+              "fold": 1,
+              "train_rows": 32,
+              "validation_rows": 30,
+              "train_start": "2026-06-01",
+              "train_end": "2026-07-02",
+              "validation_start": "2026-07-03",
+              "validation_end": "2026-08-01",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.13033333333333333,
+                  "rmse_mm_day": 0.49000340134873893,
+                  "r2": -0.07937483142026558,
+                  "bias_mm_day": -0.08633333333333333,
+                  "weekly_mae_mm": 0.5660000000000001
+                },
+                "ridge": {
+                  "mae_mm_day": 0.0475330640239364,
+                  "rmse_mm_day": 0.05624709652418946,
+                  "r2": 0.9857775532678927,
+                  "bias_mm_day": -0.02905575208683946,
+                  "weekly_mae_mm": 0.1743345125210367
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.1836824412408579,
+                  "rmse_mm_day": 0.5067417154644617,
+                  "r2": -0.15437632777234467,
+                  "bias_mm_day": -0.1836824412408579,
+                  "weekly_mae_mm": 1.1020946474451474
+                },
+                "knn": {
+                  "mae_mm_day": 0.18080501810573424,
+                  "rmse_mm_day": 0.50844829717373,
+                  "r2": -0.16216473266490405,
+                  "bias_mm_day": -0.18080501810573424,
+                  "weekly_mae_mm": 1.0848301086344054
+                },
+                "svr": {
+                  "mae_mm_day": 0.19693815275154353,
+                  "rmse_mm_day": 0.5111539096002,
+                  "r2": -0.1745661250617503,
+                  "bias_mm_day": -0.19693815275154353,
+                  "weekly_mae_mm": 1.181628916509261
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.17674911240736643,
+                  "rmse_mm_day": 0.504597441496171,
+                  "r2": -0.14462752703786008,
+                  "bias_mm_day": -0.17674911240736643,
+                  "weekly_mae_mm": 1.0604946744441985
+                }
+              }
+            },
+            {
+              "fold": 2,
+              "train_rows": 62,
+              "validation_rows": 30,
+              "train_start": "2026-06-01",
+              "train_end": "2026-08-01",
+              "validation_start": "2026-08-02",
+              "validation_end": "2026-08-31",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.30933333333333324,
+                  "rmse_mm_day": 0.4741096919490256,
+                  "r2": -0.13134867396397043,
+                  "bias_mm_day": 0.016,
+                  "weekly_mae_mm": 0.17200000000000076
+                },
+                "ridge": {
+                  "mae_mm_day": 0.3143889385167236,
+                  "rmse_mm_day": 0.46616694897624555,
+                  "r2": -0.09375931136633131,
+                  "bias_mm_day": 0.20972965663256338,
+                  "weekly_mae_mm": 1.3089000871092507
+                },
+                "random_forest": {
+                  "mae_mm_day": 2.3256330186141025,
+                  "rmse_mm_day": 2.367973769430675,
+                  "r2": -27.222311426176162,
+                  "bias_mm_day": -2.3256330186141025,
+                  "weekly_mae_mm": 13.953798111684614
+                },
+                "knn": {
+                  "mae_mm_day": 2.7371399000580254,
+                  "rmse_mm_day": 2.7730280008505823,
+                  "r2": -37.703239294663035,
+                  "bias_mm_day": -2.7371399000580254,
+                  "weekly_mae_mm": 16.422839400348153
+                },
+                "svr": {
+                  "mae_mm_day": 2.279202184285347,
+                  "rmse_mm_day": 2.322379344352106,
+                  "r2": -26.145955047180006,
+                  "bias_mm_day": -2.279202184285347,
+                  "weekly_mae_mm": 13.675213105712078
+                },
+                "xgboost": {
+                  "mae_mm_day": 1.4511205576260886,
+                  "rmse_mm_day": 1.5153438500817547,
+                  "r2": -10.557427739984398,
+                  "bias_mm_day": -1.4483111996650697,
+                  "weekly_mae_mm": 8.689867197990417
+                }
+              }
+            },
+            {
+              "fold": 3,
+              "train_rows": 92,
+              "validation_rows": 30,
+              "train_start": "2026-06-01",
+              "train_end": "2026-08-31",
+              "validation_start": "2026-09-01",
+              "validation_end": "2026-09-30",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.5280000000000001,
+                  "rmse_mm_day": 0.7711160742715717,
+                  "r2": -0.3880018674136321,
+                  "bias_mm_day": 0.0020000000000000018,
+                  "weekly_mae_mm": 0.7480000000000004
+                },
+                "ridge": {
+                  "mae_mm_day": 0.4310005678288205,
+                  "rmse_mm_day": 0.5967832441500254,
+                  "r2": 0.16865023226370512,
+                  "bias_mm_day": 0.05562567190982299,
+                  "weekly_mae_mm": 1.2171588598798229
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.6533305373099917,
+                  "rmse_mm_day": 0.8417415836496853,
+                  "r2": -0.6538956434292251,
+                  "bias_mm_day": -0.5449334794873721,
+                  "weekly_mae_mm": 3.393038183999226
+                },
+                "knn": {
+                  "mae_mm_day": 0.6638684260497393,
+                  "rmse_mm_day": 0.8536405619943855,
+                  "r2": -0.700985548744375,
+                  "bias_mm_day": -0.5555803973902612,
+                  "weekly_mae_mm": 3.4827745035303734
+                },
+                "svr": {
+                  "mae_mm_day": 0.8412713540028963,
+                  "rmse_mm_day": 0.9855884521810964,
+                  "r2": -1.2674710482556697,
+                  "bias_mm_day": -0.7748830051614753,
+                  "weekly_mae_mm": 4.649298030968852
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.8900551897684733,
+                  "rmse_mm_day": 1.0510125907703445,
+                  "r2": -1.578495485429018,
+                  "bias_mm_day": -0.8252171293894451,
+                  "weekly_mae_mm": 5.010821067810058
+                }
+              }
+            }
+          ]
+        },
+        "test": {
+          "persistence": {
+            "mae_mm_day": 0.8854545454545455,
+            "rmse_mm_day": 1.1049804605429991,
+            "r2": 0.013147178631062961,
+            "bias_mm_day": 0.01181818181818181,
+            "weekly_mae_mm": 0.6350000000000003
+          },
+          "ridge": {
+            "mae_mm_day": 0.8918010196948054,
+            "rmse_mm_day": 1.1426985438264667,
+            "r2": -0.05537435808131508,
+            "bias_mm_day": 0.6072202374059408,
+            "weekly_mae_mm": 3.3397113057326724
+          },
+          "random_forest": {
+            "mae_mm_day": 0.9229305701011753,
+            "rmse_mm_day": 1.2195480019640863,
+            "r2": -0.20210108256740789,
+            "bias_mm_day": 0.4040466887324717,
+            "weekly_mae_mm": 3.499239650891314
+          },
+          "knn": {
+            "mae_mm_day": 0.7591609386881228,
+            "rmse_mm_day": 1.0863409142347769,
+            "r2": 0.046160149032455244,
+            "bias_mm_day": 0.15288697805820292,
+            "weekly_mae_mm": 2.368898221654118
+          },
+          "svr": {
+            "mae_mm_day": 0.8032530237646892,
+            "rmse_mm_day": 1.0798683506775197,
+            "r2": 0.05749249756186525,
+            "bias_mm_day": -0.03056493085354621,
+            "weekly_mae_mm": 1.6660334224303939
+          },
+          "xgboost": {
+            "mae_mm_day": 1.0211361061442985,
+            "rmse_mm_day": 1.3253522381044252,
+            "r2": -0.41973020411605577,
+            "bias_mm_day": 0.3666730074449019,
+            "weekly_mae_mm": 3.976229405403137
+          }
+        },
+        "decision": "Seleccionar Ridge por su menor MAE medio de validación.",
+        "limitations": [
+          "Un solo ciclo, cultivo y estación no permiten demostrar generalización.",
+          "La etiqueta es una referencia calculada por SiAR, no riego real observado.",
+          "No se puede afirmar ahorro de agua sin sensores, riego aplicado y respuesta del cultivo.",
+          "La meteorología AEMET disponible no coincide temporalmente con el ciclo de entrenamiento."
+        ]
+      },
+      "final_refit": {
+        "model": "ridge",
+        "rows": 144,
+        "start": "2026-06-01",
+        "end": "2026-10-22",
+        "evaluated_on_refit": false,
+        "artifact": "models/retrained_2026/coliflor_AL01.joblib"
+      }
+    },
+    "maiz_Z06": {
+      "crop": "Maíz",
+      "station_code": "Z06",
+      "station_name": "Ejea de los Caballeros",
+      "campaigns": [
+        2025,
+        2026
+      ],
+      "source_quality": [
+        {
+          "source_csv": "data/external/siar_necesidades_maiz_Z06_2025.csv",
+          "source_metadata": "data/external/siar_necesidades_maiz_Z06_2025.metadata.json",
+          "csv_rows": 183,
+          "calendar_rows": 183,
+          "complete_rows": 183,
+          "excluded_incomplete_rows": 0,
+          "active_complete_rows": 183,
+          "last_observed_date": "2025-09-30"
+        },
+        {
+          "source_csv": "data/external/siar_necesidades_maiz_Z06_2026.csv",
+          "source_metadata": "data/external/siar_necesidades_maiz_Z06_2026.metadata.json",
+          "csv_rows": 205,
+          "calendar_rows": 205,
+          "complete_rows": 205,
+          "excluded_incomplete_rows": 0,
+          "active_complete_rows": 183,
+          "last_observed_date": "2026-10-22"
+        }
+      ],
+      "active_rows_by_year": {
+        "2025": 183,
+        "2026": 183
+      },
+      "evaluation": {
+        "objective": "Anticipar la referencia diaria de necesidad neta de SiAR",
+        "input_stage": "processed_4_2",
+        "target": "target_net_irrigation_need_mm",
+        "data_start": "2025-04-01",
+        "data_end": "2026-09-30",
+        "valid_rows": 366,
+        "random_seed": 42,
+        "selection_method": "3-fold expanding-window temporal validation",
+        "selection_metric": "cross_validation.mae_mm_day.mean",
+        "selected_model": "persistence",
+        "selected_ml_candidate": "xgboost",
+        "test_best_model": "ridge",
+        "features": [
+          "crop_coefficient_kc",
+          "day_of_year_sin",
+          "day_of_year_cos",
+          "net_irrigation_need_mm_lag_1d",
+          "net_irrigation_need_mm_lag_3d",
+          "net_irrigation_need_mm_lag_7d",
+          "net_irrigation_need_mm_sum_3d",
+          "net_irrigation_need_mm_sum_7d",
+          "net_irrigation_need_mm_sum_14d"
+        ],
+        "excluded_same_day_features": [
+          "et0_mm",
+          "et0_pm_mm",
+          "crop_evapotranspiration_etc_mm",
+          "effective_precipitation_mm",
+          "effective_precipitation_pm_mm",
+          "etc_estimated_from_weather_mm",
+          "net_irrigation_need_estimated_mm"
+        ],
+        "prediction_constraint": "Predicciones recortadas a un mínimo de 0 mm/día",
+        "model_definitions": {
+          "persistence": "Baseline de un día: la estimación de t es la necesidad observada en t-1; si falta, utiliza la mediana aprendida en entrenamiento.",
+          "ridge": "Regresión lineal regularizada con imputación y escalado.",
+          "random_forest": "Conjunto conservador de 300 árboles de regresión.",
+          "knn": "Regresión por siete vecinos próximos, distancia y variables escaladas.",
+          "svr": "Support Vector Regression con kernel RBF, imputación y escalado.",
+          "xgboost": "Gradient boosting de árboles con regularización y semilla fija."
+        },
+        "persistence_horizon": "one_step_ahead",
+        "split": {
+          "development_rows": 311,
+          "test_rows": 55,
+          "development_start": "2025-04-01",
+          "development_end": "2026-08-06",
+          "test_start": "2026-08-07",
+          "test_end": "2026-09-30"
+        },
+        "cross_validation": {
+          "summary": {
+            "persistence": {
+              "mae_mm_day": {
+                "mean": 0.7822943722943722,
+                "std": 0.21871847865533747,
+                "min": 0.49870129870129876,
+                "max": 1.0310389610389608
+              },
+              "rmse_mm_day": {
+                "mean": 1.1399290788888397,
+                "std": 0.3148685671580464,
+                "min": 0.8129727395950466,
+                "max": 1.5652048536106171
+              },
+              "r2": {
+                "mean": 0.3713357681175628,
+                "std": 0.1738440586277197,
+                "min": 0.1729349553231635,
+                "max": 0.5962758786345367
+              },
+              "bias_mm_day": {
+                "mean": 0.006450216450216452,
+                "std": 0.03527121198240493,
+                "min": -0.043376623376623374,
+                "max": 0.033376623376623366
+              },
+              "weekly_mae_mm": {
+                "mean": 1.0653535353535355,
+                "std": 0.28114618842769673,
+                "min": 0.7627272727272721,
+                "max": 1.4400000000000006
+              }
+            },
+            "ridge": {
+              "mae_mm_day": {
+                "mean": 1.0669501756509598,
+                "std": 0.6265955460086566,
+                "min": 0.5326405972987923,
+                "max": 1.9463287174515855
+              },
+              "rmse_mm_day": {
+                "mean": 1.4387428162284452,
+                "std": 0.8725655541869695,
+                "min": 0.7190175468880885,
+                "max": 2.6666795387708127
+              },
+              "r2": {
+                "mean": -0.0784750756841494,
+                "std": 0.9381806705852743,
+                "min": -1.4007058536149386,
+                "max": 0.6777916843126593
+              },
+              "bias_mm_day": {
+                "mean": 0.3986950411224597,
+                "std": 0.8064130927220525,
+                "min": -0.3742851788455707,
+                "max": 1.5113595783785663
+              },
+              "weekly_mae_mm": {
+                "mean": 5.9076770664369676,
+                "std": 4.868490725520318,
+                "min": 2.3125606058544306,
+                "max": 12.790474341537477
+              }
+            },
+            "random_forest": {
+              "mae_mm_day": {
+                "mean": 1.0773860667698665,
+                "std": 0.43865438435370957,
+                "min": 0.7175144427568996,
+                "max": 1.6949242257099562
+              },
+              "rmse_mm_day": {
+                "mean": 1.343193346727568,
+                "std": 0.469177269177351,
+                "min": 0.9732395702003468,
+                "max": 2.0051834604828938
+              },
+              "r2": {
+                "mean": 0.09748403125292908,
+                "std": 0.3871585623874735,
+                "min": -0.35739273866366905,
+                "max": 0.588840910802995
+              },
+              "bias_mm_day": {
+                "mean": -0.502487977799991,
+                "std": 0.7167334822713192,
+                "min": -1.3378473935966633,
+                "max": 0.41237510848406606
+              },
+              "weekly_mae_mm": {
+                "mean": 5.756424306406064,
+                "std": 2.553536459056667,
+                "min": 3.8303996260299193,
+                "max": 9.364931755176643
+              }
+            },
+            "knn": {
+              "mae_mm_day": {
+                "mean": 1.0493231165321661,
+                "std": 0.311142427447107,
+                "min": 0.7807607623452906,
+                "max": 1.4854653737133154
+              },
+              "rmse_mm_day": {
+                "mean": 1.3572159572773568,
+                "std": 0.3779260910506529,
+                "min": 0.9982060837275729,
+                "max": 1.8796146508714209
+              },
+              "r2": {
+                "mean": 0.007874890487364894,
+                "std": 0.4484585372976325,
+                "min": -0.4128861093999965,
+                "max": 0.6292209914769713
+              },
+              "bias_mm_day": {
+                "mean": -0.21922202624031142,
+                "std": 0.4822771746135043,
+                "min": -0.6540182679135206,
+                "max": 0.45325969230106206
+              },
+              "weekly_mae_mm": {
+                "mean": 5.385523393996359,
+                "std": 1.672490021145566,
+                "min": 3.431438146063853,
+                "max": 7.51668795220815
+              }
+            },
+            "svr": {
+              "mae_mm_day": {
+                "mean": 1.3342677596520576,
+                "std": 0.8105052617700723,
+                "min": 0.6780951011345052,
+                "max": 2.476268243288288
+              },
+              "rmse_mm_day": {
+                "mean": 1.625231088100275,
+                "std": 0.8912370064222819,
+                "min": 0.9091422179199172,
+                "max": 2.881533643068972
+              },
+              "r2": {
+                "mean": -0.4259258009866482,
+                "std": 1.0351249386195271,
+                "min": -1.8031393188926494,
+                "max": 0.6924339712203053
+              },
+              "bias_mm_day": {
+                "mean": -0.6803271905870217,
+                "std": 1.097332602371395,
+                "min": -2.1801258000019734,
+                "max": 0.41476967891270516
+              },
+              "weekly_mae_mm": {
+                "mean": 7.603852750695975,
+                "std": 5.644356528206833,
+                "min": 2.477632514835575,
+                "max": 15.46597603112711
+              }
+            },
+            "xgboost": {
+              "mae_mm_day": {
+                "mean": 0.9786872267310237,
+                "std": 0.3513887077944707,
+                "min": 0.6095049133858124,
+                "max": 1.4513571062954989
+              },
+              "rmse_mm_day": {
+                "mean": 1.2705667269958152,
+                "std": 0.4048277537361614,
+                "min": 0.8367443145213551,
+                "max": 1.8110159543661555
+              },
+              "r2": {
+                "mean": 0.23151904899524856,
+                "std": 0.25177953990809826,
+                "min": -0.10724020421487701,
+                "max": 0.49587778566083474
+              },
+              "bias_mm_day": {
+                "mean": -0.3677773396070901,
+                "std": 0.5079603394365321,
+                "min": -0.9270066972212357,
+                "max": 0.30232735680295275
+              },
+              "weekly_mae_mm": {
+                "mean": 4.546788559893165,
+                "std": 1.8179644422619088,
+                "min": 2.9853282453616465,
+                "max": 7.096380875327369
+              }
+            }
+          },
+          "folds": [
+            {
+              "fold": 1,
+              "train_rows": 80,
+              "validation_rows": 77,
+              "train_start": "2025-04-01",
+              "train_end": "2025-06-19",
+              "validation_start": "2025-06-20",
+              "validation_end": "2025-09-04",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 1.0310389610389608,
+                  "rmse_mm_day": 1.5652048536106171,
+                  "r2": 0.1729349553231635,
+                  "bias_mm_day": 0.033376623376623366,
+                  "weekly_mae_mm": 0.7627272727272721
+                },
+                "ridge": {
+                  "mae_mm_day": 1.9463287174515855,
+                  "rmse_mm_day": 2.6666795387708127,
+                  "r2": -1.4007058536149386,
+                  "bias_mm_day": 1.5113595783785663,
+                  "weekly_mae_mm": 12.790474341537477
+                },
+                "random_forest": {
+                  "mae_mm_day": 1.6949242257099562,
+                  "rmse_mm_day": 2.0051834604828938,
+                  "r2": -0.35739273866366905,
+                  "bias_mm_day": -1.3378473935966633,
+                  "weekly_mae_mm": 9.364931755176643
+                },
+                "knn": {
+                  "mae_mm_day": 1.4854653737133154,
+                  "rmse_mm_day": 1.8796146508714209,
+                  "r2": -0.19271021061488014,
+                  "bias_mm_day": -0.6540182679135206,
+                  "weekly_mae_mm": 7.51668795220815
+                },
+                "svr": {
+                  "mae_mm_day": 2.476268243288288,
+                  "rmse_mm_day": 2.881533643068972,
+                  "r2": -1.8031393188926494,
+                  "bias_mm_day": -2.1801258000019734,
+                  "weekly_mae_mm": 15.46597603112711
+                },
+                "xgboost": {
+                  "mae_mm_day": 1.4513571062954989,
+                  "rmse_mm_day": 1.8110159543661555,
+                  "r2": -0.10724020421487701,
+                  "bias_mm_day": -0.9270066972212357,
+                  "weekly_mae_mm": 7.096380875327369
+                }
+              }
+            },
+            {
+              "fold": 2,
+              "train_rows": 157,
+              "validation_rows": 77,
+              "train_start": "2025-04-01",
+              "train_end": "2025-09-04",
+              "validation_start": "2025-09-05",
+              "validation_end": "2026-05-21",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.49870129870129876,
+                  "rmse_mm_day": 0.8129727395950466,
+                  "r2": 0.3447964703949883,
+                  "bias_mm_day": 0.02935064935064936,
+                  "weekly_mae_mm": 0.9933333333333332
+                },
+                "ridge": {
+                  "mae_mm_day": 0.5326405972987923,
+                  "rmse_mm_day": 0.7190175468880885,
+                  "r2": 0.4874889422498311,
+                  "bias_mm_day": 0.059010723834383556,
+                  "weekly_mae_mm": 2.3125606058544306
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.7175144427568996,
+                  "rmse_mm_day": 0.9732395702003468,
+                  "r2": 0.06100392161946122,
+                  "bias_mm_day": 0.41237510848406606,
+                  "weekly_mae_mm": 3.8303996260299193
+                },
+                "knn": {
+                  "mae_mm_day": 0.8817432135378924,
+                  "rmse_mm_day": 1.193827137233076,
+                  "r2": -0.4128861093999965,
+                  "bias_mm_day": 0.45325969230106206,
+                  "weekly_mae_mm": 5.208444083717073
+                },
+                "svr": {
+                  "mae_mm_day": 0.8484399345333801,
+                  "rmse_mm_day": 1.0850174033119362,
+                  "r2": -0.16707205528760016,
+                  "bias_mm_day": 0.41476967891270516,
+                  "weekly_mae_mm": 4.867949706125244
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.6095049133858124,
+                  "rmse_mm_day": 0.8367443145213551,
+                  "r2": 0.30591956553978794,
+                  "bias_mm_day": 0.30232735680295275,
+                  "weekly_mae_mm": 2.9853282453616465
+                }
+              }
+            },
+            {
+              "fold": 3,
+              "train_rows": 234,
+              "validation_rows": 77,
+              "train_start": "2025-04-01",
+              "train_end": "2026-05-21",
+              "validation_start": "2026-05-22",
+              "validation_end": "2026-08-06",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.8171428571428572,
+                  "rmse_mm_day": 1.041609643460855,
+                  "r2": 0.5962758786345367,
+                  "bias_mm_day": -0.043376623376623374,
+                  "weekly_mae_mm": 1.4400000000000006
+                },
+                "ridge": {
+                  "mae_mm_day": 0.7218812122025013,
+                  "rmse_mm_day": 0.9305313630264346,
+                  "r2": 0.6777916843126593,
+                  "bias_mm_day": -0.3742851788455707,
+                  "weekly_mae_mm": 2.6199962519189945
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.8197195318427437,
+                  "rmse_mm_day": 1.0511570094994633,
+                  "r2": 0.588840910802995,
+                  "bias_mm_day": -0.5819916482873758,
+                  "weekly_mae_mm": 4.073941538011629
+                },
+                "knn": {
+                  "mae_mm_day": 0.7807607623452906,
+                  "rmse_mm_day": 0.9982060837275729,
+                  "r2": 0.6292209914769713,
+                  "bias_mm_day": -0.4569075031084757,
+                  "weekly_mae_mm": 3.431438146063853
+                },
+                "svr": {
+                  "mae_mm_day": 0.6780951011345052,
+                  "rmse_mm_day": 0.9091422179199172,
+                  "r2": 0.6924339712203053,
+                  "bias_mm_day": -0.2756254506717968,
+                  "weekly_mae_mm": 2.477632514835575
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.8751996605117601,
+                  "rmse_mm_day": 1.1639399120999354,
+                  "r2": 0.49587778566083474,
+                  "bias_mm_day": -0.4786526784029873,
+                  "weekly_mae_mm": 3.558656558990478
+                }
+              }
+            }
+          ]
+        },
+        "test": {
+          "persistence": {
+            "mae_mm_day": 0.8136363636363639,
+            "rmse_mm_day": 1.183874225506317,
+            "r2": 0.5819086450074792,
+            "bias_mm_day": 0.09763636363636366,
+            "weekly_mae_mm": 0.8137500000000002
+          },
+          "ridge": {
+            "mae_mm_day": 0.6652223126334516,
+            "rmse_mm_day": 0.9440134293100801,
+            "r2": 0.7341624035702998,
+            "bias_mm_day": -0.02036967283828975,
+            "weekly_mae_mm": 1.0770880310570037
+          },
+          "random_forest": {
+            "mae_mm_day": 0.7108769255959134,
+            "rmse_mm_day": 0.9368036511072414,
+            "r2": 0.7382074966674417,
+            "bias_mm_day": -0.22825075564805694,
+            "weekly_mae_mm": 1.9867513821100329
+          },
+          "knn": {
+            "mae_mm_day": 0.7378090437486672,
+            "rmse_mm_day": 0.9759632491554144,
+            "r2": 0.7158635271703755,
+            "bias_mm_day": -0.31499399211337115,
+            "weekly_mae_mm": 2.2380108763861752
+          },
+          "svr": {
+            "mae_mm_day": 0.6902081481032716,
+            "rmse_mm_day": 0.9679405496117387,
+            "r2": 0.7205156947764739,
+            "bias_mm_day": -0.39742742701600753,
+            "weekly_mae_mm": 2.732313560735051
+          },
+          "xgboost": {
+            "mae_mm_day": 0.7291613440080125,
+            "rmse_mm_day": 0.9634050318655021,
+            "r2": 0.7231287399485475,
+            "bias_mm_day": -0.2738961358503862,
+            "weekly_mae_mm": 2.254194400310516
+          }
+        },
+        "decision": "Mantener la persistencia como referencia predictiva del piloto: ninguno de los cinco algoritmos de aprendizaje mejora su MAE medio de validación. XGBoost queda como mejor candidato de machine learning.",
+        "limitations": [
+          "Un solo ciclo, cultivo y estación no permiten demostrar generalización.",
+          "La etiqueta es una referencia calculada por SiAR, no riego real observado.",
+          "No se puede afirmar ahorro de agua sin sensores, riego aplicado y respuesta del cultivo.",
+          "La meteorología AEMET disponible no coincide temporalmente con el ciclo de entrenamiento."
+        ]
+      },
+      "final_refit": {
+        "model": "persistence",
+        "rows": 366,
+        "start": "2025-04-01",
+        "end": "2026-09-30",
+        "evaluated_on_refit": false,
+        "artifact": "models/retrained_2026/maiz_Z06.joblib"
+      }
+    },
+    "algodon_BA08": {
+      "crop": "Algodón",
+      "station_code": "BA08",
+      "station_name": "Don Benito",
+      "campaigns": [
+        2025,
+        2026
+      ],
+      "source_quality": [
+        {
+          "source_csv": "data/external/siar_necesidades_algodon_BA08_2025.csv",
+          "source_metadata": "data/external/siar_necesidades_algodon_BA08_2025.metadata.json",
+          "csv_rows": 183,
+          "calendar_rows": 183,
+          "complete_rows": 183,
+          "excluded_incomplete_rows": 0,
+          "active_complete_rows": 183,
+          "last_observed_date": "2025-09-30"
+        },
+        {
+          "source_csv": "data/external/siar_necesidades_algodon_BA08_2026.csv",
+          "source_metadata": "data/external/siar_necesidades_algodon_BA08_2026.metadata.json",
+          "csv_rows": 205,
+          "calendar_rows": 205,
+          "complete_rows": 204,
+          "excluded_incomplete_rows": 1,
+          "active_complete_rows": 182,
+          "last_observed_date": "2026-10-22"
+        }
+      ],
+      "active_rows_by_year": {
+        "2025": 183,
+        "2026": 182
+      },
+      "evaluation": {
+        "objective": "Anticipar la referencia diaria de necesidad neta de SiAR",
+        "input_stage": "processed_4_2",
+        "target": "target_net_irrigation_need_mm",
+        "data_start": "2025-04-01",
+        "data_end": "2026-09-30",
+        "valid_rows": 365,
+        "random_seed": 42,
+        "selection_method": "3-fold expanding-window temporal validation",
+        "selection_metric": "cross_validation.mae_mm_day.mean",
+        "selected_model": "persistence",
+        "selected_ml_candidate": "ridge",
+        "test_best_model": "random_forest",
+        "features": [
+          "crop_coefficient_kc",
+          "day_of_year_sin",
+          "day_of_year_cos",
+          "net_irrigation_need_mm_lag_1d",
+          "net_irrigation_need_mm_lag_3d",
+          "net_irrigation_need_mm_lag_7d",
+          "net_irrigation_need_mm_sum_3d",
+          "net_irrigation_need_mm_sum_7d",
+          "net_irrigation_need_mm_sum_14d"
+        ],
+        "excluded_same_day_features": [
+          "et0_mm",
+          "et0_pm_mm",
+          "crop_evapotranspiration_etc_mm",
+          "effective_precipitation_mm",
+          "effective_precipitation_pm_mm",
+          "etc_estimated_from_weather_mm",
+          "net_irrigation_need_estimated_mm"
+        ],
+        "prediction_constraint": "Predicciones recortadas a un mínimo de 0 mm/día",
+        "model_definitions": {
+          "persistence": "Baseline de un día: la estimación de t es la necesidad observada en t-1; si falta, utiliza la mediana aprendida en entrenamiento.",
+          "ridge": "Regresión lineal regularizada con imputación y escalado.",
+          "random_forest": "Conjunto conservador de 300 árboles de regresión.",
+          "knn": "Regresión por siete vecinos próximos, distancia y variables escaladas.",
+          "svr": "Support Vector Regression con kernel RBF, imputación y escalado.",
+          "xgboost": "Gradient boosting de árboles con regularización y semilla fija."
+        },
+        "persistence_horizon": "one_step_ahead",
+        "split": {
+          "development_rows": 310,
+          "test_rows": 55,
+          "development_start": "2025-04-01",
+          "development_end": "2026-08-06",
+          "test_start": "2026-08-07",
+          "test_end": "2026-09-30"
+        },
+        "cross_validation": {
+          "summary": {
+            "persistence": {
+              "mae_mm_day": {
+                "mean": 0.6259307359307359,
+                "std": 0.10111123364362688,
+                "min": 0.5112987012987015,
+                "max": 0.7572727272727273
+              },
+              "rmse_mm_day": {
+                "mean": 0.9917478194778742,
+                "std": 0.0549961294019299,
+                "min": 0.9454903215009385,
+                "max": 1.0690249228686326
+              },
+              "r2": {
+                "mean": 0.45110040646043603,
+                "std": 0.10822434428698982,
+                "min": 0.3175216376868838,
+                "max": 0.5825913939512293
+              },
+              "bias_mm_day": {
+                "mean": -0.011038961038961043,
+                "std": 0.07060254370011727,
+                "min": -0.11051948051948052,
+                "max": 0.046103896103896105
+              },
+              "weekly_mae_mm": {
+                "mean": 1.256515151515151,
+                "std": 0.14840709931065724,
+                "min": 1.0475000000000005,
+                "max": 1.3774999999999988
+              }
+            },
+            "ridge": {
+              "mae_mm_day": {
+                "mean": 0.6430739824446722,
+                "std": 0.21756322309963103,
+                "min": 0.4432414895161659,
+                "max": 0.9456003598148935
+              },
+              "rmse_mm_day": {
+                "mean": 0.8915533477083111,
+                "std": 0.2786045964492499,
+                "min": 0.6896003689901198,
+                "max": 1.2855179384198532
+              },
+              "r2": {
+                "mean": 0.5818173575815924,
+                "std": 0.132829848541907,
+                "min": 0.39641002090968847,
+                "max": 0.7006694986582681
+              },
+              "bias_mm_day": {
+                "mean": -0.14931683611994603,
+                "std": 0.10573565454506435,
+                "min": -0.2411845858049317,
+                "max": -0.0012052710071579343
+              },
+              "weekly_mae_mm": {
+                "mean": 2.8994659758739627,
+                "std": 1.2467141399117507,
+                "min": 1.7980551472367055,
+                "max": 4.642486306606996
+              }
+            },
+            "random_forest": {
+              "mae_mm_day": {
+                "mean": 0.9457054704886628,
+                "std": 0.5841057188309074,
+                "min": 0.5028160908789109,
+                "max": 1.7710176823777486
+              },
+              "rmse_mm_day": {
+                "mean": 1.1923375035471013,
+                "std": 0.6521197083901138,
+                "min": 0.7242313261009279,
+                "max": 2.1145385604309315
+              },
+              "r2": {
+                "mean": 0.21435648564164,
+                "std": 0.6001910774592115,
+                "min": -0.6331157114292307,
+                "max": 0.6791675228426091
+              },
+              "bias_mm_day": {
+                "mean": -0.46066306223314296,
+                "std": 0.6905747321501052,
+                "min": -1.4340356279266677,
+                "max": 0.09494039766468501
+              },
+              "weekly_mae_mm": {
+                "mean": 5.538288233721623,
+                "std": 3.887373291601498,
+                "min": 2.7444821864873794,
+                "max": 11.035617148659428
+              }
+            },
+            "knn": {
+              "mae_mm_day": {
+                "mean": 0.9878611252188181,
+                "std": 0.565949899363387,
+                "min": 0.5360338198788303,
+                "max": 1.7859093752485993
+              },
+              "rmse_mm_day": {
+                "mean": 1.2564210373661158,
+                "std": 0.6372034854130082,
+                "min": 0.7953941978460523,
+                "max": 2.1574813329412055
+              },
+              "r2": {
+                "mean": 0.14146996787240942,
+                "std": 0.5956005142315427,
+                "min": -0.7001210004935841,
+                "max": 0.5923227357468711
+              },
+              "bias_mm_day": {
+                "mean": -0.4828942785460209,
+                "std": 0.5821210624930037,
+                "min": -1.2868435892109458,
+                "max": 0.07252915165290716
+              },
+              "weekly_mae_mm": {
+                "mean": 5.828257481181115,
+                "std": 3.9501812396428546,
+                "min": 2.9462224293217028,
+                "max": 11.413705391244427
+              }
+            },
+            "svr": {
+              "mae_mm_day": {
+                "mean": 1.2927192308324484,
+                "std": 1.020348697907597,
+                "min": 0.5186620941717309,
+                "max": 2.734401230329203
+              },
+              "rmse_mm_day": {
+                "mean": 1.5218623957220343,
+                "std": 1.08739105460878,
+                "min": 0.7234532995193113,
+                "max": 3.0592831556172517
+              },
+              "r2": {
+                "mean": -0.39342876106296565,
+                "std": 1.4318917518956655,
+                "min": -2.4184173918682608,
+                "max": 0.6251291796768353
+              },
+              "bias_mm_day": {
+                "mean": -0.8102890872488332,
+                "std": 1.1430446064268505,
+                "min": -2.4217987050711476,
+                "max": 0.1054840027428065
+              },
+              "weekly_mae_mm": {
+                "mean": 7.763359146160162,
+                "std": 6.818991487865981,
+                "min": 2.8321085690666465,
+                "max": 17.40603418908505
+              }
+            },
+            "xgboost": {
+              "mae_mm_day": {
+                "mean": 1.285878476497931,
+                "std": 1.033387986968057,
+                "min": 0.5203551286846012,
+                "max": 2.7467480301547362
+              },
+              "rmse_mm_day": {
+                "mean": 1.549817027990805,
+                "std": 1.1170950629189411,
+                "min": 0.7540318150049854,
+                "max": 3.129613391348733
+              },
+              "r2": {
+                "mean": -0.4521752333100319,
+                "std": 1.5029695746295535,
+                "min": -2.5773968581262627,
+                "max": 0.6412754470178025
+              },
+              "bias_mm_day": {
+                "mean": -0.80965673955488,
+                "std": 1.052777948534629,
+                "min": -2.288169591457813,
+                "max": 0.0812965006332893
+              },
+              "weekly_mae_mm": {
+                "mean": 7.865276062000881,
+                "std": 7.099828316226718,
+                "min": 2.7504323611656822,
+                "max": 17.90535276326266
+              }
+            }
+          },
+          "folds": [
+            {
+              "fold": 1,
+              "train_rows": 79,
+              "validation_rows": 77,
+              "train_start": "2025-04-01",
+              "train_end": "2025-06-18",
+              "validation_start": "2025-06-19",
+              "validation_end": "2025-09-03",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.7572727272727273,
+                  "rmse_mm_day": 1.0690249228686326,
+                  "r2": 0.5825913939512293,
+                  "bias_mm_day": 0.046103896103896105,
+                  "weekly_mae_mm": 1.3445454545454538
+                },
+                "ridge": {
+                  "mae_mm_day": 0.9456003598148935,
+                  "rmse_mm_day": 1.2855179384198532,
+                  "r2": 0.39641002090968847,
+                  "bias_mm_day": -0.20556065154774844,
+                  "weekly_mae_mm": 4.642486306606996
+                },
+                "random_forest": {
+                  "mae_mm_day": 1.7710176823777486,
+                  "rmse_mm_day": 2.1145385604309315,
+                  "r2": -0.6331157114292307,
+                  "bias_mm_day": -1.4340356279266677,
+                  "weekly_mae_mm": 11.035617148659428
+                },
+                "knn": {
+                  "mae_mm_day": 1.7859093752485993,
+                  "rmse_mm_day": 2.1574813329412055,
+                  "r2": -0.7001210004935841,
+                  "bias_mm_day": -1.2868435892109458,
+                  "weekly_mae_mm": 11.413705391244427
+                },
+                "svr": {
+                  "mae_mm_day": 2.734401230329203,
+                  "rmse_mm_day": 3.0592831556172517,
+                  "r2": -2.4184173918682608,
+                  "bias_mm_day": -2.4217987050711476,
+                  "weekly_mae_mm": 17.40603418908505
+                },
+                "xgboost": {
+                  "mae_mm_day": 2.7467480301547362,
+                  "rmse_mm_day": 3.129613391348733,
+                  "r2": -2.5773968581262627,
+                  "bias_mm_day": -2.288169591457813,
+                  "weekly_mae_mm": 17.90535276326266
+                }
+              }
+            },
+            {
+              "fold": 2,
+              "train_rows": 156,
+              "validation_rows": 77,
+              "train_start": "2025-04-01",
+              "train_end": "2025-09-03",
+              "validation_start": "2025-09-04",
+              "validation_end": "2026-05-20",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.5112987012987015,
+                  "rmse_mm_day": 0.9607282140640512,
+                  "r2": 0.3175216376868838,
+                  "bias_mm_day": 0.03129870129870129,
+                  "weekly_mae_mm": 1.0475000000000005
+                },
+                "ridge": {
+                  "mae_mm_day": 0.4432414895161659,
+                  "rmse_mm_day": 0.6896003689901198,
+                  "r2": 0.6483725531768206,
+                  "bias_mm_day": -0.0012052710071579343,
+                  "weekly_mae_mm": 2.2578564737781877
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.5028160908789109,
+                  "rmse_mm_day": 0.7382426241094452,
+                  "r2": 0.5970176455115417,
+                  "bias_mm_day": 0.09494039766468501,
+                  "weekly_mae_mm": 2.7444821864873794
+                },
+                "knn": {
+                  "mae_mm_day": 0.5360338198788303,
+                  "rmse_mm_day": 0.7953941978460523,
+                  "r2": 0.5322081683639412,
+                  "bias_mm_day": 0.07252915165290716,
+                  "weekly_mae_mm": 2.9462224293217028
+                },
+                "svr": {
+                  "mae_mm_day": 0.5186620941717309,
+                  "rmse_mm_day": 0.7234532995193113,
+                  "r2": 0.6130019290025284,
+                  "bias_mm_day": 0.1054840027428065,
+                  "weekly_mae_mm": 2.8321085690666465
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.5203551286846012,
+                  "rmse_mm_day": 0.7540318150049854,
+                  "r2": 0.5795957111783646,
+                  "bias_mm_day": 0.0812965006332893,
+                  "weekly_mae_mm": 2.7504323611656822
+                }
+              }
+            },
+            {
+              "fold": 3,
+              "train_rows": 233,
+              "validation_rows": 77,
+              "train_start": "2025-04-01",
+              "train_end": "2026-05-20",
+              "validation_start": "2026-05-21",
+              "validation_end": "2026-08-06",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.6092207792207792,
+                  "rmse_mm_day": 0.9454903215009385,
+                  "r2": 0.453188187743195,
+                  "bias_mm_day": -0.11051948051948052,
+                  "weekly_mae_mm": 1.3774999999999988
+                },
+                "ridge": {
+                  "mae_mm_day": 0.5403800980029569,
+                  "rmse_mm_day": 0.6995417357149604,
+                  "r2": 0.7006694986582681,
+                  "bias_mm_day": -0.2411845858049317,
+                  "weekly_mae_mm": 1.7980551472367055
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.5632826382093292,
+                  "rmse_mm_day": 0.7242313261009279,
+                  "r2": 0.6791675228426091,
+                  "bias_mm_day": -0.0428939564374462,
+                  "weekly_mae_mm": 2.83476536601806
+                },
+                "knn": {
+                  "mae_mm_day": 0.6416401805290248,
+                  "rmse_mm_day": 0.8163875813110893,
+                  "r2": 0.5923227357468711,
+                  "bias_mm_day": -0.23436839808002413,
+                  "weekly_mae_mm": 3.124844622977216
+                },
+                "svr": {
+                  "mae_mm_day": 0.6250943679964113,
+                  "rmse_mm_day": 0.7828507320295401,
+                  "r2": 0.6251291796768353,
+                  "bias_mm_day": -0.11455255941815858,
+                  "weekly_mae_mm": 3.051934680328786
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.5905322706544553,
+                  "rmse_mm_day": 0.765805877618696,
+                  "r2": 0.6412754470178025,
+                  "bias_mm_day": -0.2220971278401164,
+                  "weekly_mae_mm": 2.940043061574299
+                }
+              }
+            }
+          ]
+        },
+        "test": {
+          "persistence": {
+            "mae_mm_day": 0.45654545454545464,
+            "rmse_mm_day": 0.6978525501982363,
+            "r2": 0.8669374910297013,
+            "bias_mm_day": 0.10090909090909092,
+            "weekly_mae_mm": 0.6937500000000001
+          },
+          "ridge": {
+            "mae_mm_day": 0.4165632048832532,
+            "rmse_mm_day": 0.5629501794560764,
+            "r2": 0.9134098898542048,
+            "bias_mm_day": 0.1030537376707507,
+            "weekly_mae_mm": 1.5966435790111366
+          },
+          "random_forest": {
+            "mae_mm_day": 0.3734675986923844,
+            "rmse_mm_day": 0.5627893457608097,
+            "r2": 0.9134593600151358,
+            "bias_mm_day": 0.08234168176070411,
+            "weekly_mae_mm": 1.465580662429404
+          },
+          "knn": {
+            "mae_mm_day": 0.4451758984489055,
+            "rmse_mm_day": 0.6065855749185032,
+            "r2": 0.8994661013178255,
+            "bias_mm_day": 0.1262612938161018,
+            "weekly_mae_mm": 1.5479728194164986
+          },
+          "svr": {
+            "mae_mm_day": 0.3887734057915802,
+            "rmse_mm_day": 0.5450655826849268,
+            "r2": 0.9188243287851302,
+            "bias_mm_day": 0.1322632372302142,
+            "weekly_mae_mm": 1.5840913210292538
+          },
+          "xgboost": {
+            "mae_mm_day": 0.3888787423047154,
+            "rmse_mm_day": 0.5419902932633693,
+            "r2": 0.919737739770614,
+            "bias_mm_day": 0.04494860258969403,
+            "weekly_mae_mm": 1.5112985330820095
+          }
+        },
+        "decision": "Mantener la persistencia como referencia predictiva del piloto: ninguno de los cinco algoritmos de aprendizaje mejora su MAE medio de validación. Ridge queda como mejor candidato de machine learning.",
+        "limitations": [
+          "Un solo ciclo, cultivo y estación no permiten demostrar generalización.",
+          "La etiqueta es una referencia calculada por SiAR, no riego real observado.",
+          "No se puede afirmar ahorro de agua sin sensores, riego aplicado y respuesta del cultivo.",
+          "La meteorología AEMET disponible no coincide temporalmente con el ciclo de entrenamiento."
+        ]
+      },
+      "final_refit": {
+        "model": "persistence",
+        "rows": 365,
+        "start": "2025-04-01",
+        "end": "2026-09-30",
+        "evaluated_on_refit": false,
+        "artifact": "models/retrained_2026/algodon_BA08.joblib"
+      }
+    },
+    "alfalfa_Z06": {
+      "crop": "Alfalfa",
+      "station_code": "Z06",
+      "station_name": "Ejea de los Caballeros",
+      "campaigns": [
+        2026
+      ],
+      "source_quality": [
+        {
+          "source_csv": "data/external/siar_necesidades_alfalfa_Z06_2026.csv",
+          "source_metadata": "data/external/siar_necesidades_alfalfa_Z06_2026.metadata.json",
+          "csv_rows": 236,
+          "calendar_rows": 236,
+          "complete_rows": 236,
+          "excluded_incomplete_rows": 0,
+          "active_complete_rows": 236,
+          "last_observed_date": "2026-10-22"
+        }
+      ],
+      "active_rows_by_year": {
+        "2026": 236
+      },
+      "evaluation": {
+        "objective": "Anticipar la referencia diaria de necesidad neta de SiAR",
+        "input_stage": "processed_4_2",
+        "target": "target_net_irrigation_need_mm",
+        "data_start": "2026-03-01",
+        "data_end": "2026-10-22",
+        "valid_rows": 236,
+        "random_seed": 42,
+        "selection_method": "3-fold expanding-window temporal validation",
+        "selection_metric": "cross_validation.mae_mm_day.mean",
+        "selected_model": "persistence",
+        "selected_ml_candidate": "random_forest",
+        "test_best_model": "ridge",
+        "features": [
+          "crop_coefficient_kc",
+          "day_of_year_sin",
+          "day_of_year_cos",
+          "net_irrigation_need_mm_lag_1d",
+          "net_irrigation_need_mm_lag_3d",
+          "net_irrigation_need_mm_lag_7d",
+          "net_irrigation_need_mm_sum_3d",
+          "net_irrigation_need_mm_sum_7d",
+          "net_irrigation_need_mm_sum_14d"
+        ],
+        "excluded_same_day_features": [
+          "et0_mm",
+          "et0_pm_mm",
+          "crop_evapotranspiration_etc_mm",
+          "effective_precipitation_mm",
+          "effective_precipitation_pm_mm",
+          "etc_estimated_from_weather_mm",
+          "net_irrigation_need_estimated_mm"
+        ],
+        "prediction_constraint": "Predicciones recortadas a un mínimo de 0 mm/día",
+        "model_definitions": {
+          "persistence": "Baseline de un día: la estimación de t es la necesidad observada en t-1; si falta, utiliza la mediana aprendida en entrenamiento.",
+          "ridge": "Regresión lineal regularizada con imputación y escalado.",
+          "random_forest": "Conjunto conservador de 300 árboles de regresión.",
+          "knn": "Regresión por siete vecinos próximos, distancia y variables escaladas.",
+          "svr": "Support Vector Regression con kernel RBF, imputación y escalado.",
+          "xgboost": "Gradient boosting de árboles con regularización y semilla fija."
+        },
+        "persistence_horizon": "one_step_ahead",
+        "split": {
+          "development_rows": 200,
+          "test_rows": 36,
+          "development_start": "2026-03-01",
+          "development_end": "2026-09-16",
+          "test_start": "2026-09-17",
+          "test_end": "2026-10-22"
+        },
+        "cross_validation": {
+          "summary": {
+            "persistence": {
+              "mae_mm_day": {
+                "mean": 0.6966,
+                "std": 0.07161619928479865,
+                "min": 0.5998,
+                "max": 0.7707999999999998
+              },
+              "rmse_mm_day": {
+                "mean": 0.9695761788988756,
+                "std": 0.015917494940760446,
+                "min": 0.954984816633228,
+                "max": 0.9917166934160179
+              },
+              "r2": {
+                "mean": 0.044093629110326736,
+                "std": 0.4918210797198189,
+                "min": -0.5503280862203788,
+                "max": 0.6540808924437366
+              },
+              "bias_mm_day": {
+                "mean": -0.004866666666666672,
+                "std": 0.040855626567490345,
+                "min": -0.062200000000000026,
+                "max": 0.03
+              },
+              "weekly_mae_mm": {
+                "mean": 0.8054166666666669,
+                "std": 0.4709103919242199,
+                "min": 0.42249999999999976,
+                "max": 1.4687500000000004
+              }
+            },
+            "ridge": {
+              "mae_mm_day": {
+                "mean": 1.524253979963162,
+                "std": 1.1366006302675213,
+                "min": 0.66222367122413,
+                "max": 3.130202876804251
+              },
+              "rmse_mm_day": {
+                "mean": 1.8440822559017545,
+                "std": 1.324144153174393,
+                "min": 0.8372245354966122,
+                "max": 3.7148862496080453
+              },
+              "r2": {
+                "mean": -1.3512801968006762,
+                "std": 1.7711948465952234,
+                "min": -3.8538946344735017,
+                "max": -0.008389632470330977
+              },
+              "bias_mm_day": {
+                "mean": -0.6750761988364345,
+                "std": 1.4289197342835156,
+                "min": -2.684869987460187,
+                "max": 0.51220519576082
+              },
+              "weekly_mae_mm": {
+                "mean": 7.773218625377402,
+                "std": 7.758372061144449,
+                "min": 1.4213886354797092,
+                "max": 18.69698476714737
+              }
+            },
+            "random_forest": {
+              "mae_mm_day": {
+                "mean": 1.1331252393816085,
+                "std": 0.3927727849488206,
+                "min": 0.608526730254014,
+                "max": 1.553547844721019
+              },
+              "rmse_mm_day": {
+                "mean": 1.3581409816044838,
+                "std": 0.43343379593462344,
+                "min": 0.7960503456566027,
+                "max": 1.850935847210114
+              },
+              "r2": {
+                "mean": -0.777965198328522,
+                "std": 1.2122180549319925,
+                "min": -2.4637331805804275,
+                "max": 0.3348236863533074
+              },
+              "bias_mm_day": {
+                "mean": -0.7319080744918552,
+                "std": 0.47049647898697833,
+                "min": -1.1999663196155688,
+                "max": -0.08831636271133153
+              },
+              "weekly_mae_mm": {
+                "mean": 6.014612365852923,
+                "std": 2.986400877922663,
+                "min": 1.8480535940657439,
+                "max": 8.695994005895722
+              }
+            },
+            "knn": {
+              "mae_mm_day": {
+                "mean": 1.464449671879641,
+                "std": 0.20425876932005596,
+                "min": 1.1799204961598055,
+                "max": 1.6498979185627647
+              },
+              "rmse_mm_day": {
+                "mean": 1.7242553374594813,
+                "std": 0.2567037085254302,
+                "min": 1.3692637244215573,
+                "max": 1.9675607706345273
+              },
+              "r2": {
+                "mean": -1.6956377698592398,
+                "std": 0.9541130588934242,
+                "min": -2.538126784768975,
+                "max": -0.36161903591472777
+              },
+              "bias_mm_day": {
+                "mean": -0.24075116565874125,
+                "std": 1.2469249593588574,
+                "min": -1.130011042303856,
+                "max": 1.522645406776906
+              },
+              "weekly_mae_mm": {
+                "mean": 8.680985335898646,
+                "std": 1.1445952278571463,
+                "min": 7.062569014399102,
+                "max": 9.516533792355666
+              }
+            },
+            "svr": {
+              "mae_mm_day": {
+                "mean": 1.714200817105385,
+                "std": 0.9121388403441331,
+                "min": 0.6664342612031022,
+                "max": 2.889724202282909
+              },
+              "rmse_mm_day": {
+                "mean": 1.98326980919631,
+                "std": 0.9201892810531462,
+                "min": 0.879605396984817,
+                "max": 3.132233590719949
+              },
+              "r2": {
+                "mean": -5.270306975946103,
+                "std": 7.362145684001014,
+                "min": -15.677807885687251,
+                "max": 0.18785892457392495
+              },
+              "bias_mm_day": {
+                "mean": -1.1511538646900814,
+                "std": 1.3447806656877463,
+                "min": -2.885293571510387,
+                "max": 0.3920980397486803
+              },
+              "weekly_mae_mm": {
+                "mean": 9.806460966972644,
+                "std": 6.391246442709854,
+                "min": 2.450612748429252,
+                "max": 18.033084821939923
+              }
+            },
+            "xgboost": {
+              "mae_mm_day": {
+                "mean": 1.4834260615984596,
+                "std": 0.5954994916214761,
+                "min": 0.7991630596160888,
+                "max": 2.2507252646446227
+              },
+              "rmse_mm_day": {
+                "mean": 1.780142201176595,
+                "std": 0.7268341118860387,
+                "min": 1.003238767856373,
+                "max": 2.751472576541233
+              },
+              "r2": {
+                "mean": -1.6645638000814396,
+                "std": 1.313731782101854,
+                "min": -3.2744583739241726,
+                "max": -0.056487389799101395
+              },
+              "bias_mm_day": {
+                "mean": -0.8607633641878764,
+                "std": 1.002660516692475,
+                "min": -1.746944102191925,
+                "max": 0.5409744594573975
+              },
+              "weekly_mae_mm": {
+                "mean": 8.105072188576065,
+                "std": 3.671099111011548,
+                "min": 3.381090371608735,
+                "max": 12.33212338268757
+              }
+            }
+          },
+          "folds": [
+            {
+              "fold": 1,
+              "train_rows": 50,
+              "validation_rows": 50,
+              "train_start": "2026-03-01",
+              "train_end": "2026-04-19",
+              "validation_start": "2026-04-20",
+              "validation_end": "2026-06-08",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.5998,
+                  "rmse_mm_day": 0.9917166934160179,
+                  "r2": 0.6540808924437366,
+                  "bias_mm_day": -0.062200000000000026,
+                  "weekly_mae_mm": 1.4687500000000004
+                },
+                "ridge": {
+                  "mae_mm_day": 3.130202876804251,
+                  "rmse_mm_day": 3.7148862496080453,
+                  "r2": -3.8538946344735017,
+                  "bias_mm_day": -2.684869987460187,
+                  "weekly_mae_mm": 18.69698476714737
+                },
+                "random_forest": {
+                  "mae_mm_day": 1.553547844721019,
+                  "rmse_mm_day": 1.850935847210114,
+                  "r2": -0.20498610075844548,
+                  "bias_mm_day": -0.9074415411486655,
+                  "weekly_mae_mm": 8.695994005895722
+                },
+                "knn": {
+                  "mae_mm_day": 1.6498979185627647,
+                  "rmse_mm_day": 1.9675607706345273,
+                  "r2": -0.36161903591472777,
+                  "bias_mm_day": -1.1148878614492737,
+                  "weekly_mae_mm": 9.463853200941166
+                },
+                "svr": {
+                  "mae_mm_day": 1.5864439878301442,
+                  "rmse_mm_day": 1.9379704398841635,
+                  "r2": -0.3209719667249846,
+                  "bias_mm_day": -0.9602660623085376,
+                  "weekly_mae_mm": 8.935685330548758
+                },
+                "xgboost": {
+                  "mae_mm_day": 2.2507252646446227,
+                  "rmse_mm_day": 2.751472576541233,
+                  "r2": -1.662745636521045,
+                  "bias_mm_day": -1.746944102191925,
+                  "weekly_mae_mm": 12.33212338268757
+                }
+              }
+            },
+            {
+              "fold": 2,
+              "train_rows": 100,
+              "validation_rows": 50,
+              "train_start": "2026-03-01",
+              "train_end": "2026-06-08",
+              "validation_start": "2026-06-09",
+              "validation_end": "2026-07-28",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.7707999999999998,
+                  "rmse_mm_day": 0.954984816633228,
+                  "r2": -0.5503280862203788,
+                  "bias_mm_day": 0.017600000000000015,
+                  "weekly_mae_mm": 0.42249999999999976
+                },
+                "ridge": {
+                  "mae_mm_day": 0.66222367122413,
+                  "rmse_mm_day": 0.8372245354966122,
+                  "r2": -0.1915563234581954,
+                  "bias_mm_day": 0.14743619519006376,
+                  "weekly_mae_mm": 1.4213886354797092
+                },
+                "random_forest": {
+                  "mae_mm_day": 1.2373011431697925,
+                  "rmse_mm_day": 1.4274367519467344,
+                  "r2": -2.4637331805804275,
+                  "bias_mm_day": -1.1999663196155688,
+                  "weekly_mae_mm": 7.499789497597305
+                },
+                "knn": {
+                  "mae_mm_day": 1.1799204961598055,
+                  "rmse_mm_day": 1.3692637244215573,
+                  "r2": -2.187167488894016,
+                  "bias_mm_day": -1.130011042303856,
+                  "weekly_mae_mm": 7.062569014399102
+                },
+                "svr": {
+                  "mae_mm_day": 2.889724202282909,
+                  "rmse_mm_day": 3.132233590719949,
+                  "r2": -15.677807885687251,
+                  "bias_mm_day": -2.885293571510387,
+                  "weekly_mae_mm": 18.033084821939923
+                },
+                "xgboost": {
+                  "mae_mm_day": 1.4003898605346676,
+                  "rmse_mm_day": 1.5857152591321793,
+                  "r2": -3.2744583739241726,
+                  "bias_mm_day": -1.3763204498291015,
+                  "weekly_mae_mm": 8.602002811431886
+                }
+              }
+            },
+            {
+              "fold": 3,
+              "train_rows": 150,
+              "validation_rows": 50,
+              "train_start": "2026-03-01",
+              "train_end": "2026-07-28",
+              "validation_start": "2026-07-29",
+              "validation_end": "2026-09-16",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.7192000000000002,
+                  "rmse_mm_day": 0.9620270266473807,
+                  "r2": 0.028528081107622394,
+                  "bias_mm_day": 0.03,
+                  "weekly_mae_mm": 0.5250000000000002
+                },
+                "ridge": {
+                  "mae_mm_day": 0.7803353918611051,
+                  "rmse_mm_day": 0.9801359826006056,
+                  "r2": -0.008389632470330977,
+                  "bias_mm_day": 0.51220519576082,
+                  "weekly_mae_mm": 3.201282473505126
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.608526730254014,
+                  "rmse_mm_day": 0.7960503456566027,
+                  "r2": 0.3348236863533074,
+                  "bias_mm_day": -0.08831636271133153,
+                  "weekly_mae_mm": 1.8480535940657439
+                },
+                "knn": {
+                  "mae_mm_day": 1.563530600916352,
+                  "rmse_mm_day": 1.8359415173223592,
+                  "r2": -2.538126784768975,
+                  "bias_mm_day": 1.522645406776906,
+                  "weekly_mae_mm": 9.516533792355666
+                },
+                "svr": {
+                  "mae_mm_day": 0.6664342612031022,
+                  "rmse_mm_day": 0.879605396984817,
+                  "r2": 0.18785892457392495,
+                  "bias_mm_day": 0.3920980397486803,
+                  "weekly_mae_mm": 2.450612748429252
+                },
+                "xgboost": {
+                  "mae_mm_day": 0.7991630596160888,
+                  "rmse_mm_day": 1.003238767856373,
+                  "r2": -0.056487389799101395,
+                  "bias_mm_day": 0.5409744594573975,
+                  "weekly_mae_mm": 3.381090371608735
+                }
+              }
+            }
+          ]
+        },
+        "test": {
+          "persistence": {
+            "mae_mm_day": 0.7858333333333333,
+            "rmse_mm_day": 1.1927943382382955,
+            "r2": -0.11403486088874115,
+            "bias_mm_day": 0.07138888888888885,
+            "weekly_mae_mm": 0.4983333333333331
+          },
+          "ridge": {
+            "mae_mm_day": 0.6066186109091803,
+            "rmse_mm_day": 0.9849394908160202,
+            "r2": 0.24039687186217473,
+            "bias_mm_day": 0.2209940066978926,
+            "weekly_mae_mm": 1.4025076624594341
+          },
+          "random_forest": {
+            "mae_mm_day": 1.3740768547279432,
+            "rmse_mm_day": 1.6344208894035201,
+            "r2": -1.0916810018785594,
+            "bias_mm_day": 1.3223054071781362,
+            "weekly_mae_mm": 7.933832443068816
+          },
+          "knn": {
+            "mae_mm_day": 1.1962359390894408,
+            "rmse_mm_day": 1.5097688482548297,
+            "r2": -0.7847959156621973,
+            "bias_mm_day": 1.0658659505882075,
+            "weekly_mae_mm": 6.395195703529247
+          },
+          "svr": {
+            "mae_mm_day": 0.9566166519296169,
+            "rmse_mm_day": 1.2276053511434397,
+            "r2": -0.1800086445398823,
+            "bias_mm_day": 0.7654521824435155,
+            "weekly_mae_mm": 4.592713094661093
+          },
+          "xgboost": {
+            "mae_mm_day": 1.1079117298126218,
+            "rmse_mm_day": 1.379778353996252,
+            "r2": -0.49068643009936364,
+            "bias_mm_day": 0.9715441068013507,
+            "weekly_mae_mm": 5.8292646408081055
+          }
+        },
+        "decision": "Mantener la persistencia como referencia predictiva del piloto: ninguno de los cinco algoritmos de aprendizaje mejora su MAE medio de validación. Random Forest queda como mejor candidato de machine learning.",
+        "limitations": [
+          "Un solo ciclo, cultivo y estación no permiten demostrar generalización.",
+          "La etiqueta es una referencia calculada por SiAR, no riego real observado.",
+          "No se puede afirmar ahorro de agua sin sensores, riego aplicado y respuesta del cultivo.",
+          "La meteorología AEMET disponible no coincide temporalmente con el ciclo de entrenamiento."
+        ]
+      },
+      "final_refit": {
+        "model": "persistence",
+        "rows": 236,
+        "start": "2026-03-01",
+        "end": "2026-10-22",
+        "evaluated_on_refit": false,
+        "artifact": "models/retrained_2026/alfalfa_Z06.joblib"
+      }
+    },
+    "alcachofa_BA08": {
+      "crop": "Alcachofa",
+      "station_code": "BA08",
+      "station_name": "Don Benito",
+      "campaigns": [
+        2026
+      ],
+      "source_quality": [
+        {
+          "source_csv": "data/external/siar_necesidades_alcachofa_BA08_2026.csv",
+          "source_metadata": "data/external/siar_necesidades_alcachofa_BA08_2026.metadata.json",
+          "csv_rows": 295,
+          "calendar_rows": 295,
+          "complete_rows": 294,
+          "excluded_incomplete_rows": 1,
+          "active_complete_rows": 173,
+          "last_observed_date": "2026-10-22"
+        }
+      ],
+      "active_rows_by_year": {
+        "2026": 173
+      },
+      "evaluation": {
+        "objective": "Anticipar la referencia diaria de necesidad neta de SiAR",
+        "input_stage": "processed_4_2",
+        "target": "target_net_irrigation_need_mm",
+        "data_start": "2026-01-01",
+        "data_end": "2026-10-22",
+        "valid_rows": 173,
+        "random_seed": 42,
+        "selection_method": "3-fold expanding-window temporal validation",
+        "selection_metric": "cross_validation.mae_mm_day.mean",
+        "selected_model": "persistence",
+        "selected_ml_candidate": "knn",
+        "test_best_model": "svr",
+        "features": [
+          "crop_coefficient_kc",
+          "day_of_year_sin",
+          "day_of_year_cos",
+          "net_irrigation_need_mm_lag_1d",
+          "net_irrigation_need_mm_lag_3d",
+          "net_irrigation_need_mm_lag_7d",
+          "net_irrigation_need_mm_sum_3d",
+          "net_irrigation_need_mm_sum_7d",
+          "net_irrigation_need_mm_sum_14d"
+        ],
+        "excluded_same_day_features": [
+          "et0_mm",
+          "et0_pm_mm",
+          "crop_evapotranspiration_etc_mm",
+          "effective_precipitation_mm",
+          "effective_precipitation_pm_mm",
+          "etc_estimated_from_weather_mm",
+          "net_irrigation_need_estimated_mm"
+        ],
+        "prediction_constraint": "Predicciones recortadas a un mínimo de 0 mm/día",
+        "model_definitions": {
+          "persistence": "Baseline de un día: la estimación de t es la necesidad observada en t-1; si falta, utiliza la mediana aprendida en entrenamiento.",
+          "ridge": "Regresión lineal regularizada con imputación y escalado.",
+          "random_forest": "Conjunto conservador de 300 árboles de regresión.",
+          "knn": "Regresión por siete vecinos próximos, distancia y variables escaladas.",
+          "svr": "Support Vector Regression con kernel RBF, imputación y escalado.",
+          "xgboost": "Gradient boosting de árboles con regularización y semilla fija."
+        },
+        "persistence_horizon": "one_step_ahead",
+        "split": {
+          "development_rows": 147,
+          "test_rows": 26,
+          "development_start": "2026-01-01",
+          "development_end": "2026-09-26",
+          "test_start": "2026-09-27",
+          "test_end": "2026-10-22"
+        },
+        "cross_validation": {
+          "summary": {
+            "persistence": {
+              "mae_mm_day": {
+                "mean": 0.474537037037037,
+                "std": 0.07747704204405163,
+                "min": 0.37555555555555553,
+                "max": 0.5647222222222221
+              },
+              "rmse_mm_day": {
+                "mean": 0.7545714873930921,
+                "std": 0.054642101920273856,
+                "min": 0.7158367287463128,
+                "max": 0.8318470078352416
+              },
+              "r2": {
+                "mean": 0.10975265241722106,
+                "std": 0.34242441425377057,
+                "min": -0.2277064256355159,
+                "max": 0.579269071468973
+              },
+              "bias_mm_day": {
+                "mean": -0.04935185185185185,
+                "std": 0.015889816946046777,
+                "min": -0.07111111111111111,
+                "max": -0.0336111111111111
+              },
+              "weekly_mae_mm": {
+                "mean": 0.4892857142857143,
+                "std": 0.050588748416661965,
+                "min": 0.4216666666666668,
+                "max": 0.5433333333333333
+              }
+            },
+            "ridge": {
+              "mae_mm_day": {
+                "mean": 1.5688319049654265,
+                "std": 0.7759038049728222,
+                "min": 0.5766955047766824,
+                "max": 2.4708423354600675
+              },
+              "rmse_mm_day": {
+                "mean": 1.8510350445415593,
+                "std": 0.8910508063063547,
+                "min": 0.7748538037235843,
+                "max": 2.956869235422657
+              },
+              "r2": {
+                "mean": -6.937396443358672,
+                "std": 7.066395347107876,
+                "min": -16.43336698961494,
+                "max": 0.5070350726819419
+              },
+              "bias_mm_day": {
+                "mean": 0.0846720374652205,
+                "std": 1.6996356304894324,
+                "min": -1.6589578746595293,
+                "max": 2.389301692573391
+              },
+              "weekly_mae_mm": {
+                "mean": 8.419939780082723,
+                "std": 3.9366488669503044,
+                "min": 3.0182348161992647,
+                "max": 12.287837276091725
+              }
+            },
+            "random_forest": {
+              "mae_mm_day": {
+                "mean": 1.1681816481305416,
+                "std": 0.1878527638249764,
+                "min": 0.9568766194404579,
+                "max": 1.413281751026751
+              },
+              "rmse_mm_day": {
+                "mean": 1.3100780834982333,
+                "std": 0.22531829142933976,
+                "min": 1.0077186303551164,
+                "max": 1.5483587256803741
+              },
+              "r2": {
+                "mean": -1.6096081872462662,
+                "std": 1.178463513935984,
+                "min": -3.253542564638793,
+                "max": -0.5504191558841036
+              },
+              "bias_mm_day": {
+                "mean": -1.0631947450946062,
+                "std": 0.22773584399631758,
+                "min": -1.3669391406433071,
+                "max": -0.8185867473795727
+              },
+              "weekly_mae_mm": {
+                "mean": 6.3606614478126895,
+                "std": 1.6442881933600622,
+                "min": 4.20987470080923,
+                "max": 8.201634843859845
+              }
+            },
+            "knn": {
+              "mae_mm_day": {
+                "mean": 0.9376523041325351,
+                "std": 0.2858668233695945,
+                "min": 0.5723344922685467,
+                "max": 1.2702676480934285
+              },
+              "rmse_mm_day": {
+                "mean": 1.1458526933706699,
+                "std": 0.24490818162783545,
+                "min": 0.8155564429216257,
+                "max": 1.4012688436475658
+              },
+              "r2": {
+                "mean": -1.0111887638546473,
+                "std": 1.0421221620182712,
+                "min": -2.483778567335904,
+                "max": -0.22353868840455338
+              },
+              "bias_mm_day": {
+                "mean": -0.813616416877785,
+                "std": 0.341270522831827,
+                "min": -1.2313214028974737,
+                "max": -0.3953832582811162
+              },
+              "weekly_mae_mm": {
+                "mean": 5.0085964378740195,
+                "std": 2.215716326768917,
+                "min": 2.05309275469281,
+                "max": 7.387928417384843
+              }
+            },
+            "svr": {
+              "mae_mm_day": {
+                "mean": 1.2379271513133423,
+                "std": 0.16308862249775483,
+                "min": 1.0492628405270432,
+                "max": 1.4471557015975887
+              },
+              "rmse_mm_day": {
+                "mean": 1.4102914239287152,
+                "std": 0.25463196420552553,
+                "min": 1.1300231104035303,
+                "max": 1.7462403148612815
+              },
+              "r2": {
+                "mean": -1.7685168038215338,
+                "std": 0.344886230947535,
+                "min": -2.2556424964504145,
+                "max": -1.5037127680060443
+              },
+              "bias_mm_day": {
+                "mean": -1.1657667972093728,
+                "std": 0.19167087458695678,
+                "min": -1.4038010625356716,
+                "max": -0.9344493856270673
+              },
+              "weekly_mae_mm": {
+                "mean": 6.7786511562639875,
+                "std": 1.5441703433508807,
+                "min": 4.805739697510631,
+                "max": 8.575914110489052
+              }
+            },
+            "xgboost": {
+              "mae_mm_day": {
+                "mean": 1.2696014107991422,
+                "std": 0.2359501602995143,
+                "min": 1.0196312322219212,
+                "max": 1.5860150757618248
+              },
+              "rmse_mm_day": {
+                "mean": 1.4199557330775134,
+                "std": 0.27864916287653807,
+                "min": 1.0661183210483316,
+                "max": 1.7470987658306902
+              },
+              "r2": {
+                "mean": -2.1334072637000854,
+                "std": 1.629154331142625,
+                "min": -4.415549442225285,
+                "max": -0.718317817810866
+              },
+              "bias_mm_day": {
+                "mean": -1.1830503389204816,
+                "std": 0.2927934089181887,
+                "min": -1.5769487176566488,
+                "max": -0.8755343331893284
+              },
+              "weekly_mae_mm": {
+                "mean": 7.016785778988094,
+                "std": 2.0250706171674753,
+                "min": 4.5027479992594035,
+                "max": 9.461692305939893
+              }
+            }
+          },
+          "folds": [
+            {
+              "fold": 1,
+              "train_rows": 39,
+              "validation_rows": 36,
+              "train_start": "2026-01-01",
+              "train_end": "2026-02-08",
+              "validation_start": "2026-02-09",
+              "validation_end": "2026-03-16",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.5647222222222221,
+                  "rmse_mm_day": 0.8318470078352416,
+                  "r2": -0.2277064256355159,
+                  "bias_mm_day": -0.0336111111111111,
+                  "weekly_mae_mm": 0.4216666666666668
+                },
+                "ridge": {
+                  "mae_mm_day": 1.6589578746595293,
+                  "rmse_mm_day": 1.8213820944784371,
+                  "r2": -4.885857413143017,
+                  "bias_mm_day": -1.6589578746595293,
+                  "weekly_mae_mm": 9.953747247957176
+                },
+                "random_forest": {
+                  "mae_mm_day": 1.413281751026751,
+                  "rmse_mm_day": 1.5483587256803741,
+                  "r2": -3.253542564638793,
+                  "bias_mm_day": -1.3669391406433071,
+                  "weekly_mae_mm": 8.201634843859845
+                },
+                "knn": {
+                  "mae_mm_day": 1.2702676480934285,
+                  "rmse_mm_day": 1.4012688436475658,
+                  "r2": -2.483778567335904,
+                  "bias_mm_day": -1.2313214028974737,
+                  "weekly_mae_mm": 7.387928417384843
+                },
+                "svr": {
+                  "mae_mm_day": 1.2173629118153955,
+                  "rmse_mm_day": 1.3546108465213336,
+                  "r2": -2.2556424964504145,
+                  "bias_mm_day": -1.15904994346538,
+                  "weekly_mae_mm": 6.95429966079228
+                },
+                "xgboost": {
+                  "mae_mm_day": 1.5860150757618248,
+                  "rmse_mm_day": 1.7470987658306902,
+                  "r2": -4.415549442225285,
+                  "bias_mm_day": -1.5769487176566488,
+                  "weekly_mae_mm": 9.461692305939893
+                }
+              }
+            },
+            {
+              "fold": 2,
+              "train_rows": 75,
+              "validation_rows": 36,
+              "train_start": "2026-01-01",
+              "train_end": "2026-03-16",
+              "validation_start": "2026-03-17",
+              "validation_end": "2026-08-21",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.37555555555555553,
+                  "rmse_mm_day": 0.7160307255977217,
+                  "r2": -0.022304688581793908,
+                  "bias_mm_day": -0.07111111111111111,
+                  "weekly_mae_mm": 0.502857142857143
+                },
+                "ridge": {
+                  "mae_mm_day": 2.4708423354600675,
+                  "rmse_mm_day": 2.956869235422657,
+                  "r2": -16.43336698961494,
+                  "bias_mm_day": 2.389301692573391,
+                  "weekly_mae_mm": 12.287837276091725
+                },
+                "random_forest": {
+                  "mae_mm_day": 0.9568766194404579,
+                  "rmse_mm_day": 1.0077186303551164,
+                  "r2": -1.0248628412159024,
+                  "bias_mm_day": -0.8185867473795727,
+                  "weekly_mae_mm": 4.20987470080923
+                },
+                "knn": {
+                  "mae_mm_day": 0.5723344922685467,
+                  "rmse_mm_day": 0.8155564429216257,
+                  "r2": -0.3262490358234844,
+                  "bias_mm_day": -0.3953832582811162,
+                  "weekly_mae_mm": 2.05309275469281
+                },
+                "svr": {
+                  "mae_mm_day": 1.0492628405270432,
+                  "rmse_mm_day": 1.1300231104035303,
+                  "r2": -1.546195147008142,
+                  "bias_mm_day": -0.9344493856270673,
+                  "weekly_mae_mm": 4.805739697510631
+                },
+                "xgboost": {
+                  "mae_mm_day": 1.0196312322219212,
+                  "rmse_mm_day": 1.0661183210483316,
+                  "r2": -1.266354531064105,
+                  "bias_mm_day": -0.8755343331893284,
+                  "weekly_mae_mm": 4.5027479992594035
+                }
+              }
+            },
+            {
+              "fold": 3,
+              "train_rows": 111,
+              "validation_rows": 36,
+              "train_start": "2026-01-01",
+              "train_end": "2026-08-21",
+              "validation_start": "2026-08-22",
+              "validation_end": "2026-09-26",
+              "metrics": {
+                "persistence": {
+                  "mae_mm_day": 0.4833333333333333,
+                  "rmse_mm_day": 0.7158367287463128,
+                  "r2": 0.579269071468973,
+                  "bias_mm_day": -0.04333333333333332,
+                  "weekly_mae_mm": 0.5433333333333333
+                },
+                "ridge": {
+                  "mae_mm_day": 0.5766955047766824,
+                  "rmse_mm_day": 0.7748538037235843,
+                  "r2": 0.5070350726819419,
+                  "bias_mm_day": -0.4763277055182004,
+                  "weekly_mae_mm": 3.0182348161992647
+                },
+                "random_forest": {
+                  "mae_mm_day": 1.134386573924416,
+                  "rmse_mm_day": 1.3741568944592095,
+                  "r2": -0.5504191558841036,
+                  "bias_mm_day": -1.0040583472609388,
+                  "weekly_mae_mm": 6.670474798768994
+                },
+                "knn": {
+                  "mae_mm_day": 0.9703547720356299,
+                  "rmse_mm_day": 1.2207327935428178,
+                  "r2": -0.22353868840455338,
+                  "bias_mm_day": -0.8141445894547652,
+                  "weekly_mae_mm": 5.584768141544405
+                },
+                "svr": {
+                  "mae_mm_day": 1.4471557015975887,
+                  "rmse_mm_day": 1.7462403148612815,
+                  "r2": -1.5037127680060443,
+                  "bias_mm_day": -1.4038010625356716,
+                  "weekly_mae_mm": 8.575914110489052
+                },
+                "xgboost": {
+                  "mae_mm_day": 1.203157924413681,
+                  "rmse_mm_day": 1.4466501123535183,
+                  "r2": -0.718317817810866,
+                  "bias_mm_day": -1.096667965915468,
+                  "weekly_mae_mm": 7.085917031764985
+                }
+              }
+            }
+          ]
+        },
+        "test": {
+          "persistence": {
+            "mae_mm_day": 0.8961538461538462,
+            "rmse_mm_day": 1.397764699027041,
+            "r2": -1.268632319839937,
+            "bias_mm_day": 0.03307692307692303,
+            "weekly_mae_mm": 0.37499999999999956
+          },
+          "ridge": {
+            "mae_mm_day": 0.8038487010783025,
+            "rmse_mm_day": 1.2732802430643653,
+            "r2": -0.882538989059509,
+            "bias_mm_day": 0.7097524300647007,
+            "weekly_mae_mm": 4.613390795420555
+          },
+          "random_forest": {
+            "mae_mm_day": 0.7614431652010307,
+            "rmse_mm_day": 1.1919320909253324,
+            "r2": -0.6496773216182472,
+            "bias_mm_day": 0.55760677426837,
+            "weekly_mae_mm": 3.624444032744405
+          },
+          "knn": {
+            "mae_mm_day": 1.1059705302607403,
+            "rmse_mm_day": 1.5080259281906123,
+            "r2": -1.640666744188525,
+            "bias_mm_day": 0.8546070015844938,
+            "weekly_mae_mm": 5.554945510299211
+          },
+          "svr": {
+            "mae_mm_day": 0.6840148071505265,
+            "rmse_mm_day": 1.1931124226244698,
+            "r2": -0.6529461832568872,
+            "bias_mm_day": 0.39564219865495615,
+            "weekly_mae_mm": 2.720676507685223
+          },
+          "xgboost": {
+            "mae_mm_day": 0.9478792212559627,
+            "rmse_mm_day": 1.4120572771132611,
+            "r2": -1.3152644610410094,
+            "bias_mm_day": 0.8523583844991831,
+            "weekly_mae_mm": 5.54032949924469
+          }
+        },
+        "decision": "Mantener la persistencia como referencia predictiva del piloto: ninguno de los cinco algoritmos de aprendizaje mejora su MAE medio de validación. KNN queda como mejor candidato de machine learning.",
+        "limitations": [
+          "Un solo ciclo, cultivo y estación no permiten demostrar generalización.",
+          "La etiqueta es una referencia calculada por SiAR, no riego real observado.",
+          "No se puede afirmar ahorro de agua sin sensores, riego aplicado y respuesta del cultivo.",
+          "La meteorología AEMET disponible no coincide temporalmente con el ciclo de entrenamiento."
+        ]
+      },
+      "final_refit": {
+        "model": "persistence",
+        "rows": 173,
+        "start": "2026-01-01",
+        "end": "2026-10-22",
+        "evaluated_on_refit": false,
+        "artifact": "models/retrained_2026/alcachofa_BA08.joblib"
+      }
+    }
+  },
+  "limitations": [
+    "La etiqueta es la necesidad neta calculada por SiAR, no el riego aplicado en campo.",
+    "El Kc del día evaluado procede del calendario SiAR; el uso futuro requiere proyectarlo.",
+    "Persistencia es una predicción rodante a un día con el dato del día anterior disponible.",
+    "El reajuste final usa todo el histórico y no tiene una prueba independiente posterior.",
+    "AEMET no entra en este entrenamiento: faltan emisiones históricas archivadas antes de cada fecha objetivo.",
+    "Streamlit sigue usando el motor físico y de reglas; no consume estos artefactos predictivos."
+  ]
+}

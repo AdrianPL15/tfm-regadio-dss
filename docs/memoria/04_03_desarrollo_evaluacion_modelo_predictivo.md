@@ -208,3 +208,59 @@ modelo serializado localmente. Este último se excluye de Git por ser un
 artefacto reproducible. Las pruebas automatizadas verifican el orden temporal,
 el tratamiento de huecos, la reutilización de variables del 4.2, la exclusión
 de variables con fuga, la restricción no negativa y la reproducibilidad.
+
+## 4.3.10. Reentrenamiento con campañas disponibles hasta octubre de 2026
+
+Se amplió el experimento original sin reemplazarlo. Se agruparon los nueve CSV
+oficiales disponibles en seis combinaciones de cultivo y estación: pimiento,
+coliflor, maíz, algodón, alfalfa y alcachofa. Pimiento, maíz y algodón incluyen
+2025 y 2026; los otros tres cultivos solo disponen de una campaña parcial de
+2026. El archivo original de cada descarga permanece intacto. En total se
+leyeron 1776 filas CSV y se utilizaron 1584 jornadas completas con Kc positivo.
+Las fechas incompletas no se convirtieron en ceros y los días fuera del ciclo
+quedaron excluidos de las métricas, para evitar un resultado artificialmente
+favorable al predecir ausencia de cultivo.
+
+Se mantuvieron la variable objetivo, los nueve predictores y los seis enfoques
+del apartado 4.3.3. Los retardos se calcularon sobre el calendario antes de
+filtrar los días válidos: el primer día de 2026 no hereda el último valor de
+2025. Para cada combinación se reservó el 15 % final de las jornadas activas
+como prueba; el modelo se seleccionó únicamente por el MAE medio de tres cortes
+temporales del periodo anterior. Después de medir la prueba, se reajustó el
+enfoque seleccionado con todos los días válidos disponibles y se guardó su
+artefacto localmente. Ese último ajuste no tiene una prueba independiente
+posterior y no se utiliza en la aplicación Streamlit.
+
+**Tabla 4.15. Reentrenamiento por cultivo y estación con datos hasta el 22 de octubre de 2026.**
+
+| Caso | Jornadas activas válidas | Prueba final | Modelo elegido | MAE validación (mm/día) | MAE prueba (mm/día) |
+|---|---:|---:|---|---:|---:|
+| Pimiento AL01, 2025–2026 | 300 | 45 | Persistencia | 0,501 | 0,390 |
+| Coliflor AL01, 2026 | 144 | 22 | Ridge | 0,264 | 0,892 |
+| Maíz Z06, 2025–2026 | 366 | 55 | Persistencia | 0,782 | 0,814 |
+| Algodón BA08, 2025–2026 | 365 | 55 | Persistencia | 0,626 | 0,457 |
+| Alfalfa Z06, 2026 | 236 | 36 | Persistencia | 0,697 | 0,786 |
+| Alcachofa BA08, 2026 | 173 | 26 | Persistencia | 0,475 | 0,896 |
+
+![Figura 4.8. MAE del modelo elegido en validación temporal y prueba final para seis casos.](../images/model_retraining_2026.png)
+
+En cinco casos la selección favoreció la persistencia. En coliflor se eligió
+Ridge por validación, pero en la prueba obtuvo 0,892 mm/día frente a 0,885 de
+persistencia; la diferencia no acredita una mejora. El aumento de error entre
+validación y prueba en coliflor y alcachofa advierte de cambios de fase y de la
+escasa estabilidad de una única campaña parcial. Tampoco se comparan los MAE
+de esta tabla con los de la Tabla 4.14 como si compartieran el mismo tramo de
+prueba: tienen periodos y tamaños diferentes.
+
+Este reentrenamiento mejora la cobertura experimental, no demuestra mayor
+precisión ni ahorro de agua. La etiqueta sigue siendo la referencia calculada
+por SiAR; no se dispone de riego aplicado ni de un histórico de predicciones
+AEMET emitidas antes de cada fecha objetivo. La evaluación es rodante a un día
+y presupone que la necesidad del día anterior ya se conoce. La dosis mostrada
+en Streamlit sigue procediendo del motor agronómico y de reglas, no de estos
+modelos serializados.
+
+El experimento se reproduce con `python -m src.models.retrain_cases_2026`.
+Genera `docs/data_samples/model_retraining_2026.json`,
+`docs/data_samples/model_predictions_retraining_2026.csv`, la Figura 4.8 y
+seis artefactos locales excluidos de Git en `models/retrained_2026`.
