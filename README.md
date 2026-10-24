@@ -10,7 +10,7 @@ La app consulta además [modelos de ETc reentrenados](docs/INTEGRACION_ETC_AEMET
 
 | Si quieres... | Abre... |
 |---|---|
-| Leer la versión candidata de la memoria | [PDF con ETc y AEMET](docs/memoria/TFM_revision_integracion_ETC_AEMET_2026-10-24.pdf) o [Word editable](docs/memoria/TFM_revision_integracion_ETC_AEMET_2026-10-24.docx) |
+| Leer la versión candidata de la memoria | [PDF revisado](docs/memoria/TFM_revision_final_2026-10-24.pdf) o [Word editable](docs/memoria/TFM_revision_final_contenido_2026-10-24.docx) |
 | Probar el prototipo | [Demo pública en Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía de uso y despliegue](docs/STREAMLIT_DESPLIEGUE.md); como alternativa, [demo local](docs/DEMO_TFM.md) |
 | Ver qué datos entraron y cómo se transformaron | [Guía de reproducción](docs/REPRODUCCION_PILOTO.md) y [auditoría de coherencia](docs/AUDITORIA_COHERENCIA_2026-10-22.md) |
 
