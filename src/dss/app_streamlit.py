@@ -425,6 +425,11 @@ with st.expander("¿De dónde sale esta recomendación?"):
     )
     method = first["method"]
     st.markdown(f"**Método del primer día:** {METHOD_LABELS.get(method, 'sin método')}")
+    if summary["main_method"] != method:
+        st.markdown(
+            f"**Método principal del periodo:** "
+            f"{METHOD_LABELS.get(summary['main_method'], 'sin método')}"
+        )
     if method == "modelo_etc":
         st.caption(
             f"Modelo entrenado con SiAR hasta {first['model_trained_through']}; "
