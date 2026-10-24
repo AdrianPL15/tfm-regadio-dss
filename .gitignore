@@ -39,8 +39,10 @@ data/external/*
 # Modelos entrenados (pueden pesar mucho, se gestionan aparte)
 models/*
 !models/.gitkeep
+!models/deployed_etc_2026/
 *.pkl
 *.joblib
+!models/deployed_etc_2026/*.joblib
 *.h5
 
 # Python

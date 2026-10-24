@@ -264,3 +264,24 @@ El experimento se reproduce con `python -m src.models.retrain_cases_2026`.
 Genera `docs/data_samples/model_retraining_2026.json`,
 `docs/data_samples/model_predictions_retraining_2026.csv`, la Figura 4.8 y
 seis artefactos locales excluidos de Git en `models/retrained_2026`.
+
+## 4.3.11. Modelo de ETc para la aplicación
+
+La necesidad neta del experimento anterior ya contiene la precipitación
+efectiva SiAR; por eso no se utilizó como base para volver a descontar la
+lluvia prevista por AEMET. Se entrenó por separado una estimación de **ETc**,
+es decir, la demanda del cultivo antes de lluvia, para las mismas seis
+combinaciones. Los retardos proceden únicamente de ETc observada antes del
+día objetivo. La validación temporal selecciona Persistencia en cinco casos y
+Ridge en coliflor. Los resultados, la comparación con el cálculo físico y la
+decisión de uso en Streamlit se documentan en
+[`INTEGRACION_ETC_AEMET_2026.md`](../INTEGRACION_ETC_AEMET_2026.md).
+
+El cálculo físico obtuvo menor MAE en cinco de los seis tramos de prueba. Por
+ello, los modelos están conectados a la aplicación como estimación contrastable,
+pero solo el caso de algodón supera el control comparativo para intervenir en
+la dosis principal cuando el cultivo esté activo. Los casos activos en octubre
+de 2026 conservan la estimación física. Tras elegir la base, el motor aplica
+una sola vez la fracción supuesta de lluvia AEMET y la eficiencia del riego.
+Esta decisión operativa utiliza resultados del tramo de prueba y no constituye
+una segunda evaluación independiente del sistema desplegado.

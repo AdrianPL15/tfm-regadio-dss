@@ -4,6 +4,14 @@ La app conserva tres casos SiAR de 2025 para la evaluación retrospectiva y aña
 
 La pantalla separa la **dosis del primer día** de la **suma provisional de hasta siete días**. Expresa la primera en mm, L/m², m³/ha y m³ para la superficie introducida (`1 mm = 1 L/m² = 10 m³/ha`). El acumulado no debe interpretarse como una orden de riego para toda la semana: el Kc futuro es una proyección limitada al mes, la ET0 se estima a partir de observaciones recientes y AEMET puede no publicar mm completos para todos los días. El botón **Actualizar fuentes y generar recomendación** consulta el CSV diario SiAR del caso 2026 seleccionado, lo compara con el histórico guardado y, si el cultivo sigue en campaña, consulta la predicción AEMET. La nueva descarga SiAR se usa **solo en la sesión de la app**: no escribe en GitHub ni reemplaza el CSV versionado. Si SiAR falla o revisa jornadas previas, se muestra un aviso y se conserva la instantánea guardada. Si falla AEMET, se muestra la dosis base sin descontar lluvia prevista. Para los casos retrospectivos de 2025 no se aplica la predicción meteorológica actual.
 
+La app también carga seis modelos reentrenados de ETc previa a lluvia. Muestra
+la predicción y su comparación con el cálculo físico. El modelo solo determina
+la dosis principal si su MAE de prueba fue menor que el físico; esto ocurre en
+algodón BA08, fuera de ciclo el 24/10/2026. En los cultivos activos se mantiene
+el cálculo físico para la dosis. La lluvia AEMET se aplica después de elegir
+la base y no se descuenta dos veces. Véase la
+[evaluación de integración](INTEGRACION_ETC_AEMET_2026.md).
+
 ## Configuración de publicación
 
 El despliegue se creó el 23/10/2026 desde el fork de Adrián en [Streamlit Community Cloud](https://share.streamlit.io/) con esta configuración:
@@ -14,7 +22,7 @@ El despliegue se creó el 23/10/2026 desde el fork de Adrián en [Streamlit Comm
 | Rama | `main` |
 | Archivo principal | `src/dss/app_streamlit.py` |
 | Versión de Python | 3.12 |
-| Dependencias | `src/dss/requirements.txt` (detectado junto al archivo principal) |
+| Dependencias | `src/dss/requirements.txt`, con scikit-learn y joblib para los modelos versionados |
 | Secretos | Ninguno para SiAR retrospectivo; `AEMET_API_KEY` opcional para la consulta actual |
 | URL pública | `https://tfm-regadio-dss-adrianpl15.streamlit.app/` |
 
@@ -39,4 +47,4 @@ Guardar el secreto y reiniciar la app si no se actualiza sola. No copiar el arch
 
 La URL figura en la primera pantalla del `README.md`. Falta incorporarla al anexo de la versión final de la memoria, junto con una fecha de consulta y la advertencia de alcance del piloto. Si la app se suspende por inactividad, puede tardar unos segundos en reactivarse.
 
-**Alcance:** los ensayos de 2025 siguen siendo retrospectivos y los seis CSV de 2026 son instantáneas oficiales, no un catálogo nacional dinámico. Hay evaluaciones predictivas independientes para pimiento, maíz y algodón en 2025, pero no un modelo común ni validación en campo. El 24/10/2026 coliflor AL01, alfalfa Z06 y alcachofa BA08 están en ciclo con Kc positivo; el Kc de mañana es una proyección local dentro del mes y el descuento de lluvia usa una fracción hipotética. Los casos añadidos demuestran el motor de reglas, **no** un modelo reentrenado o evaluado para esos cultivos. La predicción AEMET actual no se cruza con 2025. El sistema de producción exacto no queda acreditado por los CSV. La referencia SiAR no es riego real observado. La demo no demuestra ahorro de agua ni validez agronómica fuera del piloto.
+**Alcance:** los ensayos de 2025 siguen siendo retrospectivos y los seis CSV de 2026 son instantáneas oficiales, no un catálogo nacional dinámico. Hay evaluaciones predictivas independientes por cultivo y estación, pero no un modelo común ni validación en campo. El 24/10/2026 coliflor AL01, alfalfa Z06 y alcachofa BA08 están en ciclo con Kc positivo; el Kc de mañana es una proyección local dentro del mes y el descuento de lluvia usa una fracción hipotética. Los modelos reentrenados de ETc se muestran en estos casos, pero sus errores de prueba aconsejan mantener el cálculo físico para la dosis. La predicción AEMET actual no se cruza con 2025. El sistema de producción exacto no queda acreditado por los CSV. La referencia SiAR no es riego real observado. La demo no demuestra ahorro de agua ni validez agronómica fuera del piloto.

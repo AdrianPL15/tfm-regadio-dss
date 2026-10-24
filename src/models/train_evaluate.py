@@ -38,7 +38,6 @@ from sklearn.model_selection import TimeSeriesSplit
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from sklearn.svm import SVR
-from xgboost import XGBRegressor
 
 
 DEFAULT_INPUT = Path("data/processed/modeling_dataset_daily.csv")
@@ -207,6 +206,9 @@ def temporal_split(
 
 
 def _models() -> dict[str, RegressorMixin]:
+    # El despliegue solo deserializa Persistencia o Ridge; XGBoost se necesita
+    # para entrenar y comparar, no para abrir esos modelos en Streamlit.
+    from xgboost import XGBRegressor
     ridge = Pipeline(
         [
             ("imputer", SimpleImputer(strategy="median")),

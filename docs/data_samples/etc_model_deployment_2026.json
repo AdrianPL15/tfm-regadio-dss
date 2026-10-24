@@ -1,0 +1,136 @@
+{
+  "target": "ETc SiAR, mm/día, antes de descontar lluvia",
+  "feature_columns": [
+    "crop_coefficient_kc",
+    "day_of_year_sin",
+    "day_of_year_cos",
+    "net_irrigation_need_mm_lag_1d",
+    "net_irrigation_need_mm_lag_3d",
+    "net_irrigation_need_mm_lag_7d",
+    "net_irrigation_need_mm_sum_3d",
+    "net_irrigation_need_mm_sum_7d",
+    "net_irrigation_need_mm_sum_14d"
+  ],
+  "selection": "MAE medio en tres cortes temporales; 15 % final reservado",
+  "rain_policy": "AEMET se aplica después de predecir ETc; no se descuenta dos veces",
+  "deployment_horizon": "solo mañana; días posteriores usan el método físico existente",
+  "cases": {
+    "pimiento_AL01": {
+      "crop": "Pimiento",
+      "station_code": "AL01",
+      "years": [
+        2025,
+        2026
+      ],
+      "active_rows": 300,
+      "trained_through": "2026-09-30",
+      "selected_model": "persistence",
+      "selected_model_label": "Persistencia",
+      "cv_mae_mm_day": 0.4809259259259259,
+      "test_mae_mm_day": 0.39,
+      "test_persistence_mae_mm_day": 0.39,
+      "physical_baseline_test_mae_mm_day": 0.2947777777777777,
+      "physical_baseline_test_rows": 45,
+      "deploy_model_for_dose": false,
+      "test_rows": 45,
+      "artifact": "pimiento_AL01.joblib"
+    },
+    "coliflor_AL01": {
+      "crop": "Coliflor",
+      "station_code": "AL01",
+      "years": [
+        2026
+      ],
+      "active_rows": 144,
+      "trained_through": "2026-10-22",
+      "selected_model": "ridge",
+      "selected_model_label": "Ridge",
+      "cv_mae_mm_day": 0.2643075234564935,
+      "test_mae_mm_day": 0.7618567197131193,
+      "test_persistence_mae_mm_day": 0.7554545454545455,
+      "physical_baseline_test_mae_mm_day": 0.6358889610389613,
+      "physical_baseline_test_rows": 22,
+      "deploy_model_for_dose": false,
+      "test_rows": 22,
+      "artifact": "coliflor_AL01.joblib"
+    },
+    "maiz_Z06": {
+      "crop": "Maíz",
+      "station_code": "Z06",
+      "years": [
+        2025,
+        2026
+      ],
+      "active_rows": 366,
+      "trained_through": "2026-09-30",
+      "selected_model": "persistence",
+      "selected_model_label": "Persistencia",
+      "cv_mae_mm_day": 0.728095238095238,
+      "test_mae_mm_day": 0.7180000000000002,
+      "test_persistence_mae_mm_day": 0.7180000000000002,
+      "physical_baseline_test_mae_mm_day": 0.5557306493506495,
+      "physical_baseline_test_rows": 55,
+      "deploy_model_for_dose": false,
+      "test_rows": 55,
+      "artifact": "maiz_Z06.joblib"
+    },
+    "algodon_BA08": {
+      "crop": "Algodón",
+      "station_code": "BA08",
+      "years": [
+        2025,
+        2026
+      ],
+      "active_rows": 365,
+      "trained_through": "2026-09-30",
+      "selected_model": "persistence",
+      "selected_model_label": "Persistencia",
+      "cv_mae_mm_day": 0.5533549783549784,
+      "test_mae_mm_day": 0.41036363636363643,
+      "test_persistence_mae_mm_day": 0.41036363636363643,
+      "physical_baseline_test_mae_mm_day": 0.433987012987013,
+      "physical_baseline_test_rows": 55,
+      "deploy_model_for_dose": true,
+      "test_rows": 55,
+      "artifact": "algodon_BA08.joblib"
+    },
+    "alfalfa_Z06": {
+      "crop": "Alfalfa",
+      "station_code": "Z06",
+      "years": [
+        2026
+      ],
+      "active_rows": 236,
+      "trained_through": "2026-10-22",
+      "selected_model": "persistence",
+      "selected_model_label": "Persistencia",
+      "cv_mae_mm_day": 0.6492666666666667,
+      "test_mae_mm_day": 0.5558333333333332,
+      "test_persistence_mae_mm_day": 0.5558333333333332,
+      "physical_baseline_test_mae_mm_day": 0.5314162698412699,
+      "physical_baseline_test_rows": 36,
+      "deploy_model_for_dose": false,
+      "test_rows": 36,
+      "artifact": "alfalfa_Z06.joblib"
+    },
+    "alcachofa_BA08": {
+      "crop": "Alcachofa",
+      "station_code": "BA08",
+      "years": [
+        2026
+      ],
+      "active_rows": 173,
+      "trained_through": "2026-10-22",
+      "selected_model": "persistence",
+      "selected_model_label": "Persistencia",
+      "cv_mae_mm_day": 0.3875,
+      "test_mae_mm_day": 0.4815384615384616,
+      "test_persistence_mae_mm_day": 0.4815384615384616,
+      "physical_baseline_test_mae_mm_day": 0.45505494505494504,
+      "physical_baseline_test_rows": 26,
+      "deploy_model_for_dose": false,
+      "test_rows": 26,
+      "artifact": "alcachofa_BA08.joblib"
+    }
+  }
+}

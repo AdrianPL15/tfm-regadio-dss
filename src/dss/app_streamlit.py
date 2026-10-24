@@ -33,6 +33,7 @@ from src.data.aemet_client import AEMETClient, AEMETError  # noqa: E402
 from src.data.refresh_siar_crop_needs import SiARRefreshError, fetch_validated_case  # noqa: E402
 from src.dss.engine import METHOD_LABELS, fmt_es, recommend  # noqa: E402
 from src.dss.live_calendar import extend_recent_kc  # noqa: E402
+from src.dss.predict_etc import ModelUnavailable, predict_tomorrow_etc  # noqa: E402
 
 
 st.set_page_config(page_title="DSS de riego", layout="wide")
@@ -152,6 +153,12 @@ with st.sidebar:
         and float(history["kc"].iloc[-1]) > 0
     )
     issue_key = f"fecha_{case.station_code}_{case.crop}_{case.campaign_year}"
+    if issue_key not in st.session_state:
+        st.session_state[issue_key] = (
+            tomorrow if live_case else historical_example
+            if case.campaign_year == date.today().year
+            else min(max(default_issue, first_day), last_day)
+        )
     if generate and live_case:
         st.session_state[issue_key] = tomorrow
     if generate and case.campaign_year == date.today().year and tomorrow.month in metadata.get("active_months", []):
@@ -179,8 +186,6 @@ with st.sidebar:
     mode = "planificacion" if mode_label.startswith("Planificación") else "seguimiento"
     issue = st.date_input(
         "Primer día a recomendar",
-        value=(tomorrow if live_case else historical_example if case.campaign_year == date.today().year
-               else min(max(default_issue, first_day), last_day)),
         min_value=first_day,
         max_value=last_day + timedelta(days=MAX_HORIZON_DAYS),
         format="DD/MM/YYYY",
@@ -286,7 +291,20 @@ try:
         extend_recent_kc(history, metadata, target_day=issue, as_of=date.today(), horizon_days=horizon)
         if live_case and issue == tomorrow else history
     )
-    result = recommend(request, history=calculation_history, metadata=metadata, forecast=forecast_input)
+    model_estimate = None
+    if live_case and issue == tomorrow and mode == "planificacion":
+        try:
+            model_estimate = predict_tomorrow_etc(case, calculation_history, issue)
+        except (ModelUnavailable, OSError, ImportError) as error:
+            st.warning(f"Modelo no disponible; se usa el cálculo físico SiAR: {error}")
+    result = recommend(
+        request, history=calculation_history, metadata=metadata,
+        forecast=forecast_input,
+        model_estimate=(
+            model_estimate if model_estimate and model_estimate["deploy_model_for_dose"]
+            else None
+        ),
+    )
 except ValueError as error:
     st.error(str(error))
     st.stop()
@@ -323,6 +341,20 @@ if pd.notna(first["gross_dose_mm"]):
         f"Necesidad neta del cultivo: {fmt_es(first['net_need_mm'])} mm. "
         "La dosis indicada considera la eficiencia del riego."
     )
+    if first["method"] == "modelo_etc":
+        st.caption(
+            f"Demanda antes de lluvia estimada con {first['predictive_model']} "
+            f"({fmt_es(first['base_need_before_rain_mm'])} mm de ETc). "
+            "Después se aplica la lluvia prevista disponible y la eficiencia del riego."
+        )
+    elif model_estimate is not None:
+        st.caption(
+            f"Modelo {model_estimate['model']} comprobado: "
+            f"{fmt_es(model_estimate['etc_mm'])} mm de ETc. Se mantiene la "
+            "estimación física para la dosis porque tuvo menos error en la "
+            "prueba histórica de este caso o porque faltan observaciones de "
+            "algún día intermedio."
+        )
     if live_case and issue == tomorrow and not use_scenario:
         if forecast_input is None:
             st.info(
@@ -391,8 +423,33 @@ with st.expander("¿De dónde sale esta recomendación?"):
         f"al {last_day:%d/%m/%Y} "
         f"({metadata.get('record_count', len(history))} registros)."
     )
-    method = summary["main_method"]
-    st.markdown(f"**Método principal:** {METHOD_LABELS.get(method, 'sin método')}")
+    method = first["method"]
+    st.markdown(f"**Método del primer día:** {METHOD_LABELS.get(method, 'sin método')}")
+    if method == "modelo_etc":
+        st.caption(
+            f"Modelo entrenado con SiAR hasta {first['model_trained_through']}; "
+            "predice ETc para mañana. La lluvia AEMET se descuenta después, "
+            "solo cuando hay cantidad horaria completa y según la fracción supuesta."
+        )
+    if model_estimate is not None:
+        st.markdown(
+            f"**Comparación ETc:** modelo {fmt_es(model_estimate['etc_mm'])} mm; "
+            f"método usado {fmt_es(first['base_need_before_rain_mm'])} mm. "
+            f"MAE de prueba: modelo {fmt_es(model_estimate['test_mae_mm_day'], 2)} "
+            "mm/día; físico "
+            f"{fmt_es(model_estimate['physical_baseline_test_mae_mm_day'], 2)} mm/día."
+        )
+        st.caption(
+            "La elección operativa utiliza este tramo de prueba como control de "
+            "calidad; esas métricas no son una evaluación independiente del sistema "
+            "completo desplegado."
+        )
+        if model_estimate["steps_ahead"] > 1:
+            st.warning(
+                f"La predicción comparativa avanzó {model_estimate['steps_ahead']} "
+                "días desde la última ETc observada. Esta extrapolación no se "
+                "evaluó y nunca modifica la dosis principal."
+            )
     st.markdown(f"**Eficiencia aplicada:** {fmt_es(summary['efficiency'] * 100, 0)} %")
     if summary["allocation_factor"] < 1:
         st.markdown(
@@ -438,6 +495,7 @@ table = pd.DataFrame(
     {
         "Fecha": daily["date"].dt.strftime("%d/%m/%Y"),
         "Kc": daily["kc"].map(lambda v: fmt_es(v, 2)),
+        "Modelo del primer día": daily["predictive_model"].fillna("cálculo físico"),
         "ET0 usada (mm)": daily["et0_used_mm"].map(lambda v: fmt_es(v, 2)),
         "Necesidad neta (mm)": daily["net_need_mm"].map(lambda v: fmt_es(v, 2)),
         "Necesidad sin lluvia hipotética (mm)": daily["base_need_before_rain_mm"].map(lambda v: fmt_es(v, 2)),

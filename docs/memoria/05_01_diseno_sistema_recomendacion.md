@@ -190,7 +190,7 @@ calibrar niveles de confianza o intervalos transferibles.
 
 ## 5.1.5. Estructura de la salida
 
-Cada consulta genera una tabla diaria con veintidós campos y un resumen del
+Cada consulta genera una tabla diaria con veinticuatro campos y un resumen del
 horizonte. La tabla incluye la fecha, el día del horizonte, el Kc, la ET0
 utilizada y su origen, la necesidad neta, el método, la persistencia como
 referencia, la dosis bruta, el factor de dotación, el volumen, la confianza,
@@ -203,6 +203,11 @@ conserva la versión del motor, los parámetros de la consulta, la URL de la
 fuente y la fecha de descarga. Todo ello se exporta en CSV y JSON, lo que
 permite archivar las recomendaciones emitidas y compararlas más adelante con
 lo que realmente se regó.
+
+La versión 1.1 añade el nombre del modelo predictivo y la última fecha de sus
+datos de entrenamiento cuando participa en el primer día. Si la prueba
+histórica favorece el cálculo físico, la predicción ETc del modelo se muestra
+como comparación, pero no modifica la dosis.
 
 La explicación se redacta a partir de los mismos valores que aparecen en la
 tabla. Para el 1 de julio de 2025, por ejemplo, la salida indica que la
@@ -230,3 +235,19 @@ tercera alternativa fue un balance hídrico del suelo con agotamiento admisible,
 que permitiría decidir no solo cuánto sino cuándo regar. Requiere capacidad de
 retención, profundidad radicular y riegos previos de la parcela, datos que el
 piloto no tiene, y se plantea como evolución en el capítulo 6.
+
+## 5.1.7. Integración de ETc predictiva y AEMET
+
+Para la planificación de mañana, el sistema comprueba si existe un modelo de
+ETc entrenado para el cultivo y la estación seleccionados. La ETc predicha es
+una demanda **anterior** a la lluvia. Su uso para la dosis queda condicionado
+a que su MAE en el tramo de prueba sea menor que el del cálculo físico de ET0
+reciente por Kc. En caso contrario, la interfaz presenta ambas estimaciones
+y conserva el cálculo físico como base. La previsión AEMET, si aporta mm
+horarios completos, se descuenta después una sola vez usando la fracción
+aprovechable hipotética indicada por el usuario. Si faltan el modelo, los
+datos recientes o la previsión cuantitativa, el motor mantiene una salida
+explícita con las advertencias correspondientes. Esta integración se limita al
+primer día; el resto del horizonte conserva el método físico provisional.
+Las cifras y la reproducción se recogen en
+[`INTEGRACION_ETC_AEMET_2026.md`](../INTEGRACION_ETC_AEMET_2026.md).

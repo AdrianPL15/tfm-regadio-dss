@@ -36,13 +36,14 @@ from src.dss.config import (
 from src.dss.data_access import load_case, normalise_forecast
 
 
-ENGINE_VERSION = "1.0.0"
+ENGINE_VERSION = "1.1.0"
 
 METHOD_LABELS = {
     "referencia_siar": "Referencia SiAR observada (ET0 × Kc − Pe)",
     "et0_prevista": "ET0 prevista × Kc del calendario",
     "et0_reciente_kc": f"ET0 media de los últimos {ET0_WINDOW_DAYS} días × Kc del calendario",
     "persistencia": "Persistencia de la última necesidad neta conocida",
+    "modelo_etc": "Modelo SiAR de ETc previa a lluvia + previsión AEMET",
     "sin_recomendacion": "Sin datos suficientes para recomendar",
 }
 
@@ -69,6 +70,8 @@ DAILY_COLUMNS = [
     "explanation",
     "data_last_observed",
     "source_file",
+    "predictive_model",
+    "model_trained_through",
 ]
 
 
@@ -150,6 +153,7 @@ def estimate_day(
     known: pd.DataFrame,
     forecast_row: pd.Series | None,
     mode: str,
+    model_etc_mm: float | None = None,
 ) -> dict[str, Any]:
     """Estima la necesidad neta de un día y registra el origen del cálculo."""
 
@@ -208,6 +212,21 @@ def estimate_day(
             "recurre a una estimación con la información anterior."
         )
         rules.append("R1 sustitución por ausencia de dato observado")
+
+    if mode == "planificacion" and model_etc_mm is not None:
+        if not np.isfinite(model_etc_mm) or model_etc_mm < 0:
+            raise ValueError("La ETc predicha por el modelo debe ser finita y no negativa.")
+        rules.append("R0 ETc predicha por modelo SiAR antes de la lluvia prevista")
+        return {
+            "kc": kc,
+            "et0_used_mm": np.nan,
+            "et0_origin": "modelo_etc",
+            "net_need_mm": model_etc_mm,
+            "method": "modelo_etc",
+            "persistence_baseline_mm": persistence,
+            "rules": rules,
+            "warnings": warnings,
+        }
 
     if forecast_row is not None and pd.notna(forecast_row.get("et0_mm")):
         et0 = float(forecast_row["et0_mm"])
@@ -306,6 +325,11 @@ def _explain(row: dict[str, Any], efficiency: float, area_ha: float | None) -> s
             f"ET0 media reciente de {fmt_es(row['et0_used_mm'], 2)} mm por Kc "
             f"{fmt_es(row['kc'], 2)}"
         )
+    elif row["method"] == "modelo_etc":
+        origin = (
+            f"la ETc previa a lluvia predicha por el modelo "
+            f"{row['predictive_model']} ({fmt_es(row['base_need_before_rain_mm'])} mm)"
+        )
     else:
         origin = "la última necesidad neta conocida"
 
@@ -337,6 +361,7 @@ def recommend(
     metadata: dict[str, Any] | None = None,
     forecast: pd.DataFrame | None = None,
     expected_errors: dict[int, float] | None = None,
+    model_estimate: dict[str, Any] | None = None,
 ) -> Recommendation:
     """Genera la recomendación diaria y el resumen del horizonte solicitado."""
 
@@ -385,8 +410,13 @@ def recommend(
             if forecast_indexed is not None and target_date in forecast_indexed.index
             else None
         )
+        use_model = (
+            offset == 0 and request.mode == "planificacion" and not stale_data
+            and model_estimate is not None
+        )
         estimate = estimate_day(
-            target=target, known=known, forecast_row=forecast_row, mode=request.mode
+            target=target, known=known, forecast_row=forecast_row, mode=request.mode,
+            model_etc_mm=float(model_estimate["etc_mm"]) if use_model else None,
         )
         rules = list(estimate.pop("rules"))
         warnings = list(estimate.pop("warnings"))
@@ -470,6 +500,8 @@ def recommend(
                 "source_file": history["source_file"].iloc[0]
                 if "source_file" in history
                 else None,
+                "predictive_model": model_estimate["model"] if use_model else None,
+                "model_trained_through": model_estimate["trained_through"] if use_model else None,
             }
         )
 
@@ -544,6 +576,7 @@ def recommend(
         "source_url": metadata.get("source_url"),
         "source_retrieved_at": metadata.get("retrieved_at"),
         "method_labels": METHOD_LABELS,
+        "model_estimate": model_estimate,
     }
     return Recommendation(
         daily=daily, summary=summary, metadata=metadata_out, warnings=general_warnings

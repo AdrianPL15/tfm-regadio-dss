@@ -21,6 +21,11 @@ estaciones, campañas o cultivos. La selección en la interfaz se limita a los
 casos ya descargados; la extracción arbitraria y la operación continua siguen
 siendo objetivos del producto, no funciones validadas del prototipo.
 
+La integración de ETc reentrenada y AEMET se describe en
+`docs/INTEGRACION_ETC_AEMET_2026.md`. La app carga los seis modelos versionados,
+pero el cálculo físico conserva la dosis en cinco casos por menor MAE de prueba;
+solo algodón favorece al modelo y está fuera de ciclo en esta revisión.
+
 ## 2. Estado por capítulo
 
 | Apartado | Estado | Revisión pendiente |
@@ -29,9 +34,9 @@ siendo objetivos del producto, no funciones validadas del prototipo.
 | 2. Marco teórico y estado del arte | Redactado | Cotejar citas, referencias, DOI y formato final. |
 | 3. Metodología y arquitectura | Redactado | Verificar que las tecnologías previstas no se presentan como desplegadas. |
 | 4. Procesamiento y Machine Learning | Piloto original y reentrenamiento independiente en seis casos documentados | Revisar reproducción de cifras y que los resultados no se describan como validación agronómica ni como mejora demostrada. |
-| 5. DSS y resultados | Implementado y documentado para el piloto | Validar con usuarios y datos de campo en una fase posterior; falta histórico de previsiones alineado. |
+| 5. DSS y resultados | Motor físico y modelos ETc conectados a la app con control comparativo | Validar prospectivamente con usuarios y datos de campo; falta histórico de previsiones alineado. |
 | 6. Conclusiones | Redactado | Revisar con el equipo el grado de cumplimiento de objetivos y las afirmaciones de alcance. |
-| Elementos preliminares y anexos | Versión de revisión preparada | La memoria ampliada está en `docs/memoria/TFM_revision_reentrenamiento_2026-10-23.docx` y su PDF en `docs/memoria/TFM_revision_reentrenamiento_2026-10-24_revisado.pdf`. Se comprobaron los índices y las páginas modificadas; resta la lectura editorial completa de las 84 páginas. El abstract en inglés se eliminó por decisión del equipo. |
+| Elementos preliminares y anexos | Versión de revisión preparada | La memoria ampliada está en `docs/memoria/TFM_revision_integracion_ETC_AEMET_2026-10-24.docx` y su PDF del mismo nombre. Se comprobaron los índices y las páginas modificadas; resta la lectura editorial completa de las 85 páginas. El abstract en inglés se eliminó por decisión del equipo. |
 
 ## 3. Qué demuestra el repositorio
 
