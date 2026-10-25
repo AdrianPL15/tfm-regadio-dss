@@ -285,3 +285,48 @@ de 2026 conservan la estimación física. Tras elegir la base, el motor aplica
 una sola vez la fracción supuesta de lluvia AEMET y la eficiencia del riego.
 Esta decisión operativa utiliza resultados del tramo de prueba y no constituye
 una segunda evaluación independiente del sistema desplegado.
+
+## 4.3.12. Explicabilidad de los modelos de árboles
+
+Se aplicó TreeSHAP a Random Forest y XGBoost para analizar su comportamiento
+en los mismos 23 días de prueba del piloto original. Los modelos se ajustaron
+solo con las 125 observaciones del periodo de desarrollo y no se modificaron la
+partición, las variables ni los hiperparámetros del apartado 4.3. Las
+contribuciones SHAP explican cómo construye cada modelo su predicción; no
+demuestran causalidad ni bastan por sí solas para explicar el error.
+
+**Tabla 4.17. Variables con mayor contribución media absoluta en la prueba temporal.**
+
+| Modelo | Variable | Contribución media absoluta | Porcentaje del total |
+|---|---|---:|---:|
+| Random Forest | Kc | 1,870 mm/día | 73,4 % |
+| Random Forest | Necesidad t-1 | 0,335 mm/día | 13,2 % |
+| Random Forest | Día del año (coseno) | 0,124 mm/día | 4,9 % |
+| XGBoost | Kc | 1,433 mm/día | 53,6 % |
+| XGBoost | Necesidad t-1 | 0,490 mm/día | 18,3 % |
+| XGBoost | Día del año (coseno) | 0,299 mm/día | 11,2 % |
+
+![Figura 4.9. Importancia global y explicaciones locales de Random Forest y XGBoost mediante TreeSHAP.](../images/model_xai_4_3.png)
+
+El resultado debe interpretarse junto con la distribución temporal. El periodo
+de desarrollo contiene valores de Kc entre 0,3 y 1,0 y una necesidad media de
+4,041 mm/día, mientras que toda la prueba corresponde a Kc igual a 0,3 y su
+media desciende a 1,130 mm/día. En ambos modelos, Kc y la necesidad del día
+anterior reducen una referencia interna aprendida cercana a 4,0 mm/día, pero
+los árboles no se ajustan completamente al tramo final y mantienen un sesgo
+positivo. La suma de los siete días anteriores aporta además una pequeña
+contribución positiva.
+
+La explicación local del 29 de septiembre, el día de mayor error para ambos
+modelos, muestra ese mismo patrón: frente a una referencia SiAR de 0,89 mm/día,
+Random Forest estima 1,72 y XGBoost 1,92 mm/día. Este análisis no convierte el
+resultado en una relación causal, pero sí permite identificar una dependencia
+fuerte del estado fenológico y de los retardos. La persistencia se adapta mejor
+al nivel local del tramo final porque utiliza directamente la observación más
+reciente. Por tanto, la evidencia XAI refuerza, en lugar de sustituir, la
+decisión de no desplegar los árboles con los datos actuales.
+
+El análisis se reproduce con `python -m src.analysis.build_xai_4_3`. El comando
+genera el informe JSON, las importancias globales, las explicaciones locales y
+la Figura 4.9. Los tres resultados tabulares se conservan en
+`docs/data_samples/`.

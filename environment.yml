@@ -19,4 +19,5 @@ dependencies:
   - pip
   - pip:
       - xgboost
+      - shap>=0.54,<0.55
       - streamlit

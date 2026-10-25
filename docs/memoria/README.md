@@ -17,3 +17,7 @@ se cotejaron con las indicaciones entregadas para el TFM.
 La [aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) está
 publicada. Las limitaciones científicas que no se resuelven con edición se recogen en
 [la revisión cruzada de entrega](../REVISION_CRUZADA_ENTREGA_2026-10-25.md).
+
+La revisión final incorpora un análisis TreeSHAP de Random Forest y XGBoost,
+un plan operativo de MLOps y control de deriva, y la formalización FAIR mediante
+`CITATION.cff`, licencia, ficha de datos y condiciones de reutilización.

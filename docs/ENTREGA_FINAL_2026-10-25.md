@@ -14,12 +14,14 @@ Fecha de cierre documental: 25 de octubre de 2026.
 |---|---|
 | Extracción y limpieza del piloto: 150 registros SiAR por fuente, 148 etiquetas válidas | [Volumen de la ETL](data_samples/etl_volume_summary_4_1.csv) y [código](../src/data/) |
 | Modelos del piloto de pimiento de 2025 | [Evaluación del apartado 4.3](data_samples/model_evaluation_4_3.json) |
+| Explicabilidad de Random Forest y XGBoost en el tramo temporal reservado | [Informe XAI](data_samples/xai_analysis_4_3.json), [importancias](data_samples/xai_feature_importance_4_3.csv) y [figura](images/model_xai_4_3.png) |
 | Ampliación a seis combinaciones y campañas disponibles de 2025 y 2026: 1776 filas CSV y 1584 jornadas activas válidas | [Reentrenamiento por caso](data_samples/model_retraining_2026.json) |
 | Selección entre el modelo de ETc y `ET0 reciente × Kc` para la dosis | [Comparación por caso](data_samples/etc_model_deployment_2026.json) y [código](../src/models/train_etc_for_dss.py) |
 | Reglas de riego y validación retrospectiva | [Motor](../src/dss/engine.py) y [13 escenarios](data_samples/dss_validation_5_3.json) |
 | Interfaz desplegada | [Código Streamlit](../src/dss/app_streamlit.py) |
+| Reutilización académica y operación | [Ficha del conjunto](DATASET_CARD.md), [principios FAIR](FAIR_Y_CITACION.md) y [plan MLOps](MLOPS_MONITORIZACION.md) |
 
-El 25/10/2026 se ejecutó `python -m unittest discover -s tests -q`: **103 pruebas correctas**, incluidas las dos pruebas `AppTest` de Streamlit. En el aislamiento local de sockets de Windows, `AppTest` se detiene antes de cargar la app; ejecutada en el entorno Windows normal, la suite terminó correctamente. La consulta pública de coliflor AL01 para hoy recibió datos SiAR y AEMET y mostró una dosis y un CSV descargable. El resultado de una consulta futura puede variar con los datos recibidos y la hora.
+El 25/10/2026 se ejecutaron **104 pruebas correctas**, incluidas la nueva comprobación XAI y las dos pruebas `AppTest` de Streamlit. En el aislamiento local de sockets de Windows, `AppTest` se detiene antes de cargar la app; ejecutada en el entorno Windows normal, la suite terminó correctamente. La consulta pública de coliflor AL01 para hoy recibió datos SiAR y AEMET y mostró una dosis y un CSV descargable. El resultado de una consulta futura puede variar con los datos recibidos y la hora.
 
 ## Alcance que debe explicarse
 

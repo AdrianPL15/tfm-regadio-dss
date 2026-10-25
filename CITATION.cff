@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: >-
+  Si utiliza este software o sus conjuntos de datos derivados, cite el TFM y
+  la versión concreta del repositorio.
+title: Sistema inteligente de apoyo a la decisión para la gestión hídrica agrícola
+type: software
+authors:
+  - family-names: Moreno Díaz
+    given-names: Luis
+  - family-names: Pérez Lombal
+    given-names: Adrián
+  - family-names: Ramos Alascio
+    given-names: Manuel
+  - family-names: Santamaría Román
+    given-names: Alicia
+repository-code: https://github.com/AdrianPL15/tfm-regadio-dss
+url: https://tfm-regadio-dss-adrianpl15.streamlit.app/
+license: MIT
+keywords:
+  - riego agrícola
+  - sistema de apoyo a la decisión
+  - evapotranspiración
+  - SiAR
+  - AEMET
+  - aprendizaje automático
+  - series temporales

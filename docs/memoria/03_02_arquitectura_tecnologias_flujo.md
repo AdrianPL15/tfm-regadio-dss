@@ -95,7 +95,7 @@ cubren construcción de consultas, protección de credenciales, escritura raw,
 normalización, calidad, características, evaluación temporal y reglas del motor
 de recomendación, incluida la comprobación de que la planificación no utiliza
 información posterior a la fecha de emisión. En total, el proyecto dispone de
-103 pruebas automáticas. Las figuras y resúmenes de la memoria se regeneran
+104 pruebas automáticas. Las figuras y resúmenes de la memoria se regeneran
 desde los mismos archivos que consume el modelado.
 
 La separación por capas permite sustituir progresivamente el almacenamiento

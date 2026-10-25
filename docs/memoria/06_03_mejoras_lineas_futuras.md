@@ -122,7 +122,44 @@ mediciones de volumen, latencia y coste que demostrasen una limitación del
 enfoque ligero. La aplicación seguiría necesitando un catálogo agronómico
 dinámico, operación, control de acceso y persistencia de consultas.
 
-## 6.3.5. Consideración final
+## 6.3.5. Operación, MLOps y control de deriva
+
+La evolución del prototipo exige vigilar la cadena completa, no solo el error
+del modelo. Cada ejecución debería registrar la versión del código, las fuentes,
+la hora de emisión, la vigencia del último dato y la recomendación. Los cambios
+de columnas, tipos, unidades o claves bloquearían la transformación; los datos
+ausentes, duplicados o fuera de rango quedarían como incidencias visibles. Esta
+disciplina evita que dependencias externas y cambios silenciosos acumulen deuda
+técnica en el sistema (Sculley et al., 2015).
+
+La monitorización estadística se separaría por cultivo y estación. Incluiría la
+distribución de las variables, el MAE y el sesgo frente a SiAR, el error de
+lluvia AEMET por horizonte, la latencia y el porcentaje de abstenciones. Una
+alerta persistente abriría una evaluación, pero no desplegaría automáticamente
+un modelo nuevo. El candidato tendría que compararse con el modelo vigente, la
+persistencia y la vía física en un bloque temporal posterior, mantener los
+controles de seguridad y conservar una versión reversible. Mientras no exista
+una referencia de campo, esta vigilancia seguirá limitada a la referencia SiAR
+y no permitirá detectar por sí sola una pérdida agronómica real.
+
+## 6.3.6. Ciencia abierta y principios FAIR
+
+La reutilización académica requiere que cada versión pueda encontrarse,
+comprenderse y reproducirse. El repositorio incorpora un archivo de citación,
+licencia para los activos propios, ficha del conjunto, diccionarios de variables,
+procedencia y comandos de reproducción. Los formatos CSV y JSON, las fechas ISO
+8601 y las claves de estación, cultivo y fecha facilitan la interoperabilidad.
+Estas medidas aplican los principios FAIR sin confundir accesibilidad con
+apertura irrestricta (Wilkinson et al., 2016).
+
+Una versión posterior podría depositarse en Zenodo para obtener un DOI, pero
+solo después de etiquetar una revisión inmutable y comprobar las condiciones de
+redistribución de SiAR y AEMET. La licencia del código no relicencia los datos
+de terceros. El depósito debería incluir la memoria, el código, los requisitos,
+las pruebas, la ficha del conjunto y los metadatos, sin tokens ni respuestas raw
+cuya redistribución no esté autorizada.
+
+## 6.3.7. Consideración final
 
 El trabajo se planteó como la construcción de una cadena completa de datos y
 decisión, con el aprendizaje automático como uno de sus componentes. El piloto
