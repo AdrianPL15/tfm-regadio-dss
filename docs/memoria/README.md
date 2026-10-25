@@ -1,8 +1,8 @@
 # Memoria del TFM: revisión final de contenido
 
 La versión de revisión más reciente es el
-[PDF de 85 páginas](TFM_revision_final_2026-10-24.pdf) y su
-[Word editable](TFM_revision_final_contenido_2026-10-24.docx).
+[PDF de 85 páginas](TFM_revision_final_2026-10-25.pdf) y su
+[Word editable](TFM_revision_final_2026-10-25.docx).
 Se revisaron visualmente todas las páginas, las referencias de los índices,
 las tablas y figuras, la coherencia de los resultados de 2025 y 2026 y las
 limitaciones de la aplicación pública. Esta es una versión candidata para
@@ -13,7 +13,8 @@ debe confundirse con esta revisión. La base editorial fue
 `TFM_version_tutor_2026-10.docx`, que se conserva sin sobrescribir. Los guiones
 `scripts/revisar_memoria_final.py`, `tools/update_memory_retraining_2026.py`
 y `tools/update_memory_etc_aemet_2026.py`, seguidos de
-`tools/finalize_memory_2026.py` y `tools/update_memory_indexes_2026.py`,
+`tools/finalize_memory_2026.py`, `tools/update_memory_today_2026.py` y
+`tools/update_memory_indexes_2026.py`,
 registran las sucesivas correcciones. Los apartados 3 a 6 en Markdown documentan
 y enlazan las evidencias técnicas del repositorio; no reemplazan por sí solos la
 memoria completa.

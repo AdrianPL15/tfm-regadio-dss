@@ -1,6 +1,6 @@
 # Estado actual y trabajo pendiente del TFM
 
-Fecha de revisión: 24 de octubre de 2026
+Fecha de revisión: 25 de octubre de 2026
 
 ## 1. Diagnóstico general
 
@@ -36,7 +36,7 @@ solo algodón favorece al modelo y está fuera de ciclo en esta revisión.
 | 4. Procesamiento y Machine Learning | Piloto original y reentrenamiento independiente en seis casos documentados | Revisar reproducción de cifras y que los resultados no se describan como validación agronómica ni como mejora demostrada. |
 | 5. DSS y resultados | Motor físico y modelos ETc conectados a la app con control comparativo | Validar prospectivamente con usuarios y datos de campo; falta histórico de previsiones alineado. |
 | 6. Conclusiones | Redactado | Revisar con el equipo el grado de cumplimiento de objetivos y las afirmaciones de alcance. |
-| Elementos preliminares y anexos | Revisión de contenido y maquetación completada | La versión candidata está en `docs/memoria/TFM_revision_final_contenido_2026-10-24.docx` y `docs/memoria/TFM_revision_final_2026-10-24.pdf`. Se revisaron las 85 páginas y los índices con la paginación exportada. El abstract en inglés se eliminó por decisión del equipo. Queda la lectura final del equipo y la confirmación agronómica del encuadre del pimiento. |
+| Elementos preliminares y anexos | Revisión de contenido y maquetación completada | La versión candidata actual está en `docs/memoria/TFM_revision_final_2026-10-25.docx` y `docs/memoria/TFM_revision_final_2026-10-25.pdf`. Se revisaron las 85 páginas y los índices con la paginación exportada. El abstract en inglés se eliminó por decisión del equipo. Queda la lectura final del equipo y la confirmación agronómica del encuadre del pimiento. |
 
 ## 3. Qué demuestra el repositorio
 
@@ -51,7 +51,7 @@ solo algodón favorece al modelo y está fuera de ciclo en esta revisión.
 - Motor de recomendación con reglas, dosis neta y bruta, conversión opcional a
   volumen, advertencias y explicación; aplicación Streamlit y línea de comandos.
 - Validación técnica frente a SiAR, análisis por horizonte, 13 escenarios y
-  97 pruebas automáticas. La referencia es calculada, no riego real observado.
+  103 pruebas automáticas definidas. La referencia es calculada, no riego real observado.
 
 Los comandos para reproducir cada fase figuran en el README. No existe un único
 comando que regenere íntegramente todas las salidas de los capítulos 4 y 5.
@@ -65,7 +65,7 @@ consultar las APIs.
 |---|---|---|
 | Elección de estación y cultivo | La aplicación permite elegir entre los nueve CSV verificados; no ofrece cualquier combinación nacional. El experimento predictivo agrupa campañas del mismo cultivo y estación. | Describir la selección limitada implementada y la libre selección como evolución. |
 | ET0 y lluvia previstas | No existe un histórico de emisiones alineado con la campaña de 2025; la previsión de ET0 puede suministrarse manualmente al motor. | No atribuir al piloto una validación predictiva con pronósticos históricos. |
-| Momento de riego | El motor estima cuánto regar y avisa ante lluvia; no calcula un balance hídrico del suelo. | No afirmar que decide el día óptimo de riego. |
+| Momento de riego | El motor estima cuánto regar y, con milímetros AEMET utilizables, descuenta una fracción supuesta de lluvia; no calcula un balance hídrico del suelo ni conoce lo ya regado hoy. | No afirmar que decide el momento óptimo ni la dosis pendiente exacta de la parcela. |
 | Disponibilidad de agua | La dotación la introduce el usuario; MITECO no se integra como asignación parcelaria. | Declarar la limitación hidrológica. |
 | MySQL, Apache Hop, Docker y PySpark | No implementados en el piloto. | Mantenerlos como arquitectura objetivo o línea futura. |
 | Power BI o Tableau | Sustituidos por una aplicación Streamlit funcional. | Describir la sustitución y su motivo. |
@@ -87,12 +87,12 @@ consultar las APIs.
    visualmente todas las páginas y evitar tablas partidas de forma incómoda.
 5. Revisar las evidencias que verá el tutor en GitHub, comprobar que no se
    versionan tokens, credenciales ni datos sensibles y contrastar la memoria
-   con la app pública. El 25/10 pasaron 33 pruebas focalizadas del motor,
-   AEMET, ETc y la demo local; la suite completa y `AppTest` quedan como
+   con la app pública. El 25/10 pasaron 41 pruebas focalizadas del motor,
+   AEMET y ETc; la suite completa y `AppTest` quedan como
    comprobaciones técnicas adicionales. La app pública se comprobó manualmente
    con coliflor, alfalfa y alcachofa activos, pimiento fuera de ciclo y un
-   escenario de lluvia hipotética. Una emisión AEMET antigua se recibió pero
-   no se aplicó a la dosis, como corresponde.
+   escenario de lluvia hipotética. La versión del 25/10 permite recomendar
+   hoy con una consulta AEMET vigente y deja la revisión histórica separada.
 6. El anexo de la memoria ya incluye el
    [enlace público de Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/).
    El 25/10/2026 se comprobó el CSV descargado: siete días, dosis y volumen

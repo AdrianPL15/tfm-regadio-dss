@@ -14,9 +14,9 @@ La presentación principal usa la [aplicación pública Streamlit](https://tfm-r
 
 ### Comprobación funcional del 25/10/2026
 
-Se probó **Andalucía → Almería → Coliflor → AL01 La Mojonera → campaña 2026**, planificación desde el 25/10/2026, siete días, goteo, eficiencia 0,90 y 1,5 ha. La app informó de SiAR actualizado hasta el 23/10 y de una previsión AEMET emitida el 24/10 a las 20:59 para el municipio `04013`. El primer día mostró **2,2 L/m²**, **33 m³** para la parcela y **2,0 mm** de necesidad neta; la lluvia cuantificada era **0,0 mm**. El CSV descargado contenía siete filas, del 25 al 31/10: **2,22 mm** y **33,306 m³** el primer día; **15,54 mm** y **233,142 m³** acumulados. La pantalla redondea los valores. Este resultado fechado no se debe esperar literalmente en otra consulta.
+Se probó **Andalucía → Almería → Coliflor → AL01 La Mojonera → campaña 2026**, en el modo **Recomendación (hoy o mañana)**, con fecha **25/10/2026**, siete días, goteo, eficiencia 0,90 y 1,5 ha. Tras pulsar el botón, la app informó de SiAR actualizado hasta el **24/10** y de una respuesta AEMET recibida. Mostró **2,3 L/m²** para hoy, **35 m³** para la parcela, **2,1 mm** de necesidad neta y **0,0 mm** de lluvia prevista para las horas restantes. El horizonte mostraba **7 de 7 días calculables**, **16,4 L/m²** y **246 m³** acumulados. En **Revisión histórica (día cerrado)**, la fecha pasó al 24/10 y el resultado quedó etiquetado como ejemplo histórico. Estas cifras dependen de la hora y de las respuestas de SiAR y AEMET; no son valores fijos de la aplicación.
 
-Para demostrar el efecto de lluvia cuando AEMET no anuncia una cantidad positiva, marcar **Explorar un escenario de lluvia**. Con el supuesto probado de 8 mm el primer día y 50 % aprovechable, la dosis bajó de 2,2 a 0,0 L/m². Es un escenario **hipotético**, separado de AEMET. Desmarcarlo para volver a la consulta real.
+Para demostrar el efecto de lluvia cuando AEMET no anuncia una cantidad positiva, marcar **Explorar un escenario de lluvia**. Se pueden introducir 8 mm el primer día y un 50 % aprovechable para observar cómo cambia la dosis. Es un escenario **hipotético**, separado de AEMET. Desmarcarlo para volver a la consulta real.
 
 ## Alternativa sin API: piloto histórico local
 
