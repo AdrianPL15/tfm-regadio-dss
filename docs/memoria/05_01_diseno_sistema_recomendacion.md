@@ -6,7 +6,7 @@ de la ET0, el coeficiente de cultivo y la precipitación efectiva, de modo que
 existe una referencia agronómica explicable para los días ya cerrados. Por
 otro, ninguno de los cinco algoritmos de aprendizaje automático evaluados en el
 apartado 4.3 superó de forma estable a la persistencia cuando se trata de
-anticipar el día siguiente. El motor de recomendación se ha construido a partir
+anticipar el día de consulta o el siguiente. El motor de recomendación se ha construido a partir
 de ambas constataciones. Su función consiste en transformar la información
 disponible en una dosis de riego diaria y en un total para el horizonte
 solicitado, dejando constancia del origen de cada cifra y de las situaciones en
@@ -73,14 +73,16 @@ la imputación.
 
 ## 5.1.3. Estimación de la necesidad neta
 
-El motor distingue dos modos de consulta. En el modo de seguimiento se
+El motor distingue dos modos de consulta, rotulados en la interfaz como
+«Recomendación (hoy o mañana)» y «Revisión histórica (día cerrado)». En la
+revisión histórica se
 analizan días ya cerrados y se aplica la expresión agronómica con las
 variables observadas:
 
 necesidad neta = max(ET0 × Kc − Pe, 0)
 
 Este modo sirve para revisar a posteriori lo que debería haberse aplicado y
-para comparar la planificación con la referencia. En el modo de planificación,
+para comparar la planificación con la referencia. En la recomendación actual,
 que es el uso operativo, la ET0 y la precipitación efectiva del día que se
 quiere regar todavía no se conocen. Para ese caso se establecieron tres vías
 con un orden de preferencia fijo.

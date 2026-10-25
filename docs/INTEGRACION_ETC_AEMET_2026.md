@@ -2,12 +2,15 @@
 
 ## Qué calcula la app
 
-Para recomendar mañana, la app consulta el calendario y los datos recientes de
+Para recomendar hoy o mañana, la app consulta el calendario y los datos recientes de
 SiAR. Un modelo entrenado por cultivo y estación estima la **ETc antes de
 lluvia**. A continuación, si AEMET aporta una cantidad de precipitación
-horaria completa, el motor descuenta la fracción aprovechable indicada por el
+horaria utilizable, el motor descuenta la fracción aprovechable indicada por el
 usuario y divide la necesidad resultante por la eficiencia del sistema de
 riego. Una probabilidad de lluvia sin cantidad en mm no equivale a lluvia cero.
+Para hoy se suman únicamente las horas futuras respecto a la consulta; para
+mañana se exige la cobertura horaria completa. Si no hay una emisión reciente
+o una cantidad utilizable, se muestra la dosis base sin descuento de lluvia.
 
 El modelo de ETc y la previsión AEMET cumplen funciones diferentes: AEMET no
 fue una variable del entrenamiento y la lluvia no se descuenta dos veces. El
@@ -63,7 +66,7 @@ aviso. La API de AEMET sigue siendo opcional para una dosis base, pero es
 necesaria para descontar la lluvia prevista real.
 
 Si SiAR aún no ha publicado uno o dos días intermedios, el modelo puede
-avanzar recursivamente hasta mañana para mostrar una comparación provisional.
+avanzar recursivamente hasta el día solicitado para mostrar una comparación provisional.
 Esa extrapolación de dos o tres pasos no fue evaluada y nunca se usa para
 determinar la dosis principal; se muestra un aviso. Solo una predicción directa
 de un día puede superar el control de despliegue.

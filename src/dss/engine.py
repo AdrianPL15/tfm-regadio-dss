@@ -180,7 +180,7 @@ def estimate_day(
     if bool(target.get("kc_imputed", False)):
         if target.get("record_status") == "kc_proyectado_mes":
             warnings.append(
-                "El Kc futuro no está publicado por SiAR: se mantiene el último "
+                "El Kc del día aún no está publicado por SiAR: se mantiene el último "
                 "Kc observado dentro del mismo mes y ciclo. Es una hipótesis."
             )
             rules.append("R10 Kc futuro proyectado dentro del mes")

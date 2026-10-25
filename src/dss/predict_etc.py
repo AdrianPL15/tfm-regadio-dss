@@ -1,4 +1,4 @@
-"""Predicción de ETc para mañana a partir de modelos SiAR versionados.
+"""Predicción de ETc para el primer día a partir de modelos SiAR versionados.
 
 Los artefactos fueron generados dentro de este repositorio. No se cargan
 modelos proporcionados por el usuario.
@@ -50,7 +50,7 @@ def predict_tomorrow_etc(
     target_timestamp = pd.Timestamp(target_day)
     target = history.loc[history["date"].eq(target_timestamp)]
     if len(target) != 1 or pd.isna(target["kc"].iat[0]) or target["kc"].iat[0] <= 0:
-        raise ModelUnavailable("No hay Kc activo para mañana.")
+        raise ModelUnavailable("No hay Kc activo para el día solicitado.")
     if pd.notna(target["etc_mm"].iat[0]):
         raise ModelUnavailable("La fecha solicitada ya tiene una ETc observada.")
 
@@ -60,7 +60,7 @@ def predict_tomorrow_etc(
     etc = previous.set_index("date")["etc_mm"].astype(float)
     observed_dates = etc.dropna().index
     if observed_dates.empty:
-        raise ModelUnavailable("No hay ETc SiAR observada antes de mañana.")
+        raise ModelUnavailable("No hay ETc SiAR observada antes del día solicitado.")
     last_observed = observed_dates.max()
     steps = (target_timestamp - last_observed).days
     if not 1 <= steps <= 3 or last_observed.month != target_timestamp.month:

@@ -7,10 +7,11 @@ Se ejecuta desde la raíz del repositorio con:
 
 from __future__ import annotations
 
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import os
 from pathlib import Path
 import sys
+from zoneinfo import ZoneInfo
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -28,7 +29,7 @@ from src.dss.config import (  # noqa: E402
     RecommendationRequest,
 )
 from src.dss.data_access import load_case, load_crop_needs_bytes  # noqa: E402
-from src.dss.aemet_forecast import fetch_live_forecast, require_current_forecast  # noqa: E402
+from src.dss.aemet_forecast import fetch_live_forecast, prepare_live_forecast  # noqa: E402
 from src.data.aemet_client import AEMETClient, AEMETError  # noqa: E402
 from src.data.refresh_siar_crop_needs import SiARRefreshError, fetch_validated_case  # noqa: E402
 from src.dss.engine import METHOD_LABELS, fmt_es, recommend  # noqa: E402
@@ -37,6 +38,9 @@ from src.dss.predict_etc import ModelUnavailable, predict_tomorrow_etc  # noqa: 
 
 
 st.set_page_config(page_title="DSS de riego", layout="wide")
+consulted_at = datetime.now(ZoneInfo("Europe/Madrid")).replace(tzinfo=None)
+today = consulted_at.date()
+tomorrow = today + timedelta(days=1)
 
 
 @st.cache_data(ttl=900)
@@ -49,15 +53,14 @@ def _absolute(path: Path) -> Path:
     return path if path.is_absolute() else ROOT / path
 
 
-def _active_for_tomorrow(item: CropCase) -> bool:
+def _active_for_today(item: CropCase) -> bool:
     """Selecciona un ejemplo vigente; el dato real se verifica otra vez al cargarlo."""
-    today = date.today()
     if item.campaign_year != today.year:
         return False
     history, metadata = _load(str(_absolute(item.source_file)), str(_absolute(item.metadata_file)))
     last = history.iloc[-1]
     return (
-        (today + timedelta(days=1)).month in metadata.get("active_months", [])
+        today.month in metadata.get("active_months", [])
         and last["record_status"] == "completo"
         and float(last["kc"]) > 0
     )
@@ -87,7 +90,7 @@ with st.sidebar:
     province_cases = [item for item in community_cases if item.province == province]
     crop_options = list(dict.fromkeys(item.crop for item in province_cases))
     preferred_crop = next(
-        (item.crop for item in province_cases if _active_for_tomorrow(item)),
+        (item.crop for item in province_cases if _active_for_today(item)),
         crop_options[0],
     )
     crop = st.selectbox("Cultivo", crop_options, index=crop_options.index(preferred_crop))
@@ -112,19 +115,21 @@ with st.sidebar:
 
     snapshot_key = f"siar_{case.station_code}_{case.crop}_{case.campaign_year}"
     aemet_key = f"aemet_{case.station_code}"
+    aemet_time_key = f"aemet_consulta_{case.station_code}"
     generate = st.button("Actualizar fuentes y generar recomendación", type="primary")
     if generate:
         st.session_state.pop(snapshot_key, None)
         st.session_state.pop(aemet_key, None)
+        st.session_state.pop(aemet_time_key, None)
 
     history, metadata = _load(
         str(_absolute(case.source_file)), str(_absolute(case.metadata_file))
     )
-    if generate and case.campaign_year == date.today().year:
+    if generate and case.campaign_year == today.year:
         try:
             with st.spinner("Consultando necesidades hídricas en SiAR…"):
                 content, fresh_metadata, additions = fetch_validated_case(
-                    metadata, _absolute(case.source_file).read_bytes(), date.today()
+                    metadata, _absolute(case.source_file).read_bytes(), today
                 )
                 fresh_history = load_crop_needs_bytes(
                     content, f"SiAR web: {case.crop} {case.station_code}"
@@ -144,26 +149,16 @@ with st.sidebar:
 
     first_day = history["date"].min().date()
     last_day = history["date"].max().date()
-    tomorrow = date.today() + timedelta(days=1)
     live_case = (
-        case.campaign_year == date.today().year
-        and tomorrow.month in metadata.get("active_months", [])
-        and 0 <= (date.today() - last_day).days <= 2
+        case.campaign_year == today.year
+        and today.month in metadata.get("active_months", [])
+        and 0 <= (today - last_day).days <= 2
         and history["record_status"].iloc[-1] == "completo"
         and float(history["kc"].iloc[-1]) > 0
     )
     active_dates = history.loc[history["kc"].gt(0), "date"]
     historical_example = active_dates.max().date() if not active_dates.empty else last_day
-    issue_key = f"fecha_{case.station_code}_{case.crop}_{case.campaign_year}"
-    if issue_key not in st.session_state:
-        st.session_state[issue_key] = (
-            tomorrow if live_case else historical_example
-            if case.campaign_year == date.today().year
-            else min(max(default_issue, first_day), last_day)
-        )
-    if generate and live_case:
-        st.session_state[issue_key] = tomorrow
-    if generate and case.campaign_year == date.today().year and tomorrow.month in metadata.get("active_months", []):
+    if generate and case.campaign_year == today.year and today.month in metadata.get("active_months", []):
         try:
             with st.spinner("Consultando la previsión municipal de AEMET…"):
                 try:
@@ -172,35 +167,60 @@ with st.sidebar:
                     cloud_key = None
                 provider = AEMETClient(api_key=cloud_key or os.getenv("AEMET_API_KEY"))
                 st.session_state[aemet_key] = fetch_live_forecast(
-                    case.aemet_municipality_code, client=provider
+                    case.aemet_municipality_code, client=provider,
+                    consulted_at=consulted_at,
                 )
+                st.session_state[aemet_time_key] = consulted_at
             st.success("Respuesta AEMET recibida; se comprobará su vigencia antes de usarla.")
         except (AEMETError, ValueError) as error:
             st.warning(f"AEMET no está disponible; se mostrará la dosis base: {error}")
     st.header("Consulta")
     mode_label = st.radio(
         "Modo",
-        ["Planificación (solo datos anteriores)", "Seguimiento (días ya cerrados)"],
+        ["Recomendación (hoy o mañana)", "Revisión histórica (día cerrado)"],
     )
-    mode = "planificacion" if mode_label.startswith("Planificación") else "seguimiento"
+    mode = "planificacion" if mode_label.startswith("Recomendación") else "seguimiento"
+    issue_key = f"fecha_{case.station_code}_{case.crop}_{case.campaign_year}_{mode}"
+    if issue_key not in st.session_state:
+        st.session_state[issue_key] = (
+            today if mode == "planificacion" and live_case
+            else historical_example if case.campaign_year == today.year
+            else min(max(default_issue, first_day), last_day)
+        )
+    if generate and live_case and mode == "planificacion":
+        st.session_state[issue_key] = today
+    latest_selectable = (
+        tomorrow if mode == "planificacion" and live_case
+        and tomorrow.month in metadata.get("active_months", [])
+        else today if mode == "planificacion" and live_case else last_day
+    )
+    if not first_day <= st.session_state[issue_key] <= latest_selectable:
+        st.session_state[issue_key] = min(
+            max(st.session_state[issue_key], first_day), latest_selectable
+        )
     issue = st.date_input(
         "Primer día a recomendar",
         min_value=first_day,
-        max_value=last_day + timedelta(days=MAX_HORIZON_DAYS),
+        max_value=latest_selectable,
         format="DD/MM/YYYY",
         key=issue_key,
+    )
+    operational_view = (
+        mode == "planificacion" and live_case and issue in {today, tomorrow}
+        and issue.month in metadata.get("active_months", [])
     )
     horizon = st.slider(
         "Horizonte orientativo (días)", 1, MAX_HORIZON_DAYS,
         MAX_HORIZON_DAYS if live_case else 7,
     )
-    if live_case and issue == tomorrow:
+    if operational_view:
         st.caption(
-            "El primer día es la recomendación principal. Los siguientes son una "
+            "El primer día es la recomendación principal para la fecha elegida. "
+            "Los siguientes son una "
             "previsión provisional, que conviene recalcular con nuevos datos SiAR y AEMET."
         )
-    if case.campaign_year == date.today().year and not live_case:
-        if tomorrow.month not in metadata.get("active_months", []) or float(history["kc"].iloc[-1]) <= 0:
+    if case.campaign_year == today.year and not live_case:
+        if today.month not in metadata.get("active_months", []) or float(history["kc"].iloc[-1]) <= 0:
             st.warning(
                 "No hay predicción actual: este cultivo figura fuera de su periodo "
                 "de ciclo en SiAR (Kc nulo o mes no activo). Hay datos históricos, "
@@ -246,23 +266,29 @@ with st.sidebar:
             "Fracción aprovechable hipotética (%)", 0, 100, 50, 5
         ) / 100
         st.caption("Este porcentaje es un supuesto editable, no una calibración de la parcela.")
-    elif live_case:
+    elif operational_view:
         rain_fraction = st.slider(
             "Lluvia prevista aprovechable, supuesto (%)", 0, 100, 50, 5
         ) / 100
-        st.caption("La fracción es orientativa. Solo se descuenta si AEMET cubre las 24 horas de mañana con mm numéricos.")
+        st.caption(
+            "La fracción es orientativa. Para hoy solo se consideran las horas "
+            "que quedan; para mañana se exige el día completo con mm numéricos."
+        )
 
 live_forecast = st.session_state.get(aemet_key)
 forecast_input = None
 if live_forecast is not None:
-    if issue == tomorrow and live_case and not use_scenario:
+    if operational_view and not use_scenario:
         try:
-            require_current_forecast(live_forecast, date.today())
-            forecast_input = live_forecast.copy()
-            incomplete = (
-                forecast_input["precipitation_hours_covered"].fillna(0) < 24
-            ) | (forecast_input["precipitation_amount_status"] != "horas_disponibles")
-            forecast_input.loc[incomplete, "precipitation_mm"] = float("nan")
+            if issue == today and (
+                consulted_at - st.session_state.get(aemet_time_key, consulted_at)
+            ) > timedelta(minutes=15):
+                raise ValueError(
+                    "La consulta AEMET para hoy tiene más de 15 minutos; actualiza las fuentes."
+                )
+            forecast_input = prepare_live_forecast(
+                live_forecast, target_day=issue, consulted_at=consulted_at,
+            )
         except ValueError as error:
             st.warning(str(error))
 
@@ -287,11 +313,11 @@ request = RecommendationRequest(
 
 try:
     calculation_history = (
-        extend_recent_kc(history, metadata, target_day=issue, as_of=date.today(), horizon_days=horizon)
-        if live_case and issue == tomorrow else history
+        extend_recent_kc(history, metadata, target_day=issue, as_of=today, horizon_days=horizon)
+        if operational_view else history
     )
     model_estimate = None
-    if live_case and issue == tomorrow and mode == "planificacion":
+    if operational_view:
         try:
             model_estimate = predict_tomorrow_etc(case, calculation_history, issue)
         except (ModelUnavailable, OSError, ImportError) as error:
@@ -319,13 +345,20 @@ for warning in result.warnings:
     st.warning(warning)
 
 first = daily.iloc[0]
-historical_view = case.campaign_year != date.today().year or not live_case or issue != tomorrow
+historical_view = not operational_view
 st.subheader(
     f"{'Ejemplo histórico' if historical_view else 'Riego recomendado'} "
     f"· {first['date']:%d/%m/%Y}"
 )
 if historical_view:
-    st.warning("Esta cifra es de un día pasado. No es una dosis para regar mañana.")
+    st.warning("Esta cifra es de un día ya cerrado. No es una dosis para regar hoy.")
+elif issue == today:
+    st.info(
+        "La dosis representa la necesidad orientativa de todo el día. "
+        "Se descuenta solo la lluvia prevista para las horas restantes; "
+        "la aplicación no conoce el riego ni la lluvia ya ocurridos hoy. "
+        "Si ya has regado, ajusta la cantidad antes de aplicarla."
+    )
 if pd.notna(first["gross_dose_mm"]):
     dose = float(first["gross_dose_mm"])
     first_volume = first["volume_m3"]
@@ -354,7 +387,7 @@ if pd.notna(first["gross_dose_mm"]):
             "prueba histórica de este caso o porque faltan observaciones de "
             "algún día intermedio."
         )
-    if live_case and issue == tomorrow and not use_scenario:
+    if operational_view and not use_scenario:
         if forecast_input is None:
             if live_forecast is None:
                 st.info(
@@ -363,15 +396,19 @@ if pd.notna(first["gross_dose_mm"]):
                 )
             else:
                 st.info(
-                    "La previsión recibida no es vigente para esta consulta; "
-                    "no se descuenta lluvia. Puedes volver a consultar cuando "
-                    "AEMET publique una emisión actualizada."
+                    "La previsión recibida no es utilizable para esta consulta; "
+                    "no se descuenta lluvia. Actualiza las fuentes cuando haya "
+                    "una emisión vigente o una consulta reciente para hoy."
                 )
         elif pd.isna(first["precipitation_forecast_mm"]):
-            st.info("AEMET no aporta una cantidad de lluvia completa para mañana; no se descuenta lluvia.")
+            st.info(
+                "AEMET no aporta una cantidad de lluvia utilizable para la fecha "
+                "elegida; no se descuenta lluvia."
+            )
         else:
             st.caption(
-                f"Lluvia prevista para mañana: {fmt_es(first['precipitation_forecast_mm'])} mm "
+                f"Lluvia prevista para {'hoy (horas restantes)' if issue == today else 'mañana'}: "
+                f"{fmt_es(first['precipitation_forecast_mm'])} mm "
                 f"(fracción aprovechable supuesta: {fmt_es(rain_fraction * 100, 0)} %)."
             )
 else:
@@ -393,12 +430,12 @@ if horizon > 1:
         "Días calculables",
         f"{summary['days_with_recommendation']} de {summary['days_requested']}",
     )
-    if live_case and issue == tomorrow:
+    if operational_view:
         st.warning(
-            "Los días posteriores a mañana son orientativos: se mantiene temporalmente "
+            "Los días posteriores al primero son orientativos: se mantiene temporalmente "
             "el último Kc SiAR dentro del mismo mes, la ET0 se estima con observaciones "
             "recientes y la lluvia solo se descuenta cuando AEMET aporta mm horarios "
-            "completos. Una lluvia sin cantidad disponible no significa lluvia cero. "
+            "utilizables. Una lluvia sin cantidad disponible no significa lluvia cero. "
             "Recalcula antes de regar cada día."
         )
     if summary["days_with_recommendation"] < summary["days_requested"]:
@@ -439,8 +476,8 @@ with st.expander("¿De dónde sale esta recomendación?"):
     if method == "modelo_etc":
         st.caption(
             f"Modelo entrenado con SiAR hasta {first['model_trained_through']}; "
-            "predice ETc para mañana. La lluvia AEMET se descuenta después, "
-            "solo cuando hay cantidad horaria completa y según la fracción supuesta."
+            "predice ETc para el primer día. La lluvia AEMET se descuenta después, "
+            "solo cuando hay cantidad horaria utilizable y según la fracción supuesta."
         )
     if model_estimate is not None:
         st.markdown(
@@ -484,12 +521,12 @@ with st.expander("¿De dónde sale esta recomendación?"):
     st.caption(
         "Para cultivos activos, el botón consulta SiAR y AEMET. SiAR se usa en memoria "
         "y no altera el CSV de GitHub. La previsión AEMET corresponde al municipio, "
-        "no a la parcela, y solo se aplica a fechas futuras compatibles."
+        "no a la parcela, y solo se aplica al día seleccionado si es utilizable."
     )
 
 if live_forecast is not None:
     with st.expander("Ver previsión recibida de AEMET"):
-        if issue != tomorrow or not live_case or use_scenario:
+        if not operational_view or use_scenario:
             st.info("Esta previsión se muestra como referencia, pero no se aplica al cálculo histórico o al escenario manual.")
         visible = live_forecast[[
             "date", "precipitation_probability_pct", "precipitation_mm",

@@ -8,7 +8,7 @@ predicción parcial. No se inventa ET0 a partir de temperatura o UV.
 
 from __future__ import annotations
 
-from datetime import date
+from datetime import date, datetime, timedelta
 from typing import Any
 
 import pandas as pd
@@ -22,8 +22,9 @@ def forecast_from_payloads(
     hourly_payload: list[dict[str, Any]],
     *,
     municipality_code: str | None = None,
+    consulted_at: datetime | None = None,
 ) -> pd.DataFrame:
-    """Une dos productos del mismo municipio, sin confundir probabilidad y mm."""
+    """Une productos municipales; en directo suma solo horas aún futuras."""
     if not daily_payload:
         raise ValueError("Falta la predicción diaria de AEMET.")
     daily_root = daily_payload[0]
@@ -61,6 +62,10 @@ def forecast_from_payloads(
     hourly = pd.DataFrame(hourly_rows)
     if not hourly.empty:
         hourly = hourly.loc[hourly["is_future_at_issue"]].copy()
+        if consulted_at is not None:
+            hourly = hourly.loc[
+                pd.to_datetime(hourly["valid_time_local"]).gt(pd.Timestamp(consulted_at))
+            ].copy()
         hourly["date"] = pd.to_datetime(hourly["valid_time_local"]).dt.normalize()
         if hourly["valid_time_local"].duplicated().any():
             raise ValueError("AEMET devolvió horas duplicadas.")
@@ -98,7 +103,10 @@ def forecast_from_payloads(
     return pd.DataFrame(rows).sort_values("date").reset_index(drop=True)
 
 
-def fetch_live_forecast(municipality_code: str, *, client: AEMETClient | None = None) -> pd.DataFrame:
+def fetch_live_forecast(
+    municipality_code: str, *, client: AEMETClient | None = None,
+    consulted_at: datetime | None = None,
+) -> pd.DataFrame:
     """Descarga la predicción actual; el llamante decide si su fecha es válida."""
     provider = client or AEMETClient()
     daily = provider.get_daily_municipality_forecast(municipality_code)
@@ -108,7 +116,34 @@ def fetch_live_forecast(municipality_code: str, *, client: AEMETClient | None = 
         hourly = []
     if not isinstance(daily, list) or not isinstance(hourly, list):
         raise ValueError("La respuesta municipal AEMET no tiene el formato esperado.")
-    return forecast_from_payloads(daily, hourly, municipality_code=municipality_code)
+    return forecast_from_payloads(
+        daily, hourly, municipality_code=municipality_code,
+        consulted_at=consulted_at,
+    )
+
+
+def prepare_live_forecast(
+    forecast: pd.DataFrame, *, target_day: date, consulted_at: datetime,
+) -> pd.DataFrame:
+    """Conserva lluvia cuantificada para hoy restante o días completos futuros.
+
+    ``consulted_at`` se expresa como hora local española sin zona, igual que
+    las fechas horarias normalizadas de AEMET.
+    """
+    if target_day not in {consulted_at.date(), consulted_at.date() + timedelta(days=1)}:
+        raise ValueError("La previsión AEMET solo se usa para hoy o mañana.")
+    issued = pd.to_datetime(forecast["issued_at"])
+    age = pd.Timestamp(consulted_at) - issued
+    if (age < pd.Timedelta(0)).any() or (age > pd.Timedelta(hours=24)).any():
+        raise ValueError("La emisión AEMET no es reciente; no se descuenta lluvia.")
+    prepared = forecast.copy()
+    dates = pd.to_datetime(prepared["date"]).dt.date
+    hours = prepared["precipitation_hours_covered"].fillna(0)
+    complete = prepared["precipitation_amount_status"].eq("horas_disponibles")
+    usable_today = dates.eq(consulted_at.date()) & hours.gt(0)
+    usable_future = dates.gt(consulted_at.date()) & hours.ge(24)
+    prepared.loc[~(complete & (usable_today | usable_future)), "precipitation_mm"] = float("nan")
+    return prepared
 
 
 def require_current_forecast(forecast: pd.DataFrame, issue_date: date) -> None:
