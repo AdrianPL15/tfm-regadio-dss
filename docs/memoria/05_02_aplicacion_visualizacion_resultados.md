@@ -35,9 +35,10 @@ repositorio que lo demuestre.
 
 La pantalla se divide en un panel lateral de entrada y un área principal de
 resultados. El panel lateral agrupa los controles en cuatro bloques. En el
-primero se muestran comunidad, provincia, cultivo y estación de las tres
-combinaciones con CSV versionado. Esta selección permite recorrer distintos
-casos, pero no genera automáticamente fuentes para todas las zonas. El segundo
+primero se muestran comunidad, provincia, cultivo, estación y campaña de las
+nueve instantáneas SiAR versionadas: seis combinaciones de cultivo y estación
+en tres provincias. Esta selección permite recorrer los casos disponibles,
+pero no genera automáticamente fuentes para todas las zonas. El segundo
 bloque recoge la consulta: el modo de planificación o seguimiento, la fecha de
 emisión y el horizonte de uno a siete días. El tercero describe la parcela: el
 sistema de riego, la eficiencia, que se rellena con el valor orientativo del
@@ -47,26 +48,24 @@ casilla adicional permite superponer la referencia SiAR
 calculada a posteriori, algo que solo tiene sentido en una demostración
 retrospectiva como la de este trabajo.
 
-La ampliación AEMET añade una consulta opcional de la predicción municipal
-actual. Se presenta separada de las dosis históricas porque no coincide con
-la campaña de 2025. Para ilustrar cómo afectaría la lluvia a la dosis sin
-atribuir a AEMET una predicción inexistente de aquel año, el usuario puede
-definir un escenario manual de cantidad y fracción hipotética aprovechable.
-La pantalla lo distingue de los datos observados y advierte que necesita
-validación agronómica.
+El botón **Actualizar fuentes y generar recomendación** consulta SiAR para el
+caso de la campaña actual y solicita la predicción municipal de AEMET. La
+descarga validada de SiAR se usa en memoria durante la sesión; no modifica el
+CSV publicado en GitHub. AEMET solo ajusta la dosis cuando la emisión es vigente
+y existe cantidad horaria numérica con cobertura completa del día. La pantalla
+separa esta consulta de los ejemplos históricos y de un escenario manual de
+lluvia, identificado como hipotético. La fracción aprovechable es un supuesto
+editable que requiere validación agronómica.
 
-El área principal sigue el orden en el que un técnico suele leer una
-recomendación. Arriba aparecen cuatro indicadores: la necesidad neta del
-horizonte, la dosis bruta propuesta, el volumen estimado y el número de días
-con recomendación. Debajo se sitúa un gráfico de barras con la dosis bruta de
-cada día y la necesidad neta superpuesta, acompañado de un bloque titulado
-Fundamento que indica el método principal, la eficiencia aplicada, la fuente
-con su fecha de descarga y el último dato observado. Si existe algún aviso
-general, como datos desactualizados o una dotación insuficiente, se muestra en
-un recuadro destacado encima de los indicadores. La parte inferior contiene la
-tabla diaria con la confianza y los avisos, un desplegable con la explicación y
-las reglas aplicadas a cada día, y un botón para descargar la recomendación en
-CSV.
+El área principal muestra primero la dosis bruta del primer día en L/m², su
+volumen en m³ para la parcela y el equivalente en m³/ha. Debajo presenta el
+panorama orientativo de hasta siete días, con su acumulado y el número de días
+calculables. Siguen un gráfico diario, desplegables con la procedencia, el
+método y la previsión AEMET recibida, la tabla detallada y el botón para
+descargar el CSV. Un cultivo fuera de ciclo o sin observación reciente muestra
+un aviso y su resultado se etiqueta como ejemplo histórico, no como dosis para
+mañana. Los avisos de datos, dotación y horizonte parcial se muestran junto a
+la recomendación.
 
 Las cifras de resultados se presentan con coma decimal y las fechas en formato día, mes y
 año. Puede parecer un detalle menor, pero la aplicación está dirigida a
@@ -150,16 +149,17 @@ memoria.
 ## 5.2.6. Limitaciones de la aplicación
 
 La aplicación es un prototipo de demostración. No dispone de usuarios ni de
-control de acceso, no guarda un histórico de consultas por parcela y lee la
-fuente SiAR desde un archivo local en lugar de una base de datos. La ampliación
-posterior permite consultar AEMET actual si se configura una clave de acceso y
-mostrar probabilidad y cantidad horaria disponible. La predicción actual se
-separa de la campaña histórica de 2025; para ella solo se ofrece un escenario
-manual de lluvia, identificado como hipotético. La vía de ET0 prevista está
-implementada en el motor, pero no se calcula automáticamente con la temperatura
-de AEMET. Para una dosis operativa en directo harían falta SiAR y Kc vigentes,
-además de validar cómo se estima la lluvia efectiva. Estas carencias no impiden
-demostrar el funcionamiento del sistema, aunque sí condicionan su uso real.
+control de acceso, no guarda un histórico de consultas por parcela y no usa una
+base de datos. Parte de CSV SiAR versionados y puede actualizar el caso vigente
+en memoria al pulsar el botón. La previsión AEMET requiere una clave privada y
+puede llegar con una emisión no vigente o sin una cantidad de lluvia utilizable;
+en esos casos no se descuenta precipitación. La campaña histórica de 2025 solo
+admite un escenario manual de lluvia, identificado como hipotético. La vía de
+ET0 prevista está implementada en el motor, pero no se calcula automáticamente
+con la temperatura de AEMET. La consulta de los días posteriores a mañana
+prolonga temporalmente el último Kc dentro del mismo mes y necesita recalcularse
+con nuevas observaciones. Faltan datos de suelo, riego aplicado y validación de
+la lluvia efectiva para presentar la dosis como consejo agronómico operativo.
 Por último, la interfaz no se ha
 evaluado con agricultores ni técnicos. La literatura señala que la facilidad de
 uso y la relevancia percibida son determinantes para que una herramienta de
