@@ -1,6 +1,6 @@
-"""Proyección limitada del Kc SiAR para una recomendación próxima.
+"""Proyección limitada del Kc SiAR para hoy o mañana.
 
-El CSV histórico no incluye mañana. Solo se prolonga el último Kc publicado
+El CSV puede no incluir el día de consulta. Solo se prolonga el último Kc publicado
 dentro del mismo mes y ciclo declarado por SiAR, con dato reciente y aviso
 explícito. No se fabrican ET0, lluvia ni necesidad observadas.
 """
@@ -21,9 +21,9 @@ def extend_recent_kc(
     as_of: date,
     horizon_days: int = 1,
 ) -> pd.DataFrame:
-    """Añade Kc futuro solo si la serie y el ciclo sostienen la proyección."""
-    if target_day != as_of + timedelta(days=1):
-        raise ValueError("La proyección SiAR solo se permite para empezar mañana.")
+    """Añade Kc para hoy o mañana si la serie y el ciclo lo sostienen."""
+    if target_day not in {as_of, as_of + timedelta(days=1)}:
+        raise ValueError("La proyección SiAR solo se permite para hoy o mañana.")
     if not 1 <= horizon_days <= 7:
         raise ValueError("El horizonte debe estar entre uno y siete días.")
     active_months = {int(month) for month in metadata.get("active_months", [])}
@@ -40,10 +40,11 @@ def extend_recent_kc(
         raise ValueError("El último Kc SiAR no está completo.")
     if float(last["kc"]) <= 0:
         raise ValueError("El cultivo figura fuera de ciclo: Kc SiAR es cero.")
-
     future = []
     for offset in range(horizon_days):
         day = target_day + timedelta(days=offset)
+        if day <= last_day:
+            continue
         if day.month != last_day.month or day.month not in active_months:
             break
         row = last.copy()
@@ -55,5 +56,7 @@ def extend_recent_kc(
             row[column] = float("nan")
         future.append(row)
     if not future:
-        raise ValueError("Mañana queda fuera del mes y ciclo SiAR publicados.")
+        if target_day <= last_day:
+            return history
+        raise ValueError("La fecha solicitada queda fuera del mes y ciclo SiAR publicados.")
     return pd.concat([history, pd.DataFrame(future)], ignore_index=True)

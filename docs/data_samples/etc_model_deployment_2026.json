@@ -13,7 +13,7 @@
   ],
   "selection": "MAE medio en tres cortes temporales; 15 % final reservado",
   "rain_policy": "AEMET se aplica después de predecir ETc; no se descuenta dos veces",
-  "deployment_horizon": "solo mañana; días posteriores usan el método físico existente",
+  "deployment_horizon": "primer día de hoy o mañana; días posteriores usan el método físico existente",
   "cases": {
     "pimiento_AL01": {
       "crop": "Pimiento",

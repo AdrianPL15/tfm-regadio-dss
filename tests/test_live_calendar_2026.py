@@ -45,7 +45,34 @@ class Campaign2026Tests(unittest.TestCase):
         rain = pd.DataFrame({"date": ["2026-10-24"], "issued_at": ["2026-10-23T10:00:00"], "precipitation_mm": [4.0]})
         wet = recommend(request, history=extended, metadata=metadata, forecast=rain)
         self.assertAlmostEqual(dry.daily["net_need_mm"].iat[0] - wet.daily["net_need_mm"].iat[0], 2.0)
-        self.assertIn("Kc futuro", wet.daily["warnings"].iat[0])
+        self.assertIn("Kc del día", wet.daily["warnings"].iat[0])
+
+    def test_coliflor_today_uses_only_previous_siar_observations(self):
+        case = next(case for case in DEMO_CASES if case.campaign_year == 2026 and case.crop == "Coliflor")
+        history, metadata = load_case(case)
+        today = date(2026, 10, 23)
+        extended = extend_recent_kc(
+            history, metadata, target_day=today, as_of=today,
+        )
+        self.assertEqual(extended.iloc[-1]["date"].date(), today)
+        self.assertEqual(extended.iloc[-1]["record_status"], "kc_proyectado_mes")
+        self.assertTrue(pd.isna(extended.iloc[-1]["et0_mm"]))
+        result = recommend(
+            RecommendationRequest(issue_date=today, horizon_days=1, case=case),
+            history=extended, metadata=metadata,
+        )
+        self.assertGreater(result.daily["gross_dose_mm"].iat[0], 0)
+        self.assertEqual(result.daily["data_last_observed"].iat[0], "2026-10-22")
+
+    def test_today_observed_keeps_tomorrow_in_requested_horizon(self):
+        case = next(case for case in DEMO_CASES if case.campaign_year == 2026 and case.crop == "Coliflor")
+        history, metadata = load_case(case)
+        today = date(2026, 10, 22)
+        extended = extend_recent_kc(
+            history, metadata, target_day=today, as_of=today, horizon_days=2,
+        )
+        self.assertEqual(extended["date"].iloc[-1].date(), date(2026, 10, 23))
+        self.assertEqual(extended["record_status"].iloc[-1], "kc_proyectado_mes")
 
     def test_three_regions_have_different_active_crops_on_pilot_date(self):
         cases = [case for case in DEMO_CASES if case.campaign_year == 2026

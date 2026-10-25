@@ -1,13 +1,15 @@
 """Contrato entre los productos municipales AEMET y el DSS."""
 
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 import tempfile
 import unittest
 
 import pandas as pd
 
-from src.dss.aemet_forecast import forecast_from_payloads, require_current_forecast
+from src.dss.aemet_forecast import (
+    forecast_from_payloads, prepare_live_forecast, require_current_forecast,
+)
 from src.data.archive_aemet_forecast import archive_forecast
 
 
@@ -68,6 +70,63 @@ class AemetForecastDssTests(unittest.TestCase):
         self.assertEqual(len(table), 2)
         self.assertTrue(table["precipitation_mm"].isna().all())
         self.assertEqual(table["precipitation_probability_pct"].iat[0], 80)
+
+    def test_today_only_uses_hours_remaining_at_consultation(self):
+        daily, hourly = sample_payloads()
+        hourly[0]["prediccion"]["dia"][0]["precipitacion"].insert(
+            0, {"periodo": "07", "value": "4"}
+        )
+        consulted_at = datetime(2025, 6, 20, 7, 30)
+        table = forecast_from_payloads(daily, hourly, consulted_at=consulted_at)
+        prepared = prepare_live_forecast(
+            table, target_day=date(2025, 6, 20), consulted_at=consulted_at,
+        )
+        self.assertEqual(prepared.loc[0, "precipitation_mm"], 12.0)
+        self.assertEqual(prepared.loc[0, "precipitation_hours_covered"], 2)
+        self.assertTrue(pd.isna(prepared.loc[1, "precipitation_mm"]))
+
+    def test_live_forecast_rejects_stale_issue(self):
+        daily, hourly = sample_payloads()
+        table = forecast_from_payloads(daily, hourly)
+        with self.assertRaisesRegex(ValueError, "no es reciente"):
+            prepare_live_forecast(
+                table, target_day=date(2025, 6, 21),
+                consulted_at=datetime(2025, 6, 21, 8, 0),
+            )
+
+    def test_today_accepts_recent_previous_day_issue_with_future_hours(self):
+        table = pd.DataFrame({
+            "date": [pd.Timestamp("2026-10-25")],
+            "issued_at": ["2026-10-24T20:00:00"],
+            "precipitation_mm": [2.5],
+            "precipitation_hours_covered": [7],
+            "precipitation_amount_status": ["horas_disponibles"],
+        })
+        prepared = prepare_live_forecast(
+            table, target_day=date(2026, 10, 25),
+            consulted_at=datetime(2026, 10, 25, 10),
+        )
+        self.assertEqual(prepared["precipitation_mm"].iat[0], 2.5)
+
+    def test_tomorrow_requires_complete_hourly_amount(self):
+        table = pd.DataFrame({
+            "date": [pd.Timestamp("2025-06-21")],
+            "issued_at": ["2025-06-20T20:00:00"],
+            "precipitation_mm": [3.0],
+            "precipitation_hours_covered": [23],
+            "precipitation_amount_status": ["horas_disponibles"],
+        })
+        prepared = prepare_live_forecast(
+            table, target_day=date(2025, 6, 21),
+            consulted_at=datetime(2025, 6, 20, 21, 0),
+        )
+        self.assertTrue(pd.isna(prepared["precipitation_mm"].iat[0]))
+        table.loc[0, "precipitation_hours_covered"] = 24
+        prepared = prepare_live_forecast(
+            table, target_day=date(2025, 6, 21),
+            consulted_at=datetime(2025, 6, 20, 21, 0),
+        )
+        self.assertEqual(prepared["precipitation_mm"].iat[0], 3.0)
 
     def test_ejea_daily_uses_internal_negative_id_but_hourly_confirms_requested_code(self):
         daily, hourly = sample_payloads()

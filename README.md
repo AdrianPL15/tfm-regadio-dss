@@ -11,7 +11,7 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 | 3 | [Código de la interfaz](src/dss/app_streamlit.py), [motor de recomendación](src/dss/engine.py) y [actualización SiAR](src/data/refresh_siar_crop_needs.py) | Implementación que utiliza la demo. |
 | 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json) y [validación del DSS](docs/data_samples/dss_validation_5_3.json) | Entradas, limpieza y resultados verificables sin ejecutar el proyecto. |
 
-La app muestra una dosis actual solo si el cultivo está en ciclo y hay una observación SiAR reciente. Los demás casos permiten consultar ejemplos históricos, identificados como tales. La [guía de la demo](docs/DEMO_TFM.md) indica qué enseñar y qué límites explicar al tutor.
+La app abre en **Recomendación (hoy o mañana)** y propone hoy por defecto cuando el cultivo está en ciclo y hay una observación SiAR reciente. **Revisión histórica (día cerrado)** utiliza datos observados para analizar días pasados; no mide el riego realmente aplicado. Los demás casos permiten consultar ejemplos históricos, identificados como tales. La [guía de la demo](docs/DEMO_TFM.md) indica qué enseñar y qué límites explicar al tutor.
 
 ## Alcance actual
 
@@ -131,5 +131,3 @@ La forma de trabajar con ramas, commits, push y pull requests se explica en [`CO
 
 ## Datos sensibles
 No se almacenan en este repositorio credenciales, contraseñas ni claves de acceso a las APIs. Las variables de entorno se gestionan mediante un fichero `.env` local que queda excluido por el `.gitignore`.
-
-

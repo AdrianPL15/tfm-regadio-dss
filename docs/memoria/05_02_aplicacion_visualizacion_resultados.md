@@ -39,7 +39,8 @@ primero se muestran comunidad, provincia, cultivo, estación y campaña de las
 nueve instantáneas SiAR versionadas: seis combinaciones de cultivo y estación
 en tres provincias. Esta selección permite recorrer los casos disponibles,
 pero no genera automáticamente fuentes para todas las zonas. El segundo
-bloque recoge la consulta: el modo de planificación o seguimiento, la fecha de
+bloque recoge la consulta: «Recomendación (hoy o mañana)» o «Revisión histórica
+(día cerrado)», la fecha de
 emisión y el horizonte de uno a siete días. El tercero describe la parcela: el
 sistema de riego, la eficiencia, que se rellena con el valor orientativo del
 sistema pero puede modificarse, la superficie y, de manera opcional, una
@@ -52,7 +53,11 @@ El botón **Actualizar fuentes y generar recomendación** consulta SiAR para el
 caso de la campaña actual y solicita la predicción municipal de AEMET. La
 descarga validada de SiAR se usa en memoria durante la sesión; no modifica el
 CSV publicado en GitHub. AEMET solo ajusta la dosis cuando la emisión es vigente
-y existe cantidad horaria numérica con cobertura completa del día. La pantalla
+y existe cantidad horaria numérica utilizable: para hoy se suman solo las horas
+posteriores a la consulta y para mañana se exige cobertura completa del día.
+La dosis de hoy representa la necesidad estimada de todo el día; como no se
+registra el riego ni la lluvia ya ocurridos, el usuario debe ajustar la cifra
+si ya ha regado. La pantalla
 separa esta consulta de los ejemplos históricos y de un escenario manual de
 lluvia, identificado como hipotético. La fracción aprovechable es un supuesto
 editable que requiere validación agronómica.
@@ -64,7 +69,7 @@ calculables. Siguen un gráfico diario, desplegables con la procedencia, el
 método y la previsión AEMET recibida, la tabla detallada y el botón para
 descargar el CSV. Un cultivo fuera de ciclo o sin observación reciente muestra
 un aviso y su resultado se etiqueta como ejemplo histórico, no como dosis para
-mañana. Los avisos de datos, dotación y horizonte parcial se muestran junto a
+hoy. Los avisos de datos, dotación y horizonte parcial se muestran junto a
 la recomendación.
 
 Las cifras de resultados se presentan con coma decimal y las fechas en formato día, mes y
@@ -156,7 +161,7 @@ puede llegar con una emisión no vigente o sin una cantidad de lluvia utilizable
 en esos casos no se descuenta precipitación. La campaña histórica de 2025 solo
 admite un escenario manual de lluvia, identificado como hipotético. La vía de
 ET0 prevista está implementada en el motor, pero no se calcula automáticamente
-con la temperatura de AEMET. La consulta de los días posteriores a mañana
+con la temperatura de AEMET. La consulta de los días posteriores al primero
 prolonga temporalmente el último Kc dentro del mismo mes y necesita recalcularse
 con nuevas observaciones. Faltan datos de suelo, riego aplicado y validación de
 la lluvia efectiva para presentar la dosis como consejo agronómico operativo.

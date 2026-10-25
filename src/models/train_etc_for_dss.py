@@ -1,4 +1,4 @@
-"""Evalúa ETc SiAR sin lluvia y prepara modelos para la recomendación de mañana.
+"""Evalúa ETc SiAR sin lluvia y prepara modelos para el primer día recomendado.
 
 La ETc (ET0 × Kc) es la demanda previa a descontar precipitación. El informe
 histórico de necesidad neta se conserva como experimento independiente.
@@ -48,7 +48,7 @@ def evaluate_cases() -> tuple[dict, dict]:
         "feature_columns": FEATURE_COLUMNS,
         "selection": "MAE medio en tres cortes temporales; 15 % final reservado",
         "rain_policy": "AEMET se aplica después de predecir ETc; no se descuenta dos veces",
-        "deployment_horizon": "solo mañana; días posteriores usan el método físico existente",
+        "deployment_horizon": "primer día de hoy o mañana; días posteriores usan el método físico existente",
         "cases": {},
     }
     fitted_models = {}
