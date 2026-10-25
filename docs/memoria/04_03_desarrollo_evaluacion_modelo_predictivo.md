@@ -157,7 +157,7 @@ enfoques.
 Con la evidencia disponible, la decisión técnica es mantener la persistencia
 como referencia predictiva del piloto y no desplegar todavía ninguno de los
 cinco algoritmos de aprendizaje. Ridge se conserva como el mejor candidato de
-machine learning para futuras comparaciones. Esto no significa que el
+aprendizaje automático para futuras comparaciones. Esto no significa que el
 aprendizaje automático carezca de utilidad, sino que la muestra actual —un
 único ciclo, cultivo y estación— no contiene información suficiente para
 demostrar una mejora estable frente a una serie muy autocorrelacionada.

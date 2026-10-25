@@ -29,18 +29,22 @@ del capítulo 4.
 ## 6.3.2. Mejora del motor de recomendación
 
 La prioridad principal para la siguiente iteración es incorporar un balance
-hídrico real de la parcela. Requiere combinar sensores IoT de humedad del suelo,
-capacidad de retención, profundidad radicular, precipitación efectiva y registro
-del riego realmente aplicado. Con estas entradas el sistema podría estimar el
-agotamiento admisible propuesto en FAO-56, decidir no solo cuánto sino cuándo
-regar y aprovechar la lluvia realmente almacenada en el suelo (Allen et al.,
-1998). Los sensores facilitan una telemetría continua, pero no sustituyen la
-caracterización agronómica ni el registro de las actuaciones: recomendar una
-dosis no prueba que se haya ejecutado. Cualquier mejora de precisión deberá
-comprobarse mediante observaciones y ensayos de campo. Con esa información, la
-reducción proporcional por dotación podría sustituirse por una estrategia de
-riego deficitario que concentre el déficit en las fases menos sensibles del
-cultivo (Fereres & Soriano, 2007).
+hídrico real de la parcela. La instrumentación podría combinar sondas
+capacitivas FDR o TDR para contenido volumétrico y tensiómetros para potencial
+matricial, instalados a varias profundidades representativas de la zona
+radicular. Como configuración inicial se propone un registro frecuente y una
+agregación horaria; Sui (2017) documenta un caso con lectura cada minuto,
+promedio horario y sensores a tres profundidades. La frecuencia definitiva
+deberá ajustarse al suelo, cultivo y sistema de riego. La tubería de datos
+controlaría rango físico, valores ausentes, deriva, conectividad y calibración
+específica del suelo antes de alimentar el DSS. Junto con capacidad de
+retención, profundidad radicular, precipitación efectiva y riego realmente
+aplicado, estas entradas permitirían estimar el agotamiento admisible de FAO-56,
+decidir no solo cuánto sino cuándo regar y aprovechar la lluvia almacenada
+(Allen et al., 1998). La telemetría no sustituye la caracterización agronómica
+ni prueba que una dosis recomendada se haya ejecutado. Cualquier mejora deberá
+validarse en campo; después podría estudiarse un riego deficitario que concentre
+el déficit en fases menos sensibles (Fereres & Soriano, 2007).
 
 La segunda prioridad es anticipar cambios de tiempo mediante una ET0 prevista,
 especialmente en los días 4 a 7 del horizonte. El motor ya admite esta entrada,
@@ -62,6 +66,12 @@ utilizando solo predicciones emitidas antes de cada fecha objetivo, y sustituir
 a la vía actual únicamente si mejora el error por horizonte de la Tabla 5.5.
 El mismo archivo permitirá evaluar si conviene descontar la lluvia prevista
 en lugar de limitarse a avisar.
+También permitiría modelizar el error local de AEMET mediante dos tareas
+separadas: clasificación de la ocurrencia de lluvia y regresión de la cantidad
+observada frente a la prevista. Este posprocesado corregiría sesgos locales y
+cuantificaría la incertidumbre; no sustituiría la predicción oficial. El
+entrenamiento respetaría la hora de emisión y reservaría bloques temporales
+posteriores para prueba.
 
 La tercera prioridad es reevaluar el aprendizaje automático una vez ampliados
 los datos. Debería reintroducirse
@@ -95,18 +105,22 @@ trabajo.
 
 ## 6.3.4. Evolución de la plataforma
 
-La industrialización del prototipo debería abordarse cuando las mejoras
-anteriores justifiquen un uso continuado. Comprende persistir catálogos,
-recomendaciones y metadatos en la base de datos relacional prevista en el
-apartado 3.2.2, programar la ingesta diaria con un orquestador, que puede ser
-Apache Hop u otra herramienta equivalente, empaquetar el sistema con Docker y
-permitir que la aplicación seleccione estación y cultivo entre los casos
-declarados. Los indicadores del Boletín Hidrológico del MITECO pueden
-incorporarse como contexto a escala de cuenca, para advertir de situaciones de
-escasez, sin pretender deducir de ellos la dotación de una parcela. El
-procesamiento distribuido con PySpark solo estaría justificado si el sistema se
-extendiera a escala nacional; con el volumen actual añadiría complejidad sin un
-beneficio demostrable, como se señaló en el apartado 3.2.4.
+La industrialización debería ser gradual y proporcional al volumen real. Una
+primera etapa programaría procesos ligeros en Python o funciones gestionadas
+que conservaran cada respuesta JSON, su hora de emisión y su procedencia en una
+capa raw inmutable de almacenamiento de objetos. Una segunda capa normalizaría
+y particionaría los datos en Parquet por fuente, estación y fecha, con catálogo,
+controles de calidad y trazabilidad. Una base relacional quedaría reservada
+para usuarios, parcelas y recomendaciones; el histórico analítico se consultaría
+con DuckDB o Polars mientras el volumen sea moderado. Si una ampliación nacional
+y multianual exigiera consultas concurrentes, podría incorporarse un motor SQL
+distribuido como Trino, capaz de consultar formatos de tabla y archivos Parquet
+sobre almacenamiento de objetos (Trino, s. f.). Esta evolución sigue los
+principios de un lakehouse sin presentar Apache Hop, Impala, Hue o PySpark como
+requisitos. El procesamiento distribuido solo se justificaría mediante
+mediciones de volumen, latencia y coste que demostrasen una limitación del
+enfoque ligero. La aplicación seguiría necesitando un catálogo agronómico
+dinámico, operación, control de acceso y persistencia de consultas.
 
 ## 6.3.5. Consideración final
 

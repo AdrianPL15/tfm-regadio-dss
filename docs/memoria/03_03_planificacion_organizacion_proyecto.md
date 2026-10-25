@@ -22,7 +22,7 @@ fuentes y ETL el 24/09/2026; análisis y modelado entre el 28/09 y el 07/10;
 motor de recomendación y validación el 12/10; conclusiones entre el 15 y el
 17/10; revisión de coherencia y reproducción independiente el 22/10. Son
 fechas de integración comprobables, no una asignación individual de tareas ni
-un cronograma contractual. La publicación de una demo accesible por enlace y
+un cronograma contractual. La publicación de un prototipo accesible por enlace y
 una validación agronómica externa quedan fuera de esos hitos completados.
 
 El desarrollo se organiza mediante Git y GitHub para mantener trazabilidad

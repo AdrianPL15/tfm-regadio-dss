@@ -271,7 +271,7 @@ apartado 2.3, de que la incertidumbre debe formar parte de la salida.
 
 Las comprobaciones de la Tabla 5.7 se complementan con veinte pruebas
 definidas en `tests/test_dss_engine.py`. Tras añadir controles de selección
-de archivos, compatibilidad de estación y campaña e integración de la demo,
+de archivos, compatibilidad de estación y campaña e integración de la aplicación,
 el repositorio contiene 103 pruebas definidas. Entre otras cosas, verifican que la
 planificación no cambia si se alteran los datos posteriores a la fecha de
 emisión, que es la garantía formal de que el sistema no utiliza información
