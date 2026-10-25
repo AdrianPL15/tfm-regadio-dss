@@ -174,7 +174,7 @@ with st.sidebar:
                 st.session_state[aemet_key] = fetch_live_forecast(
                     case.aemet_municipality_code, client=provider
                 )
-            st.success("Previsión AEMET recibida.")
+            st.success("Respuesta AEMET recibida; se comprobará su vigencia antes de usarla.")
         except (AEMETError, ValueError) as error:
             st.warning(f"AEMET no está disponible; se mostrará la dosis base: {error}")
     st.header("Consulta")
@@ -356,10 +356,17 @@ if pd.notna(first["gross_dose_mm"]):
         )
     if live_case and issue == tomorrow and not use_scenario:
         if forecast_input is None:
-            st.info(
-                "Esta dosis todavía no descuenta lluvia prevista. Pulsa «Actualizar fuentes y "
-                "generar recomendación» para incorporar los datos de AEMET."
-            )
+            if live_forecast is None:
+                st.info(
+                    "Esta dosis todavía no descuenta lluvia prevista. Pulsa «Actualizar fuentes y "
+                    "generar recomendación» para consultar AEMET."
+                )
+            else:
+                st.info(
+                    "La previsión recibida no es vigente para esta consulta; "
+                    "no se descuenta lluvia. Puedes volver a consultar cuando "
+                    "AEMET publique una emisión actualizada."
+                )
         elif pd.isna(first["precipitation_forecast_mm"]):
             st.info("AEMET no aporta una cantidad de lluvia completa para mañana; no se descuenta lluvia.")
         else:
