@@ -66,11 +66,12 @@ generó.
 | PySpark | Procesamiento distribuido si el volumen nacional lo justifica | Condicional; no necesario para el piloto actual. |
 
 Esta clasificación actualiza el planteamiento del anteproyecto. MySQL, Apache
-Hop, Docker, PySpark y un cuadro de mando en Power BI o Tableau forman parte de
-la arquitectura objetivo, pero no se consideran evidencias terminadas. En el
-estado actual, el prototipo reproducible se apoya en módulos Python,
-almacenamiento local por capas y una aplicación en Streamlit para consultar el
-sistema de recomendación.
+Hop, Docker, PySpark y un cuadro de mando en Power BI o Tableau se evaluaron
+como opciones, pero no constituyen evidencias terminadas ni una arquitectura
+obligatoria. En el estado actual, el prototipo reproducible se apoya en módulos
+Python, almacenamiento local por capas y una aplicación Streamlit. La evolución
+propuesta en 6.3.4 prioriza una ingesta ligera y programada, almacenamiento de
+objetos y formatos analíticos antes de introducir procesamiento distribuido.
 
 ## 3.2.3. Contratos de datos e integración
 
@@ -98,8 +99,10 @@ información posterior a la fecha de emisión. En total, el proyecto dispone de
 desde los mismos archivos que consume el modelado.
 
 La separación por capas permite sustituir progresivamente el almacenamiento
-local por Parquet, almacenamiento de objetos o MySQL sin cambiar el significado
-de las variables. La escalabilidad se abordará cuando exista un histórico de
-varias campañas y estaciones. Para el volumen del piloto, pandas es suficiente
-y añadir procesamiento distribuido aumentaría la complejidad sin aportar una
-mejora demostrable.
+local por una capa raw JSON y una capa curada Parquet sobre almacenamiento de
+objetos, sin cambiar el significado de las variables. Una base relacional, como
+PostgreSQL o MySQL, quedaría reservada para usuarios, parcelas, recomendaciones
+y metadatos transaccionales. La escalabilidad se abordará cuando exista un
+histórico de varias campañas y estaciones. Para el volumen del piloto, pandas,
+Polars o DuckDB son suficientes y añadir procesamiento distribuido aumentaría
+la complejidad sin aportar una mejora demostrable.

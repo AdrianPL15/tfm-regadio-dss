@@ -1,4 +1,4 @@
-# Revisión cruzada de memoria, repositorio y demo
+# Revisión cruzada de memoria, repositorio y aplicación
 
 Fecha de comprobación: 25 de octubre de 2026.
 
@@ -19,7 +19,7 @@ La versión de entrega es `docs/memoria/TFM_definitivo_2026-10-25.docx` y su PDF
 homónimo. El PDF tiene 85 páginas. Los índices se cotejaron contra las páginas
 exportadas: sus 141 entradas se localizaron en la página indicada, sin
 desfases. Se renderizaron y revisaron visualmente las 85 páginas definitivas,
-sin cortes ni solapamientos. Las 34 direcciones externas del documento se
+sin cortes ni solapamientos. Las 36 direcciones externas activas del documento se
 convirtieron en hipervínculos activos y se mantuvo la notación `mm/día` de forma
 uniforme.
 
@@ -38,5 +38,5 @@ uniforme.
   aislado se bloquea antes de ejecutar la aplicación.
 
 Antes de enviar el TFM, el equipo debe leer el PDF completo. Los resultados de
-la demo varían con la hora de consulta y la
+la aplicación varían con la hora de consulta y la
 disponibilidad de SiAR y AEMET.

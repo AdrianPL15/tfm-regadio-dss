@@ -4,7 +4,7 @@ Fecha de cierre documental: 25 de octubre de 2026.
 
 ## Archivos que se presentan
 
-1. [Memoria definitiva en PDF](memoria/TFM_definitivo_2026-10-25.pdf) y [Word editable](memoria/TFM_definitivo_2026-10-25.docx). El PDF tiene 85 páginas e incluye portada, resumen, índices, capítulos 1 a 6, 31 referencias y anexo de reproducción. El equipo debe leer el PDF antes de enviarlo a la universidad.
+1. [Memoria definitiva en PDF](memoria/TFM_definitivo_2026-10-25.pdf) y [Word editable](memoria/TFM_definitivo_2026-10-25.docx). Incluye portada, resumen, índices, capítulos 1 a 6, referencias y anexo de reproducción. El equipo debe leer el PDF antes de enviarlo a la universidad.
 2. [Aplicación pública Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [recorrido de demostración](DEMO_TFM.md). El evaluador puede escoger entre los casos SiAR verificados, actualizar SiAR y AEMET, consultar una dosis y descargar el CSV.
 3. [Repositorio de entrega](https://github.com/AdrianPL15/tfm-regadio-dss). El [README](../README.md) lleva directamente a la memoria, la app, el código y las evidencias.
 

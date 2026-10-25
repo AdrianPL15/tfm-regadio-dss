@@ -14,6 +14,6 @@ El piloto asume pimiento al aire libre; SiAR identifica «Pimiento» sin precisa
 el sistema productivo. La evaluación se hizo frente a la referencia calculada
 por SiAR, no frente a riegos aplicados en campo. La bibliografía y las citas
 se cotejaron con las indicaciones entregadas para el TFM.
-La [demo pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) está
+La [aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) está
 publicada. Las limitaciones científicas que no se resuelven con edición se recogen en
 [la revisión cruzada de entrega](../REVISION_CRUZADA_ENTREGA_2026-10-25.md).

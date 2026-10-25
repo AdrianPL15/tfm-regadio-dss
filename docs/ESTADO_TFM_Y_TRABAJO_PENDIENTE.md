@@ -36,7 +36,7 @@ solo algodón favorece al modelo y está fuera de ciclo en esta revisión.
 | 1. Introducción y objetivos | Redactado | Distinguir con claridad la visión de producto (elegir zona y cultivo) del piloto fijo realmente implementado. |
 | 2. Marco teórico y estado del arte | Redactado | Cotejar citas, referencias, DOI y formato final. |
 | 3. Metodología y arquitectura | Redactado | Verificar que las tecnologías previstas no se presentan como desplegadas. |
-| 4. Procesamiento y Machine Learning | Piloto original y reentrenamiento independiente en seis casos documentados | Revisar reproducción de cifras y que los resultados no se describan como validación agronómica ni como mejora demostrada. |
+| 4. Procesamiento y aprendizaje automático | Piloto original y reentrenamiento independiente en seis casos documentados | Revisar reproducción de cifras y que los resultados no se describan como validación agronómica ni como mejora demostrada. |
 | 5. DSS y resultados | Motor físico y modelos ETc conectados a la app con control comparativo | Validar prospectivamente con usuarios y datos de campo; falta histórico de previsiones alineado. |
 | 6. Conclusiones | Redactado | Revisar con el equipo el grado de cumplimiento de objetivos y las afirmaciones de alcance. |
 | Elementos preliminares y anexos | Revisión de contenido y maquetación completada | La versión candidata actual está en `docs/memoria/TFM_revision_final_2026-10-25.docx` y `docs/memoria/TFM_revision_final_2026-10-25.pdf`. Se revisaron las 85 páginas y los índices con la paginación exportada. El abstract en inglés se eliminó por decisión del equipo. Queda la lectura final del equipo y la confirmación agronómica del encuadre del pimiento. |
@@ -70,7 +70,7 @@ consultar las APIs.
 | ET0 y lluvia previstas | No existe un histórico de emisiones alineado con la campaña de 2025; la previsión de ET0 puede suministrarse manualmente al motor. | No atribuir al piloto una validación predictiva con pronósticos históricos. |
 | Momento de riego | El motor estima cuánto regar y, con milímetros AEMET utilizables, descuenta una fracción supuesta de lluvia; no calcula un balance hídrico del suelo ni conoce lo ya regado hoy. | No afirmar que decide el momento óptimo ni la dosis pendiente exacta de la parcela. |
 | Disponibilidad de agua | La dotación la introduce el usuario; MITECO no se integra como asignación parcelaria. | Declarar la limitación hidrológica. |
-| MySQL, Apache Hop, Docker y PySpark | No implementados en el piloto. | Mantenerlos como arquitectura objetivo o línea futura. |
+| MySQL, Apache Hop, Docker y PySpark | No implementados en el piloto. | Presentarlos solo como opciones evaluadas; la evolución prioriza ingesta ligera, almacenamiento de objetos y Parquet, escalando el motor de consulta cuando lo justifiquen el volumen y la concurrencia. |
 | Power BI o Tableau | Sustituidos por una aplicación Streamlit funcional. | Describir la sustitución y su motivo. |
 
 ## 5. Revisión de cierre antes de la entrega
