@@ -70,34 +70,39 @@ consultar las APIs.
 | MySQL, Apache Hop, Docker y PySpark | No implementados en el piloto. | Mantenerlos como arquitectura objetivo o línea futura. |
 | Power BI o Tableau | Sustituidos por una aplicación Streamlit funcional. | Describir la sustitución y su motivo. |
 
-## 5. Trabajo imprescindible antes de la entrega
+## 5. Revisión de cierre antes de la entrega
 
 1. Confirmar con el tutor que la portada, el resumen español, los índices y el
    anexo A de la versión de revisión cumplen las normas del máster; no se
    incluye abstract en inglés por decisión del equipo.
 2. La guía `docs/DEMO_TFM.md` ya incluye el recorrido público comprobado el
-   25/10/2026, la lectura del CSV y la alternativa retrospectiva local. Falta
-   repetir la instalación y la demo local desde un clon limpio en otro equipo.
+   25/10/2026, la lectura del CSV y la alternativa retrospectiva local. La
+   instalación desde un clon limpio queda como comprobación técnica opcional:
+   el recorrido de evaluación previsto usa GitHub y la app pública.
 3. Revisar todas las referencias cruzadas, pies de tablas y figuras, citas,
    bibliografía, unidades, redondeos y ortografía. Confirmar el origen y la
    aplicabilidad al pimiento al aire libre del calendario y los coeficientes
    `Kc` utilizados por SiAR.
 4. Asegurar que el Word y el PDF finales representan la misma versión; revisar
    visualmente todas las páginas y evitar tablas partidas de forma incómoda.
-5. Ejecutar el flujo documentado y la suite completa en un entorno reproducible,
-   registrar versiones de dependencias y comprobar que no se versionan tokens,
-   credenciales ni datos sensibles. El 25/10 pasaron 33 pruebas focalizadas
-   del motor, AEMET, ETc y la demo local. La prueba de interfaz con `AppTest`
-   no concluyó en este entorno y queda por diagnosticar; la aplicación pública
-   sí se comprobó manualmente.
+5. Revisar las evidencias que verá el tutor en GitHub, comprobar que no se
+   versionan tokens, credenciales ni datos sensibles y contrastar la memoria
+   con la app pública. El 25/10 pasaron 33 pruebas focalizadas del motor,
+   AEMET, ETc y la demo local; la suite completa y `AppTest` quedan como
+   comprobaciones técnicas adicionales. La app pública se comprobó manualmente
+   con coliflor, alfalfa y alcachofa activos, pimiento fuera de ciclo y un
+   escenario de lluvia hipotética. Una emisión AEMET antigua se recibió pero
+   no se aplicó a la dosis, como corresponde.
 6. El anexo de la memoria ya incluye el
    [enlace público de Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/).
    El 25/10/2026 se comprobó el CSV descargado: siete días, dosis y volumen
    coherentes con los indicadores redondeados de la pantalla. El recorrido está
    en `docs/DEMO_TFM.md`; verificarlo de nuevo el día de la presentación.
-7. La rama de revisión ya se integró en `main` mediante la PR #8 y se creó el
-   fork `AdrianPL15/tfm-regadio-dss` para el despliegue. Mantener identificados
-   ambos repositorios y sincronizar el fork si `main` original cambia.
+7. La versión pública y la memoria candidata están en el fork
+   `AdrianPL15/tfm-regadio-dss`, cuya rama `main` contiene también las
+   correcciones de la demo y el recorrido del README. Conservar el fork para la
+   entrega mantiene visibles las pull requests; revisar cambios nuevos del
+   repositorio original antes de decidir si incorporarlos.
 
 Las prioridades posteriores a la entrega son ampliar campañas y estaciones,
 archivar previsiones por fecha de emisión, incorporar datos de suelo y riego

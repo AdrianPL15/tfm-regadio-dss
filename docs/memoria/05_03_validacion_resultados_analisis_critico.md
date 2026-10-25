@@ -269,10 +269,10 @@ de vía de estimación, y en los casos sin información suficiente prefiere no
 emitir recomendación. Este comportamiento responde a la idea, expuesta en el
 apartado 2.3, de que la incertidumbre debe formar parte de la salida.
 
-Las comprobaciones de la Tabla 5.7 se complementan con quince pruebas
-automáticas en `tests/test_dss_engine.py`. Tras añadir controles de selección
-de archivos y compatibilidad de estación y campaña, la suite completa contiene
-61 pruebas. Entre otras cosas, verifican que la
+Las comprobaciones de la Tabla 5.7 se complementan con veinte pruebas
+definidas en `tests/test_dss_engine.py`. Tras añadir controles de selección
+de archivos, compatibilidad de estación y campaña e integración de la demo,
+el repositorio contiene 97 pruebas definidas. Entre otras cosas, verifican que la
 planificación no cambia si se alteran los datos posteriores a la fecha de
 emisión, que es la garantía formal de que el sistema no utiliza información
 futura.
