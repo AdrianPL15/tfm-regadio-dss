@@ -28,9 +28,23 @@ del capítulo 4.
 
 ## 6.3.2. Mejora del motor de recomendación
 
-Una mejora prioritaria para anticipar cambios de tiempo es incorporar una ET0
-prevista, especialmente en los días 4 a 7 del horizonte. El motor ya admite
-esta entrada, de modo que el trabajo pendiente es de datos y de evaluación.
+La prioridad principal para la siguiente iteración es incorporar un balance
+hídrico real de la parcela. Requiere combinar sensores IoT de humedad del suelo,
+capacidad de retención, profundidad radicular, precipitación efectiva y registro
+del riego realmente aplicado. Con estas entradas el sistema podría estimar el
+agotamiento admisible propuesto en FAO-56, decidir no solo cuánto sino cuándo
+regar y aprovechar la lluvia realmente almacenada en el suelo (Allen et al.,
+1998). Los sensores facilitan una telemetría continua, pero no sustituyen la
+caracterización agronómica ni el registro de las actuaciones: recomendar una
+dosis no prueba que se haya ejecutado. Cualquier mejora de precisión deberá
+comprobarse mediante observaciones y ensayos de campo. Con esa información, la
+reducción proporcional por dotación podría sustituirse por una estrategia de
+riego deficitario que concentre el déficit en las fases menos sensibles del
+cultivo (Fereres & Soriano, 2007).
+
+La segunda prioridad es anticipar cambios de tiempo mediante una ET0 prevista,
+especialmente en los días 4 a 7 del horizonte. El motor ya admite esta entrada,
+de modo que el trabajo pendiente es de datos y de evaluación.
 La predicción municipal de AEMET OpenData describe los días
 posteriores a cada emisión y el proyecto no dispone de emisiones pasadas, por
 lo que el histórico debe construirse archivando de forma programada cada
@@ -49,7 +63,8 @@ a la vía actual únicamente si mejora el error por horizonte de la Tabla 5.5.
 El mismo archivo permitirá evaluar si conviene descontar la lluvia prevista
 en lugar de limitarse a avisar.
 
-Una vez ampliados los datos, el aprendizaje automático debería reintroducirse
+La tercera prioridad es reevaluar el aprendizaje automático una vez ampliados
+los datos. Debería reintroducirse
 con un papel distinto al del capítulo 4: no para predecir directamente la
 necesidad, sino para aprender la corrección de la estimación física, es decir,
 el residuo entre la vía ET0 × Kc y la referencia, a partir de las variables
@@ -59,18 +74,6 @@ riesgo de sobreajuste. En paralelo, los niveles de confianza actuales,
 definidos mediante reglas a partir del error medio por horizonte, deberían
 sustituirse por intervalos de predicción, de forma que cada dosis se acompañe
 de un rango cuantificado (Hyndman & Athanasopoulos, 2021).
-
-La tercera mejora del motor es un balance hídrico del suelo con agotamiento
-admisible, como el propuesto en FAO-56 (Allen et al., 1998). Permitiría decidir
-no solo cuánto sino cuándo regar y aprovechar la lluvia realmente almacenada en
-el suelo. Requiere la capacidad de retención, la profundidad radicular y el
-registro de los riegos realmente aplicados en cada parcela: recomendar una
-dosis no prueba que se haya ejecutado. El balance podría adaptar mejor la
-recomendación a la situación de la parcela, pero cualquier mejora de precisión
-debería comprobarse con observaciones y ensayos de campo. Con esa información,
-la reducción proporcional por dotación podría sustituirse por una estrategia de riego
-deficitario que concentre el déficit en las fases menos sensibles del cultivo
-(Fereres & Soriano, 2007).
 
 ## 6.3.3. Validación en condiciones de uso
 

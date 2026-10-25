@@ -1,5 +1,8 @@
 # Estado actual y trabajo pendiente del TFM
 
+> Registro histórico anterior al cierre. La versión presentada se describe en
+> [la guía de entrega](ENTREGA_FINAL_2026-10-25.md).
+
 Fecha de revisión: 25 de octubre de 2026
 
 ## 1. Diagnóstico general

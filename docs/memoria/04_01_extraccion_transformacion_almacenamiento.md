@@ -9,8 +9,8 @@ el análisis. Esta separación permite auditar cada recomendación, repetir el
 procesamiento cuando cambien las reglas y evitar que una corrección destruya el
 contenido recibido de la fuente.
 
-El piloto plantea como referencia el pimiento al aire libre en Almería, con la
-correspondencia del CSV de SiAR a ese sistema aún pendiente de acreditar. Se ha
+El piloto asume como referencia el pimiento al aire libre en Almería. El CSV de
+SiAR identifica «Pimiento», pero no especifica el sistema productivo. Se ha
 extraído un ciclo completo del 1 de mayo al 30 de septiembre de 2025 para la
 estación SiAR `AL01` La Mojonera, junto con las necesidades hídricas del
 pimiento en esa misma estación y periodo. Se obtuvo una predicción de prueba
@@ -18,7 +18,8 @@ para el municipio AEMET `04013` Almería en 2026; no alimenta la evaluación
 retrospectiva de 2025. Esta configuración es un caso de validación y no una
 restricción fija del producto. El diseño conserva identificadores de fuente,
 estación, municipio, cultivo y tiempo para preparar otros casos; la interfaz
-actual no ofrece esa selección.
+actual selecciona entre las combinaciones ya verificadas, sin extracción
+automática para cualquier zona o cultivo.
 
 ![Flujo de procesamiento de datos del piloto](../images/procesamiento_datos_4_1.png)
 
@@ -32,7 +33,7 @@ extracción del 24 de septiembre de 2026.*
 |---|---|---|---|
 | Ministerio de Agricultura, Pesca y Alimentación, SiAR | Web API SiAR v1, `https://servicio.mapa.gob.es/siarapi/API/V1` | Observaciones por estación, ET0, precipitación efectiva y catálogos | Histórico agroclimático y trazabilidad espacial. |
 | Ministerio de Agricultura, Pesca y Alimentación, SiAR | Web de cálculo de necesidades hídricas, `https://servicio.mapa.gob.es/siarweb/necesidadesHidricas/calculo` | Kc, ET0, ETc, Pe y necesidad neta por cultivo, estación y periodo | Referencia agronómica y variable objetivo del piloto. |
-| Agencia Estatal de Meteorología | AEMET OpenData, `https://opendata.aemet.es/opendata/api` | Predicción municipal diaria y horaria | Anticipación meteorológica para recomendaciones futuras. |
+| Agencia Estatal de Meteorología | AEMET OpenData, `https://opendata.aemet.es/opendata/api` | Predicción municipal diaria y horaria | Lluvia prevista para la recomendación actual. |
 
 Las respuestas de la Web API SiAR y AEMET se conservan con su fecha de
 ingestión, parámetros y archivo de procedencia. El CSV agronómico se acompaña de

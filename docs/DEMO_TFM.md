@@ -20,7 +20,7 @@ Para demostrar el efecto de lluvia cuando AEMET no anuncia una cantidad positiva
 
 ## Alternativa sin API: piloto histórico local
 
-El ejemplo local usa el CSV oficial versionado de pimiento, estación `AL01` La Mojonera (Almería), campaña 2025. El encuadre **al aire libre** es una hipótesis que este CSV no acredita. La interfaz permite mostrar el funcionamiento del motor sin consultar SiAR ni AEMET.
+El ejemplo local usa el CSV oficial versionado de pimiento, estación `AL01` La Mojonera (Almería), campaña 2025. Para el piloto se asume cultivo **al aire libre**; el CSV no especifica el sistema productivo. La interfaz permite mostrar el funcionamiento del motor sin consultar SiAR ni AEMET.
 
 ### Abrir la demo local
 
@@ -55,6 +55,6 @@ La pantalla permite cambiar fecha, horizonte, sistema y eficiencia de riego, sup
 
 La app pública es la demostración principal. También puede ejecutarse localmente con `streamlit run src/dss/app_streamlit.py` si Streamlit está instalado. La demo histórica evita depender de las APIs durante la presentación; no modifica el método de cálculo.
 
-**Verificación:** el 25/10/2026 pasaron 33 pruebas focalizadas de la demo local, el motor, la integración AEMET y el despliegue de ETc. La prueba automatizada de la interfaz mediante Streamlit `AppTest` no concluyó en este entorno; el recorrido público anterior se comprobó manualmente en el navegador. Repetir la suite completa en el entorno definitivo.
+**Verificación:** el 25/10/2026 pasaron las 103 pruebas automáticas del proyecto, incluidas las dos de interfaz Streamlit mediante `AppTest`. Dentro del aislamiento local de sockets estas dos pruebas se bloquean antes de cargar la app; se ejecutaron correctamente en el entorno Windows normal. El recorrido público anterior también se comprobó manualmente en el navegador.
 
 **Alcance:** ninguna pantalla demuestra ahorro de agua, aumento de rendimiento o generalización a otros cultivos y estaciones. Los resultados se contrastan con la necesidad neta calculada por SiAR, no con riegos realmente aplicados ni datos de campo.

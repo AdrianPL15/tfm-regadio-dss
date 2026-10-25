@@ -131,12 +131,15 @@ def build_visual(interim_root: Path, processed_path: Path, output: Path) -> Path
     forecast_axis.xaxis.set_major_formatter(mdates.DateFormatter("%d/%m"))
     forecast_axis.grid(axis="y", alpha=0.25)
     forecast_axis.spines[["top", "right"]].set_visible(False)
-    forecast_axis.legend(frameon=False, ncol=3, loc="upper right", fontsize=8)
+    forecast_axis.legend(
+        frameon=False, ncol=3, loc="lower right",
+        bbox_to_anchor=(1.0, 1.015), fontsize=8,
+    )
 
     figure.text(
         0.5, 0.02,
-        "Configuración actual: pimiento · Almería · estación AL01 · 01/05–30/09/2025. "
-        "La selección por el usuario aún no está disponible en la interfaz.",
+        "Caso visualizado: pimiento · Almería · estación AL01 · 01/05–30/09/2025. "
+        "La demo permite elegir entre las combinaciones SiAR verificadas.",
         ha="center", fontsize=9, color="#596579",
     )
     output.parent.mkdir(parents=True, exist_ok=True)

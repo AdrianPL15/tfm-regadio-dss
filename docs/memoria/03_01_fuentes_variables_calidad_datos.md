@@ -11,10 +11,9 @@ periodo. Esos parámetros determinan la estación SiAR, el municipio AEMET, el
 calendario de cultivo y los datos que se consultan. Para validar el flujo se fija
 un piloto reproducible de pimiento al aire libre en Almería, estación `AL01` La
 Mojonera, entre mayo y septiembre de 2025. La web de SiAR identifica el cultivo
-como `Pimiento` sin declarar el sistema productivo; su tratamiento como aire
-libre es una hipótesis de alcance del piloto, coherente con el uso de
-meteorología y precipitación exterior, pero pendiente de acreditación para el
-CSV concreto empleado.
+como `Pimiento` sin declarar el sistema productivo. Para este piloto se asume
+el cultivo al aire libre, coherente con el uso de meteorología y precipitación
+exterior. El CSV no confirma ese sistema productivo.
 
 ## 3.1.1. Fuentes incorporadas
 
@@ -22,7 +21,7 @@ CSV concreto empleado.
 |---|---|---|---|---|
 | SiAR Web API | Observada | Estaciones, temperatura, humedad, viento, radiación, precipitación, ET0 y precipitación efectiva | Histórico agroclimático y trazabilidad espacial | Integrada y probada. |
 | SiAR, cálculo de necesidades hídricas | Referencia agronómica | Kc, ET0, ETc, precipitación efectiva y necesidad neta por cultivo y zona | Baseline agronómico y etiqueta de referencia del piloto | Incorporada mediante CSV oficial. |
-| AEMET OpenData | Predictiva | Predicción municipal diaria y horaria, temperatura, humedad, lluvia, probabilidad, viento y horizonte | Anticipación meteorológica y futura recomendación | Integrada y normalizada; todavía no alineada con el histórico 2025. |
+| AEMET OpenData | Predictiva | Predicción municipal diaria y horaria, temperatura, humedad, lluvia, probabilidad, viento y horizonte | Ajuste condicionado por lluvia prevista en la consulta actual | Integrada y normalizada; no hay emisiones archivadas alineadas con el histórico 2025. |
 | MITECO y datos de parcela | Contextual | Disponibilidad de agua, restricciones, suelo, instalación y riego aplicado | Restricciones operativas y validación real | Evolución prevista; no forma parte del conjunto actual. |
 
 Los inventarios completos de campos, endpoints, significado y prioridad ya se
