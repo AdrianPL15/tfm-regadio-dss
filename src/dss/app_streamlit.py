@@ -152,6 +152,8 @@ with st.sidebar:
         and history["record_status"].iloc[-1] == "completo"
         and float(history["kc"].iloc[-1]) > 0
     )
+    active_dates = history.loc[history["kc"].gt(0), "date"]
+    historical_example = active_dates.max().date() if not active_dates.empty else last_day
     issue_key = f"fecha_{case.station_code}_{case.crop}_{case.campaign_year}"
     if issue_key not in st.session_state:
         st.session_state[issue_key] = (
@@ -175,9 +177,6 @@ with st.sidebar:
             st.success("Previsión AEMET recibida.")
         except (AEMETError, ValueError) as error:
             st.warning(f"AEMET no está disponible; se mostrará la dosis base: {error}")
-    active_dates = history.loc[history["kc"].gt(0), "date"]
-    historical_example = active_dates.max().date() if not active_dates.empty else last_day
-
     st.header("Consulta")
     mode_label = st.radio(
         "Modo",
