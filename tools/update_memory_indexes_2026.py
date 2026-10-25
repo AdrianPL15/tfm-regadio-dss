@@ -1,5 +1,6 @@
 """Synchronize the manually typeset indices with the rendered final memory."""
 
+import argparse
 from pathlib import Path
 import re
 import unicodedata
@@ -10,8 +11,15 @@ from pypdf import PdfReader
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DOCX = ROOT / "docs/memoria/TFM_revision_final_contenido_2026-10-24.docx"
-PDF = ROOT / "docs/memoria/TFM_revision_final_2026-10-24.pdf"
+DEFAULT_DOCX = ROOT / "docs/memoria/TFM_revision_final_contenido_2026-10-24.docx"
+DEFAULT_PDF = ROOT / "docs/memoria/TFM_revision_final_2026-10-24.pdf"
+
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--docx", type=Path, default=DEFAULT_DOCX)
+parser.add_argument("--pdf", type=Path, default=DEFAULT_PDF)
+args = parser.parse_args()
+DOCX = args.docx
+PDF = args.pdf
 
 
 def normalized(value):

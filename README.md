@@ -7,7 +7,7 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 | Orden | Qué abrir | Qué permite comprobar |
 |---|---|---|
 | 1 | [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía breve de la demo](docs/DEMO_TFM.md) | Selección de caso, consulta SiAR/AEMET, dosis, explicaciones y CSV descargable. |
-| 2 | [Memoria candidata en PDF](docs/memoria/TFM_revision_final_2026-10-24.pdf) ([Word editable](docs/memoria/TFM_revision_final_contenido_2026-10-24.docx)) | Planteamiento, método, resultados y límites. |
+| 2 | [Memoria candidata en PDF](docs/memoria/TFM_revision_final_2026-10-25.pdf) ([Word editable](docs/memoria/TFM_revision_final_2026-10-25.docx)) | Planteamiento, método, resultados y límites. |
 | 3 | [Código de la interfaz](src/dss/app_streamlit.py), [motor de recomendación](src/dss/engine.py) y [actualización SiAR](src/data/refresh_siar_crop_needs.py) | Implementación que utiliza la demo. |
 | 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json) y [validación del DSS](docs/data_samples/dss_validation_5_3.json) | Entradas, limpieza y resultados verificables sin ejecutar el proyecto. |
 
