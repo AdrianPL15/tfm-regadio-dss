@@ -347,7 +347,7 @@ El primer comando produce el informe completo
 (`docs/data_samples/dss_validation_5_3.json`), los errores por horizonte
 (`dss_horizon_errors_5_3.csv`), los escenarios (`dss_scenarios_5_3.csv`), el
 ejemplo del apartado 5.2 y las Figuras 5.3, 5.4 y 5.5. El segundo genera la
-Figura 5.1 y el tercero ejecuta las sesenta y una pruebas automáticas del
+Figura 5.1 y el tercero ejecuta las 103 pruebas automáticas del
 proyecto. La captura de la Figura 5.2 se obtiene arrancando la aplicación con
 `streamlit run src/dss/app_streamlit.py` y abriendo la dirección local con los
 parámetros `?fecha=2025-06-28&referencia=1`.

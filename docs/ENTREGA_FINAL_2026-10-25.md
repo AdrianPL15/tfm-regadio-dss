@@ -1,0 +1,35 @@
+# Guía de la entrega del TFM
+
+Fecha de cierre documental: 25 de octubre de 2026.
+
+## Archivos que se presentan
+
+1. [Memoria definitiva en PDF](memoria/TFM_definitivo_2026-10-25.pdf) y [Word editable](memoria/TFM_definitivo_2026-10-25.docx). El PDF tiene 85 páginas e incluye portada, resumen, índices, capítulos 1 a 6, 31 referencias y anexo de reproducción. El equipo debe leer el PDF antes de enviarlo a la universidad.
+2. [Aplicación pública Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [recorrido de demostración](DEMO_TFM.md). El evaluador puede escoger entre los casos SiAR verificados, actualizar SiAR y AEMET, consultar una dosis y descargar el CSV.
+3. [Repositorio de entrega](https://github.com/AdrianPL15/tfm-regadio-dss). El [README](../README.md) lleva directamente a la memoria, la app, el código y las evidencias.
+
+## Evidencias principales
+
+| Qué se contrasta | Archivo |
+|---|---|
+| Extracción y limpieza del piloto: 150 registros SiAR por fuente, 148 etiquetas válidas | [Volumen de la ETL](data_samples/etl_volume_summary_4_1.csv) y [código](../src/data/) |
+| Modelos del piloto de pimiento de 2025 | [Evaluación del apartado 4.3](data_samples/model_evaluation_4_3.json) |
+| Ampliación a seis combinaciones y campañas disponibles de 2025 y 2026: 1776 filas CSV y 1584 jornadas activas válidas | [Reentrenamiento por caso](data_samples/model_retraining_2026.json) |
+| Selección entre el modelo de ETc y `ET0 reciente × Kc` para la dosis | [Comparación por caso](data_samples/etc_model_deployment_2026.json) y [código](../src/models/train_etc_for_dss.py) |
+| Reglas de riego y validación retrospectiva | [Motor](../src/dss/engine.py) y [13 escenarios](data_samples/dss_validation_5_3.json) |
+| Interfaz desplegada | [Código Streamlit](../src/dss/app_streamlit.py) |
+
+El 25/10/2026 se ejecutó `python -m unittest discover -s tests -q`: **103 pruebas correctas**, incluidas las dos pruebas `AppTest` de Streamlit. En el aislamiento local de sockets de Windows, `AppTest` se detiene antes de cargar la app; ejecutada en el entorno Windows normal, la suite terminó correctamente. La consulta pública de coliflor AL01 para hoy recibió datos SiAR y AEMET y mostró una dosis y un CSV descargable. El resultado de una consulta futura puede variar con los datos recibidos y la hora.
+
+## Alcance que debe explicarse
+
+- La selección se limita a seis combinaciones de cultivo y estación ya verificadas; todavía no se extrae automáticamente cualquier caso de España.
+- El piloto retrospectivo de 2025 asume pimiento al aire libre. El CSV SiAR identifica «Pimiento» sin indicar el sistema productivo.
+- Los modelos se compararon con necesidades calculadas por SiAR. No se registró el riego aplicado ni se midió ahorro, rendimiento o precisión en campo.
+- La app estima primero la ETc antes de lluvia. Solo descuenta lluvia AEMET cuando hay milímetros horarios utilizables y aplica una fracción aprovechable **supuesta y editable**. La dosis de hoy representa la necesidad del día completo y requiere ajuste si ya se ha regado.
+- En cinco de los seis casos, `ET0 reciente × Kc` tuvo menor MAE de prueba que el modelo de ETc seleccionado. La app muestra el modelo como contraste en los cultivos activos de octubre; no afirma una mejora general debida al aprendizaje automático.
+- El carácter inteligente del DSS reside en la arquitectura híbrida, la integración automatizada de fuentes, la selección trazable del método y las reglas agronómicas; comprobar que un modelo complejo no mejora de forma estable la referencia física es un resultado experimental válido.
+- Los días posteriores al primero son orientativos. No hay histórico de emisiones AEMET alineadas con 2025 ni balance hídrico de la parcela para validarlos prospectivamente.
+- La prioridad de evolución es un balance hídrico de parcela con sensores de humedad, propiedades del suelo y registro del riego realmente aplicado.
+
+La [revisión cruzada](REVISION_CRUZADA_ENTREGA_2026-10-25.md) recoge la comprobación entre memoria, código y aplicación. Las versiones anteriores de la memoria y los guiones editoriales permanecen recuperables en el historial de Git; los archivos señalados arriba son los de entrega.

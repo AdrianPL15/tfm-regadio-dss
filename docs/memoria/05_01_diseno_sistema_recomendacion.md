@@ -1,5 +1,15 @@
 # 5.1. Diseño del sistema de recomendación de riego
 
+Este capítulo separa dos entornos que aportan evidencias diferentes. El
+**entorno de evaluación estricta** utiliza el histórico SiAR de 2025,
+particiones temporales y métricas reproducibles; no incorpora previsiones AEMET
+archivadas. El **entorno de demostración operativa** corresponde a la aplicación
+Streamlit actual, que consulta datos recientes de SiAR y previsión AEMET para
+generar una recomendación. Por tanto, la demo acredita integración y
+funcionamiento, mientras que su efecto sobre el error, el ahorro de agua o la
+adecuación a una parcela todavía no dispone de una evaluación retrospectiva
+equivalente.
+
 El capítulo anterior dejó dos resultados que condicionan el diseño del sistema.
 Por un lado, la necesidad neta publicada por SiAR puede reconstruirse a partir
 de la ET0, el coeficiente de cultivo y la precipitación efectiva, de modo que

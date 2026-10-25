@@ -36,7 +36,7 @@ muestra limitada y evita presentar una mejora artificial.
 - [`docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md`](memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md): texto completo del apartado 4.3.
 - [`docs/data_samples/model_evaluation_4_3.json`](data_samples/model_evaluation_4_3.json): métricas y configuración auditables.
 - [`docs/data_samples/model_predictions_4_3.csv`](data_samples/model_predictions_4_3.csv): predicciones del tramo de prueba.
-- [`docs/memoria/TFM_definitivo.docx`](memoria/TFM_definitivo.docx): memoria actualizada.
+- [`docs/memoria/TFM_definitivo_2026-10-25.docx`](memoria/TFM_definitivo_2026-10-25.docx): memoria actualizada.
 
 ## 5. Reproducción
 

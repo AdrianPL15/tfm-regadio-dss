@@ -1,5 +1,8 @@
 # Auditoría de coherencia de la versión para el tutor
 
+> Registro histórico del 22–23 de octubre. La comprobación de la versión de
+> entrega está en [la revisión cruzada](REVISION_CRUZADA_ENTREGA_2026-10-25.md).
+
 Esta nota contrasta las propuestas de la revisión externa de octubre de 2026
 con el código, las tablas generadas y la memoria. No convierte una prueba de
 concepto en una validación agronómica de campo.
