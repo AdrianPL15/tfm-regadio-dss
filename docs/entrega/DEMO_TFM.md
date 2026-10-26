@@ -50,8 +50,8 @@ La pantalla permite cambiar fecha, horizonte, sistema y eficiencia de riego, sup
 | Comparación de seis enfoques; la persistencia gana en este piloto | `docs/data_samples/model_evaluation_4_3.json`, `src/models/train_evaluate.py` | 4.3 |
 | Recomendación interactiva | `scripts/demo_local.py`, `docs/demo/index.html`, `src/dss/engine.py` | 5.1–5.2 |
 | Validación técnica, 13 escenarios y errores por horizonte | `docs/data_samples/dss_validation_5_3.json`, `src/analysis/build_validation_5_3.py` | 5.3 |
-| App pública y casos verificables | [`src/dss/app_streamlit.py`](../src/dss/app_streamlit.py), [`src/dss/config.py`](../src/dss/config.py) | 5.2 |
-| Modelos reentrenados y criterio de uso | [`model_retraining_2026.json`](data_samples/model_retraining_2026.json), [`etc_model_deployment_2026.json`](data_samples/etc_model_deployment_2026.json) | 4.3 y 5.1 |
+| App pública y casos verificables | [`src/dss/app_streamlit.py`](../../src/dss/app_streamlit.py), [`src/dss/config.py`](../../src/dss/config.py) | 5.2 |
+| Modelos reentrenados y criterio de uso | [`model_retraining_2026.json`](../data_samples/model_retraining_2026.json), [`etc_model_deployment_2026.json`](../data_samples/etc_model_deployment_2026.json) | 4.3 y 5.1 |
 
 La app pública es la demostración principal. También puede ejecutarse localmente con `streamlit run src/dss/app_streamlit.py` si Streamlit está instalado. La demo histórica evita depender de las APIs durante la presentación; no modifica el método de cálculo.
 

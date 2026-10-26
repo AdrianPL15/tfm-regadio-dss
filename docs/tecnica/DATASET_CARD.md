@@ -30,8 +30,8 @@ algunos cultivos solo aportan una campaña parcial de 2026.
 | Muestras y resultados | `docs/data_samples/` | Evidencias pequeñas incluidas en el repositorio |
 
 El diccionario funcional de variables y sus unidades se encuentra en
-`docs/FUENTE_DATOS_SIAR.md`, `docs/FUENTE_DATOS_AEMET.md` y
-`docs/ESTRATEGIA_DATOS_DSS.md`.
+`docs/tecnica/FUENTE_DATOS_SIAR.md`, `docs/tecnica/FUENTE_DATOS_AEMET.md` y
+`docs/tecnica/ESTRATEGIA_DATOS_DSS.md`.
 
 ## Identificadores y trazabilidad
 

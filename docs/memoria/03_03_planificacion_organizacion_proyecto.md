@@ -68,5 +68,5 @@ del control de versiones salvo una instantánea acotada de entradas públicas
 del piloto, conservada para poder reconstruir la ETL sin tokens. Se versionan
 también el código, los esquemas, las métricas y las figuras. La composición,
 procedencia y condiciones de esa instantánea se documentan en
-`docs/REPRODUCCION_PILOTO.md`. Las instrucciones operativas completas se mantienen
+`docs/tecnica/REPRODUCCION_PILOTO.md`. Las instrucciones operativas completas se mantienen
 en `CONTRIBUTING.md` y `ORGANIZACION_Y_VERSIONADO.md`.

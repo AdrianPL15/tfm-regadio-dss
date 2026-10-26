@@ -32,7 +32,7 @@ MAE de persistencia de 0,120 mm/día en prueba y los 13 escenarios pasaron.
 Tras incorporar los dos tests de la demo, la suite completa pasó con 61/61
 pruebas. Se utilizó el entorno Python ya instalado; queda por comprobar la
 instalación de dependencias desde cero en otro equipo. Los comandos se indican
-en [REPRODUCCION_PILOTO.md](../../REPRODUCCION_PILOTO.md).
+en [REPRODUCCION_PILOTO.md](../../tecnica/REPRODUCCION_PILOTO.md).
 
 El 23/10/2026 se repitieron las 61 pruebas con un directorio temporal dentro
 del espacio de trabajo (61/61 correctas) y se ejecutó la prueba local de la

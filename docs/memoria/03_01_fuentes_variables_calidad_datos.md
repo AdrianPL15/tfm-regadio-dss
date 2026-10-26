@@ -25,9 +25,9 @@ exterior. El CSV no confirma ese sistema productivo.
 | MITECO y datos de parcela | Contextual | Disponibilidad de agua, restricciones, suelo, instalación y riego aplicado | Restricciones operativas y validación real | Evolución prevista; no forma parte del conjunto actual. |
 
 Los inventarios completos de campos, endpoints, significado y prioridad ya se
-mantienen en `docs/FUENTE_DATOS_SIAR.md` y
-`docs/FUENTE_DATOS_AEMET.md`. La estrategia de combinación se documenta en
-`docs/ESTRATEGIA_DATOS_DSS.md`; por tanto, este apartado resume las decisiones
+mantienen en `docs/tecnica/FUENTE_DATOS_SIAR.md` y
+`docs/tecnica/FUENTE_DATOS_AEMET.md`. La estrategia de combinación se documenta en
+`docs/tecnica/ESTRATEGIA_DATOS_DSS.md`; por tanto, este apartado resume las decisiones
 metodológicas sin duplicar esos diccionarios técnicos.
 
 ## 3.1.2. Familias de variables

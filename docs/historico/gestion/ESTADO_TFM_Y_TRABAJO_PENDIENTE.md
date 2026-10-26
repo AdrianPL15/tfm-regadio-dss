@@ -1,7 +1,7 @@
 # Estado actual y trabajo pendiente del TFM
 
 > Registro histórico anterior al cierre. La versión presentada se describe en
-> [la guía de entrega](../../ENTREGA_FINAL_2026-10-25.md).
+> [la guía de entrega](../../entrega/ENTREGA_FINAL_2026-10-25.md).
 
 Fecha de revisión: 25 de octubre de 2026
 
@@ -26,7 +26,7 @@ casos ya descargados; la extracción arbitraria y la operación continua siguen
 siendo objetivos del producto, no funciones validadas del prototipo.
 
 La integración de ETc reentrenada y AEMET se describe en
-`docs/INTEGRACION_ETC_AEMET_2026.md`. La app carga los seis modelos versionados,
+`docs/tecnica/INTEGRACION_ETC_AEMET_2026.md`. La app carga los seis modelos versionados,
 pero el cálculo físico conserva la dosis en cinco casos por menor MAE de prueba;
 solo algodón favorece al modelo y está fuera de ciclo en esta revisión.
 

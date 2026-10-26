@@ -22,7 +22,7 @@ Las tareas pendientes y los problemas detectados se registran como issues en Git
 
 ## Documentación del TFM
 
-La memoria del TFM se redacta en los ficheros de la carpeta `docs/memoria` y se actualiza de forma periódica en el repositorio para llevar un histórico de versiones, además de en la plataforma del máster. Cada cita bibliográfica que se incorpora al texto se añade también al registro de citas de `references/bibliografia`, indicando el apartado, la afirmación respaldada y la referencia completa en formato APA.
+La memoria del TFM se redacta en los ficheros de la carpeta `docs/memoria` y se actualiza de forma periódica en el repositorio para llevar un histórico de versiones, además de en la plataforma del máster. La bibliografía definitiva forma parte de la memoria; los registros auxiliares de redacción se conservan únicamente en `docs/historico/bibliografia_trabajo`.
 
 ## Datos y credenciales
 
