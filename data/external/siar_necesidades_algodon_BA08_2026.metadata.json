@@ -1,7 +1,7 @@
 {
   "source": "SiAR - Cálculo de necesidades netas",
   "source_url": "https://servicio.mapa.gob.es/siarweb/necesidadesHidricas/calculo",
-  "retrieved_at": "2026-10-23",
+  "retrieved_at": "2026-10-26",
   "community": "Extremadura",
   "province": "Badajoz",
   "station_code": "BA08",
@@ -9,12 +9,19 @@
   "region": "Don Benito",
   "crop": "Algodón",
   "crop_cycle": "Abr / Sep",
-  "active_months": [4, 5, 6, 7, 8, 9],
+  "active_months": [
+    4,
+    5,
+    6,
+    7,
+    8,
+    9
+  ],
   "frequency": "Diarios",
   "requested_start_date": "2026-04-01",
-  "requested_end_date": "2026-10-23",
+  "requested_end_date": "2026-10-26",
   "first_returned_date": "2026-04-01",
-  "last_returned_date": "2026-10-22",
-  "record_count": 205,
-  "notes": "CSV oficial descargado el 23/10/2026. El 23/10 no estaba publicado. Desde octubre el Kc del algodón figura a cero: no es un caso de riego activo para mañana. No acredita manejo de parcela ni riego real."
+  "last_returned_date": "2026-10-25",
+  "record_count": 208,
+  "notes": "CSV oficial descargado el 26/10/2026; última jornada publicada 25/10/2026. No son riegos reales ni previsiones futuras. La actualización conserva intacto el histórico previamente versionado."
 }

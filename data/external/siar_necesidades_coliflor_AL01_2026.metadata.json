@@ -1,7 +1,7 @@
 {
   "source": "SiAR - Cálculo de necesidades netas",
   "source_url": "https://servicio.mapa.gob.es/siarweb/necesidadesHidricas/calculo",
-  "retrieved_at": "2026-10-23",
+  "retrieved_at": "2026-10-26",
   "community": "Andalucía",
   "province": "Almería",
   "station_code": "AL01",
@@ -9,12 +9,20 @@
   "region": "Dalias",
   "crop": "Coliflor",
   "crop_cycle": "Jun / Dic",
-  "active_months": [6, 7, 8, 9, 10, 11, 12],
+  "active_months": [
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12
+  ],
   "frequency": "Diarios",
   "requested_start_date": "2026-06-01",
-  "requested_end_date": "2026-10-23",
+  "requested_end_date": "2026-10-26",
   "first_returned_date": "2026-06-01",
-  "last_returned_date": "2026-10-22",
-  "record_count": 144,
-  "notes": "CSV oficial descargado el 23/10/2026. El 23/10 no estaba publicado. Octubre pertenece al ciclo SiAR; Kc de 0,99 el 22/10. La proyección de Kc al 24/10 es una hipótesis local, no un valor futuro publicado ni una fecha de siembra acreditada."
+  "last_returned_date": "2026-10-25",
+  "record_count": 147,
+  "notes": "CSV oficial descargado el 26/10/2026; última jornada publicada 25/10/2026. No son riegos reales ni previsiones futuras. La actualización conserva intacto el histórico previamente versionado."
 }

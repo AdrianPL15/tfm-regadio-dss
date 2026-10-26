@@ -44,7 +44,11 @@ class Campaign2026Tests(unittest.TestCase):
         dry = recommend(request, history=extended, metadata=metadata)
         rain = pd.DataFrame({"date": ["2026-10-24"], "issued_at": ["2026-10-23T10:00:00"], "precipitation_mm": [4.0]})
         wet = recommend(request, history=extended, metadata=metadata, forecast=rain)
-        self.assertAlmostEqual(dry.daily["net_need_mm"].iat[0] - wet.daily["net_need_mm"].iat[0], 2.0)
+        expected_wet_need = max(0.0, dry.daily["net_need_mm"].iat[0] - 2.0)
+        self.assertAlmostEqual(
+            wet.daily["net_need_mm"].iat[0], expected_wet_need, places=3
+        )
+        self.assertLess(wet.daily["net_need_mm"].iat[0], dry.daily["net_need_mm"].iat[0])
         self.assertIn("Kc del día", wet.daily["warnings"].iat[0])
 
     def test_coliflor_today_uses_only_previous_siar_observations(self):
