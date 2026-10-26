@@ -103,7 +103,7 @@ complejos no superan al baseline de manera estable.
 - [`04_03_desarrollo_evaluacion_modelo_predictivo.md`](../../memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md)
 - [`arquitectura_sistema_3_2.png`](../../images/arquitectura_sistema_3_2.png)
 - [`model_evaluation_4_3.json`](../../data_samples/model_evaluation_4_3.json)
-- [`AP_DEMO_TUTOR_CAPITULO_4.ipynb`](../../../notebooks/AP_DEMO_TUTOR_CAPITULO_4.ipynb)
+- [`AP_DEMO_TUTOR_CAPITULO_4.ipynb`](../reunion_tutor/AP_DEMO_TUTOR_CAPITULO_4.ipynb)
 - [`TFM_definitivo_2026-10-25.docx`](../../memoria/TFM_definitivo_2026-10-25.docx)
 
 ## 7. Verificación y estado final

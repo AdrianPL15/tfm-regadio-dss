@@ -39,16 +39,11 @@ El uso de ChatGPT/Codex y Claude como herramientas de apoyo se declara en [`docs
 │   ├── memoria/             Memoria definitiva y capítulos fuente
 │   ├── data_samples/        Tablas, métricas y muestras verificables
 │   ├── images/              Figuras reproducibles de la memoria
-│   ├── entregables/         Prácticas previas relacionadas
-│   └── historico/           Auditorías, sesiones y gestión conservadas como archivo
+│   └── historico/           Material previo conservado fuera del recorrido principal
 ├── models/deployed_etc_2026/ Modelos serializados que consulta la aplicación
-├── notebooks/              Cuaderno de recorrido visual para el tutor
 ├── src/                    ETL, variables, modelos, DSS y visualización
 ├── tests/                  Pruebas automáticas
 ├── references/             Registro bibliográfico de apoyo
-├── database/               Estructura reservada para la arquitectura objetivo
-├── dashboards/             Estructura reservada para cuadros de mando futuros
-├── docker/                 Estructura reservada para contenerización futura
 ├── .github/workflows/      Comprobaciones y revisión de datos SiAR
 ├── CONTRIBUTING.md         Flujo de ramas, commits y pull requests
 └── README.md               Punto de entrada del proyecto
@@ -56,7 +51,7 @@ El uso de ChatGPT/Codex y Claude como herramientas de apoyo se declara en [`docs
 
 ## Entorno de desarrollo y tecnologías
 
-El proyecto distingue entre tecnologías ya utilizadas en el prototipo y componentes previstos en la arquitectura final:
+El proyecto distingue entre tecnologías utilizadas en el prototipo y componentes que solo se proponen como evolución futura. Las tecnologías no implementadas se explican en la memoria, sin crear carpetas vacías que puedan confundirse con entregables funcionales:
 
 - Implementado: Python, pandas y NumPy para extracción, normalización, calidad y preparación; scikit-learn y XGBoost para modelado; SHAP para explicabilidad de los modelos de árboles; Matplotlib para evidencias; Streamlit para la aplicación de demostración del DSS; Jupyter y Visual Studio Code para desarrollo; Git y GitHub para versionado.
 - Diseñado o previsto: procesos Python programados, almacenamiento de objetos con capas JSON raw y Parquet curado, una base PostgreSQL o MySQL para información transaccional y Docker para despliegue reproducible.
