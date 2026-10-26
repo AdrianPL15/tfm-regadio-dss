@@ -32,7 +32,21 @@ def extend_recent_kc(
     if history.empty or history["date"].isna().any():
         raise ValueError("No hay una serie SiAR válida para proyectar Kc.")
 
-    last = history.sort_values("date").iloc[-1]
+    # Una consulta retrospectiva solo puede utilizar observaciones que ya
+    # existían en su fecha de emisión. El CSV versionado puede haberse ampliado
+    # después; ignorar esas filas evita fuga temporal y mantiene reproducibles
+    # las simulaciones históricas.
+    available_history = history.copy()
+    available_history["date"] = pd.to_datetime(
+        available_history["date"], errors="raise"
+    ).dt.normalize()
+    available_history = available_history.loc[
+        available_history["date"].dt.date <= as_of
+    ].copy()
+    if available_history.empty:
+        raise ValueError("SiAR no dispone de observaciones anteriores a la consulta.")
+
+    last = available_history.sort_values("date").iloc[-1]
     last_day = pd.Timestamp(last["date"]).date()
     if not as_of - timedelta(days=2) <= last_day <= as_of:
         raise ValueError("SiAR no dispone de un Kc reciente para esta campaña.")
@@ -57,6 +71,8 @@ def extend_recent_kc(
         future.append(row)
     if not future:
         if target_day <= last_day:
-            return history
+            return available_history.reset_index(drop=True)
         raise ValueError("La fecha solicitada queda fuera del mes y ciclo SiAR publicados.")
-    return pd.concat([history, pd.DataFrame(future)], ignore_index=True)
+    return pd.concat(
+        [available_history, pd.DataFrame(future)], ignore_index=True
+    )
