@@ -1,6 +1,6 @@
 # Revisión cruzada de memoria, repositorio y aplicación
 
-Fecha de comprobación: 25 de octubre de 2026.
+Fecha de última comprobación: 26 de octubre de 2026.
 
 ## Qué se ha contrastado
 
@@ -11,14 +11,13 @@ Fecha de comprobación: 25 de octubre de 2026.
 | Necesidad antes de lluvia | El modelo de ETc y la vía `ET0 reciente × Kc` se comparan por caso | `docs/data_samples/etc_model_deployment_2026.json`: la vía física conserva la dosis en cinco casos; el artefacto de algodón puede determinarla si existe observación directa y está en ciclo | Para coliflor se mostró Ridge como contraste y la estimación física como dosis |
 | Lluvia AEMET | Descuento condicional de una fracción supuesta tras estimar ETc | `src/dss/aemet_forecast.py`: hoy solo horas posteriores a la consulta; mañana cobertura de 24 horas; sin mm utilizables no se descuenta | La consulta del 25/10 mostró 0,0 mm para las horas restantes. La app indica la fracción supuesta |
 | Dosis de hoy | Necesidad orientativa del día completo, sin conocer riego ni lluvia ya ocurridos | El motor no lleva balance hídrico de parcela ni historial de riegos aplicados | Aviso visible antes de las métricas; si se ha regado, la cifra requiere ajuste |
-| Validación | El piloto de 2025 se evaluó retrospectivamente frente a referencia SiAR | 13 escenarios documentados; las 104 pruebas automáticas pasaron el 25/10/2026 | La consulta en vivo demuestra funcionamiento, no ahorro ni precisión agronómica en campo |
+| Validación | El piloto de 2025 se evaluó retrospectivamente frente a referencia SiAR | 13 escenarios documentados; las 105 pruebas automáticas pasaron el 26/10/2026 | La consulta en vivo demuestra funcionamiento, no ahorro ni precisión agronómica en campo |
 
 ## Comprobación del entregable escrito
 
 La versión de entrega es `docs/memoria/TFM_definitivo_2026-10-25.docx` y su PDF
-homónimo. El PDF tiene 85 páginas. Los índices se cotejaron contra las páginas
-exportadas: sus 141 entradas se localizaron en la página indicada, sin
-desfases. Se renderizaron y revisaron visualmente las 85 páginas definitivas,
+homónimo. El PDF tiene 90 páginas. Los índices se cotejaron contra las páginas
+exportadas y conservan navegación interna. Se renderizaron y revisaron visualmente las 90 páginas definitivas,
 sin cortes ni solapamientos. Las 36 direcciones externas activas del documento se
 convirtieron en hipervínculos activos y se mantuvo la notación `mm/día` de forma
 uniforme.
@@ -33,7 +32,7 @@ uniforme.
   2025 para medir retrospectivamente su aportación.
 - El horizonte posterior al primer día es orientativo y se recalcula con nuevas
   observaciones. El séptimo día perdió frente a persistencia en el piloto.
-- La suite completa de 104 pruebas pasó; las dos pruebas `AppTest` se ejecutaron fuera del aislamiento local de sockets.
+- La suite completa de 105 pruebas pasó; las dos pruebas `AppTest` se ejecutaron fuera del aislamiento local de sockets.
   `AppTest` necesita crear un canal interno de Windows; dentro de ese entorno
   aislado se bloquea antes de ejecutar la aplicación.
 
