@@ -107,7 +107,7 @@ La cuarta aportación es la reproducibilidad. El repositorio conserva los datos
 del piloto, los informes de evaluación y los módulos que generan las
 principales evidencias cuantitativas y visualizaciones de los capítulos 4 y 5;
 el README documenta los comandos separados
-para ejecutar cada fase. Las 103 pruebas automáticas se han
+para ejecutar cada fase. Las 104 pruebas automáticas se han
 ejecutado correctamente en el entorno local del proyecto y el motor de
 recomendación puede utilizar el CSV oficial versionado sin nuevas credenciales.
 Así, el lector puede comprobar la correspondencia entre la memoria y el código,

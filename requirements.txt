@@ -4,6 +4,7 @@ scipy
 scikit-learn
 joblib
 xgboost
+shap>=0.54,<0.55
 matplotlib
 seaborn
 jupyterlab

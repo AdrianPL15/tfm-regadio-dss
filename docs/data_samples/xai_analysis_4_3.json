@@ -1,0 +1,154 @@
+{
+  "method": "TreeSHAP",
+  "scope": "Random Forest y XGBoost del piloto original de pimiento AL01",
+  "interpretation_warning": "Las contribuciones describen el comportamiento de cada modelo; no demuestran causalidad ni explican por sí solas el error.",
+  "development_rows": 125,
+  "test_rows": 23,
+  "test_start": "2025-09-08",
+  "test_end": "2025-09-30",
+  "test_kc_unique": [
+    0.3
+  ],
+  "models": {
+    "random_forest": {
+      "metrics": {
+        "mae_mm_day": 0.5620453098210163,
+        "rmse_mm_day": 0.5829772329512651,
+        "r2": -20.78024837542737,
+        "bias_mm_day": 0.5620453098210163,
+        "weekly_mae_mm": 3.231760531470843
+      },
+      "expected_value_mm": 4.038335466666667,
+      "top_features": [
+        {
+          "model": "random_forest",
+          "rank": 1,
+          "feature": "crop_coefficient_kc",
+          "feature_label": "Kc",
+          "mean_absolute_shap_mm": 1.8703159578097726,
+          "mean_signed_shap_mm": -1.8703159578097726,
+          "importance_share_pct": 73.40804425251409
+        },
+        {
+          "model": "random_forest",
+          "rank": 2,
+          "feature": "net_irrigation_need_mm_lag_1d",
+          "feature_label": "Necesidad t-1",
+          "mean_absolute_shap_mm": 0.335132877019305,
+          "mean_signed_shap_mm": -0.335132877019305,
+          "importance_share_pct": 13.153632659753889
+        },
+        {
+          "model": "random_forest",
+          "rank": 3,
+          "feature": "day_of_year_cos",
+          "feature_label": "Día del año (coseno)",
+          "mean_absolute_shap_mm": 0.1238146610860131,
+          "mean_signed_shap_mm": -0.1238146610860131,
+          "importance_share_pct": 4.85960250842094
+        },
+        {
+          "model": "random_forest",
+          "rank": 4,
+          "feature": "day_of_year_sin",
+          "feature_label": "Día del año (seno)",
+          "mean_absolute_shap_mm": 0.0627552481945046,
+          "mean_signed_shap_mm": -0.0627552481945046,
+          "importance_share_pct": 2.4630811801094863
+        },
+        {
+          "model": "random_forest",
+          "rank": 5,
+          "feature": "net_irrigation_need_mm_sum_7d",
+          "feature_label": "Suma previa 7 días",
+          "mean_absolute_shap_mm": 0.05488632677043082,
+          "mean_signed_shap_mm": 0.05488632677043082,
+          "importance_share_pct": 2.1542338274972517
+        }
+      ],
+      "worst_local_explanation": {
+        "model": "random_forest",
+        "observed_date": "2025-09-29",
+        "actual_mm": 0.89,
+        "prediction_mm": 1.7191466240557687,
+        "absolute_error_mm": 0.8291466240557687,
+        "base_value_mm": 4.038335466666667,
+        "top_positive_feature": "net_irrigation_need_mm_sum_7d",
+        "top_positive_shap_mm": 0.055027944039522436,
+        "top_negative_feature": "crop_coefficient_kc",
+        "top_negative_shap_mm": -1.8620796625227443,
+        "shap_sum_prediction_mm": 1.719146624055767
+      }
+    },
+    "xgboost": {
+      "metrics": {
+        "mae_mm_day": 0.7655953850953475,
+        "rmse_mm_day": 0.7815517843249131,
+        "r2": -38.144897190244215,
+        "bias_mm_day": 0.7655953850953475,
+        "weekly_mae_mm": 4.402173464298248
+      },
+      "expected_value_mm": 4.024662494659424,
+      "top_features": [
+        {
+          "model": "xgboost",
+          "rank": 1,
+          "feature": "crop_coefficient_kc",
+          "feature_label": "Kc",
+          "mean_absolute_shap_mm": 1.4326243607894233,
+          "mean_signed_shap_mm": -1.4326243607894233,
+          "importance_share_pct": 53.56173968020942
+        },
+        {
+          "model": "xgboost",
+          "rank": 2,
+          "feature": "net_irrigation_need_mm_lag_1d",
+          "feature_label": "Necesidad t-1",
+          "mean_absolute_shap_mm": 0.489715488060661,
+          "mean_signed_shap_mm": -0.489715488060661,
+          "importance_share_pct": 18.30906566074182
+        },
+        {
+          "model": "xgboost",
+          "rank": 3,
+          "feature": "day_of_year_cos",
+          "feature_label": "Día del año (coseno)",
+          "mean_absolute_shap_mm": 0.2985933189806731,
+          "mean_signed_shap_mm": -0.2985933189806731,
+          "importance_share_pct": 11.16355274922156
+        },
+        {
+          "model": "xgboost",
+          "rank": 4,
+          "feature": "net_irrigation_need_mm_sum_7d",
+          "feature_label": "Suma previa 7 días",
+          "mean_absolute_shap_mm": 0.14016940736252329,
+          "mean_signed_shap_mm": 0.14016940736252329,
+          "importance_share_pct": 5.240534444174676
+        },
+        {
+          "model": "xgboost",
+          "rank": 5,
+          "feature": "day_of_year_sin",
+          "feature_label": "Día del año (seno)",
+          "mean_absolute_shap_mm": 0.11324188858270645,
+          "mean_signed_shap_mm": -0.11324188858270645,
+          "importance_share_pct": 4.233791301594193
+        }
+      ],
+      "worst_local_explanation": {
+        "model": "xgboost",
+        "observed_date": "2025-09-29",
+        "actual_mm": 0.89,
+        "prediction_mm": 1.9245092868804932,
+        "absolute_error_mm": 1.034509286880493,
+        "base_value_mm": 4.024662494659424,
+        "top_positive_feature": "net_irrigation_need_mm_sum_7d",
+        "top_positive_shap_mm": 0.14068306982517242,
+        "top_negative_feature": "crop_coefficient_kc",
+        "top_negative_shap_mm": -1.427168607711792,
+        "shap_sum_prediction_mm": 1.9245084347203374
+      }
+    }
+  }
+}

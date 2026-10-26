@@ -46,6 +46,16 @@ ni prueba que una dosis recomendada se haya ejecutado. Cualquier mejora deberá
 validarse en campo; después podría estudiarse un riego deficitario que concentre
 el déficit en fases menos sensibles (Fereres & Soriano, 2007).
 
+Como complemento espacial, podría evaluarse la teledetección de Copernicus
+Sentinel-2 para estimar índices de vegetación como NDVI y observar diferencias
+de vigor dentro de la parcela (Drusch et al., 2012). Estos índices no
+sustituirían automáticamente el Kc de calendario. Servirían para investigar un
+Kc dinámico por cultivo y parcela, calibrado frente a sensores, observaciones de
+campo y ETc de referencia. La nubosidad, la frecuencia de adquisición y la
+resolución disponible deberían tratarse como fuentes de ausencia e
+incertidumbre, de modo que el sistema mantuviera la vía agronómica cuando la
+imagen no fuese representativa.
+
 La segunda prioridad es anticipar cambios de tiempo mediante una ET0 prevista,
 especialmente en los días 4 a 7 del horizonte. El motor ya admite esta entrada,
 de modo que el trabajo pendiente es de datos y de evaluación.
@@ -94,6 +104,15 @@ al., 2016). Esta evaluación puede realizarse con la aplicación actual y
 respondería a una pregunta que el trabajo no ha podido contestar: si las
 explicaciones y los avisos resultan útiles a quienes deben decidir.
 
+La evaluación de uso debería reproducir además las condiciones del campo. Una
+versión orientada al regante tendría que adoptar un diseño mobile-first, alto
+contraste para lectura bajo luz solar, objetivos táctiles amplios y lenguaje
+directo. También debería tolerar conectividad intermitente mediante una vista
+local de la última recomendación válida, mostrando siempre su fecha y vigencia
+para evitar que una dosis almacenada se interprete como actual. Estas decisiones
+se validarían con pruebas de tarea y accesibilidad, no solo mediante una
+revisión estética de la interfaz.
+
 La única forma de cuantificar el ahorro de agua o el efecto sobre la producción
 es un ensayo en campo que registre el riego aplicado, la humedad del suelo y el
 rendimiento en parcelas que sigan la recomendación y en parcelas de control. El
@@ -122,7 +141,53 @@ mediciones de volumen, latencia y coste que demostrasen una limitación del
 enfoque ligero. La aplicación seguiría necesitando un catálogo agronómico
 dinámico, operación, control de acceso y persistencia de consultas.
 
-## 6.3.5. Consideración final
+La decisión de escalar debería incluir una práctica FinOps proporcional al
+producto: registrar coste por estación, cultivo y emisión, junto con consumo de
+API, almacenamiento, cómputo, transferencia y mantenimiento. Para el volumen
+actual, las ejecuciones bajo demanda y los archivos Parquet permiten mantener
+una infraestructura ligera; esta viabilidad debe demostrarse con mediciones,
+no presentarse como coste nulo. Antes de incorporar un motor distribuido se
+compararían coste total, latencia y carga operativa con la solución vigente y
+se fijarían umbrales que justificasen el cambio.
+
+## 6.3.5. Operación, MLOps y control de deriva
+
+La evolución del prototipo exige vigilar la cadena completa, no solo el error
+del modelo. Cada ejecución debería registrar la versión del código, las fuentes,
+la hora de emisión, la vigencia del último dato y la recomendación. Los cambios
+de columnas, tipos, unidades o claves bloquearían la transformación; los datos
+ausentes, duplicados o fuera de rango quedarían como incidencias visibles. Esta
+disciplina evita que dependencias externas y cambios silenciosos acumulen deuda
+técnica en el sistema (Sculley et al., 2015).
+
+La monitorización estadística se separaría por cultivo y estación. Incluiría la
+distribución de las variables, el MAE y el sesgo frente a SiAR, el error de
+lluvia AEMET por horizonte, la latencia y el porcentaje de abstenciones. Una
+alerta persistente abriría una evaluación, pero no desplegaría automáticamente
+un modelo nuevo. El candidato tendría que compararse con el modelo vigente, la
+persistencia y la vía física en un bloque temporal posterior, mantener los
+controles de seguridad y conservar una versión reversible. Mientras no exista
+una referencia de campo, esta vigilancia seguirá limitada a la referencia SiAR
+y no permitirá detectar por sí sola una pérdida agronómica real.
+
+## 6.3.6. Ciencia abierta y principios FAIR
+
+La reutilización académica requiere que cada versión pueda encontrarse,
+comprenderse y reproducirse. El repositorio incorpora un archivo de citación,
+licencia para los activos propios, ficha del conjunto, diccionarios de variables,
+procedencia y comandos de reproducción. Los formatos CSV y JSON, las fechas ISO
+8601 y las claves de estación, cultivo y fecha facilitan la interoperabilidad.
+Estas medidas aplican los principios FAIR sin confundir accesibilidad con
+apertura irrestricta (Wilkinson et al., 2016).
+
+Una versión posterior podría depositarse en Zenodo para obtener un DOI, pero
+solo después de etiquetar una revisión inmutable y comprobar las condiciones de
+redistribución de SiAR y AEMET. La licencia del código no relicencia los datos
+de terceros. El depósito debería incluir la memoria, el código, los requisitos,
+las pruebas, la ficha del conjunto y los metadatos, sin tokens ni respuestas raw
+cuya redistribución no esté autorizada.
+
+## 6.3.7. Consideración final
 
 El trabajo se planteó como la construcción de una cadena completa de datos y
 decisión, con el aprendizaje automático como uno de sus componentes. El piloto

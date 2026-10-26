@@ -9,9 +9,11 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 | 1 | [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía breve de la demostración](docs/DEMO_TFM.md) | Selección de caso, consulta SiAR/AEMET, dosis, explicaciones y CSV descargable. |
 | 2 | [Memoria definitiva en PDF](docs/memoria/TFM_definitivo_2026-10-25.pdf) ([Word editable](docs/memoria/TFM_definitivo_2026-10-25.docx)) | Planteamiento, método, resultados y límites. |
 | 3 | [Código de la interfaz](src/dss/app_streamlit.py), [motor de recomendación](src/dss/engine.py) y [actualización SiAR](src/data/refresh_siar_crop_needs.py) | Implementación que utiliza la aplicación pública. |
-| 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json) y [validación del DSS](docs/data_samples/dss_validation_5_3.json) | Entradas, limpieza y resultados verificables sin ejecutar el proyecto. |
+| 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json), [análisis XAI](docs/data_samples/xai_analysis_4_3.json) y [validación del DSS](docs/data_samples/dss_validation_5_3.json) | Entradas, limpieza, explicabilidad y resultados verificables sin ejecutar el proyecto. |
 
 La [guía de entrega](docs/ENTREGA_FINAL_2026-10-25.md) reúne el recorrido para el evaluador, los archivos principales y los límites científicos que deben explicarse.
+
+La reutilización académica se documenta mediante la [ficha de los datos](docs/DATASET_CARD.md), los [principios FAIR y la citación](docs/FAIR_Y_CITACION.md), el [plan de MLOps y monitorización](docs/MLOPS_MONITORIZACION.md), `CITATION.cff` y las [condiciones de los datos](DATA_LICENSE.md).
 
 La aplicación abre en **Recomendación (hoy o mañana)** y propone hoy por defecto cuando el cultivo está en ciclo y hay una observación SiAR reciente. **Revisión histórica (día cerrado)** utiliza datos observados para analizar días pasados; no mide el riego realmente aplicado. Los demás casos permiten consultar ejemplos históricos, identificados como tales. La [guía de la demostración](docs/DEMO_TFM.md) indica qué enseñar y qué límites explicar al tutor.
 
@@ -83,7 +85,7 @@ El uso de ChatGPT/Codex y Claude como herramientas de apoyo se declara en [`docs
 
 El proyecto distingue entre tecnologías ya utilizadas en el prototipo y componentes previstos en la arquitectura final:
 
-- Implementado: Python, pandas y NumPy para extracción, normalización, calidad y preparación; scikit-learn y XGBoost para modelado; Matplotlib para evidencias; Streamlit para la aplicación de demostración del DSS; Jupyter y Visual Studio Code para desarrollo; Git y GitHub para versionado.
+- Implementado: Python, pandas y NumPy para extracción, normalización, calidad y preparación; scikit-learn y XGBoost para modelado; SHAP para explicabilidad de los modelos de árboles; Matplotlib para evidencias; Streamlit para la aplicación de demostración del DSS; Jupyter y Visual Studio Code para desarrollo; Git y GitHub para versionado.
 - Diseñado o previsto: procesos Python programados, almacenamiento de objetos con capas JSON raw y Parquet curado, una base PostgreSQL o MySQL para información transaccional y Docker para despliegue reproducible.
 - Condicional: un motor SQL distribuido como Trino y, solo si las mediciones de volumen y latencia lo justifican, procesamiento distribuido; no son necesarios para el piloto actual.
 

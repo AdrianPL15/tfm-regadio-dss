@@ -50,6 +50,9 @@ class Campaign2026Tests(unittest.TestCase):
     def test_coliflor_today_uses_only_previous_siar_observations(self):
         case = next(case for case in DEMO_CASES if case.campaign_year == 2026 and case.crop == "Coliflor")
         history, metadata = load_case(case)
+        # Reconstruye la instantánea que estaba disponible antes de que la
+        # actualización diaria incorporase observaciones posteriores.
+        history = history.loc[history["date"] <= pd.Timestamp("2026-10-22")].copy()
         today = date(2026, 10, 23)
         extended = extend_recent_kc(
             history, metadata, target_day=today, as_of=today,
@@ -63,6 +66,25 @@ class Campaign2026Tests(unittest.TestCase):
         )
         self.assertGreater(result.daily["gross_dose_mm"].iat[0], 0)
         self.assertEqual(result.daily["data_last_observed"].iat[0], "2026-10-22")
+
+    def test_future_rows_are_excluded_from_a_retrospective_query(self):
+        case = next(case for case in DEMO_CASES if case.campaign_year == 2026 and case.crop == "Coliflor")
+        history, metadata = load_case(case)
+        snapshot = history.loc[history["date"] <= pd.Timestamp("2026-10-22")].copy()
+        future_row = snapshot.iloc[[-1]].copy()
+        future_row["date"] = pd.Timestamp("2026-10-25")
+        contaminated = pd.concat([snapshot, future_row], ignore_index=True)
+
+        extended = extend_recent_kc(
+            contaminated,
+            metadata,
+            target_day=date(2026, 10, 23),
+            as_of=date(2026, 10, 23),
+        )
+
+        self.assertEqual(extended["date"].max().date(), date(2026, 10, 23))
+        self.assertNotIn(date(2026, 10, 25), extended["date"].dt.date.tolist())
+        self.assertEqual(extended.iloc[-1]["record_status"], "kc_proyectado_mes")
 
     def test_today_observed_keeps_tomorrow_in_requested_horizon(self):
         case = next(case for case in DEMO_CASES if case.campaign_year == 2026 and case.crop == "Coliflor")

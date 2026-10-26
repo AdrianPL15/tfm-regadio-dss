@@ -54,7 +54,7 @@ solo algodón favorece al modelo y está fuera de ciclo en esta revisión.
 - Motor de recomendación con reglas, dosis neta y bruta, conversión opcional a
   volumen, advertencias y explicación; aplicación Streamlit y línea de comandos.
 - Validación técnica frente a SiAR, análisis por horizonte, 13 escenarios y
-  103 pruebas automáticas definidas. La referencia es calculada, no riego real observado.
+  104 pruebas automáticas definidas. La referencia es calculada, no riego real observado.
 
 Los comandos para reproducir cada fase figuran en el README. No existe un único
 comando que regenere íntegramente todas las salidas de los capítulos 4 y 5.
