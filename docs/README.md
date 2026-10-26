@@ -32,4 +32,4 @@ Este directorio distingue los materiales que debe revisar un evaluador de las ev
 
 ## Archivo histórico
 
-`historico/` conserva auditorías anteriores, resúmenes de sesión, pendientes ya superados y el historial previo a la separación del repositorio. Se mantiene por trazabilidad, pero no es documentación de entrega ni describe necesariamente el estado actual.
+`historico/` conserva el anteproyecto, las prácticas previas, materiales de reuniones, auditorías anteriores, resúmenes de sesión, pendientes ya superados y el historial previo a la separación del repositorio. Se mantiene por trazabilidad, pero no es documentación de entrega ni describe necesariamente el estado actual.

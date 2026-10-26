@@ -13,10 +13,8 @@ data/raw/*
 data/interim/*
 data/processed/*
 data/external/*
-!data/raw/.gitkeep
 !data/interim/.gitkeep
 !data/processed/.gitkeep
-!data/external/.gitkeep
 !data/external/siar_necesidades_pimiento_AL01_2025.csv
 !data/external/siar_necesidades_pimiento_AL01_2025.metadata.json
 !data/external/siar_necesidades_maiz_Z06_2025.csv
@@ -38,7 +36,6 @@ data/external/*
 
 # Modelos entrenados (pueden pesar mucho, se gestionan aparte)
 models/*
-!models/.gitkeep
 !models/deployed_etc_2026/
 *.pkl
 *.joblib
@@ -83,9 +80,6 @@ Thumbs.db
 .idea/
 
 # Resultados voluminosos generados automáticamente
-results/figures/*
-results/reports/*
-!results/figures/.gitkeep
-!results/reports/.gitkeep
+results/
 
 TOKEN_SIAR.txt
