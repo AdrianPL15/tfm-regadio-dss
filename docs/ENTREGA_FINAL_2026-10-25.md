@@ -34,4 +34,4 @@ El 26/10/2026 se ejecutaron **105 pruebas correctas**, incluidas la comprobació
 - Los días posteriores al primero son orientativos. No hay histórico de emisiones AEMET alineadas con 2025 ni balance hídrico de la parcela para validarlos prospectivamente.
 - La prioridad de evolución es un balance hídrico de parcela con sensores de humedad, propiedades del suelo y registro del riego realmente aplicado.
 
-La [revisión cruzada](REVISION_CRUZADA_ENTREGA_2026-10-25.md) recoge la comprobación entre memoria, código y aplicación. Las versiones anteriores de la memoria y los guiones editoriales permanecen recuperables en el historial de Git; los archivos señalados arriba son los de entrega.
+La [revisión cruzada](historico/auditorias/REVISION_CRUZADA_ENTREGA_2026-10-25.md) recoge la comprobación entre memoria, código y aplicación. Las versiones anteriores de la memoria y los guiones editoriales permanecen recuperables en el historial de Git; los archivos señalados arriba son los de entrega.

@@ -31,12 +31,12 @@ muestra limitada y evita presentar una mejora artificial.
 
 ## 4. Archivos principales
 
-- [`src/models/train_evaluate.py`](../src/models/train_evaluate.py): entrenamiento, selección y evaluación temporal.
-- [`tests/test_train_evaluate.py`](../tests/test_train_evaluate.py): pruebas de modelado y prevención de fuga.
-- [`docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md`](memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md): texto completo del apartado 4.3.
-- [`docs/data_samples/model_evaluation_4_3.json`](data_samples/model_evaluation_4_3.json): métricas y configuración auditables.
-- [`docs/data_samples/model_predictions_4_3.csv`](data_samples/model_predictions_4_3.csv): predicciones del tramo de prueba.
-- [`docs/memoria/TFM_definitivo_2026-10-25.docx`](memoria/TFM_definitivo_2026-10-25.docx): memoria actualizada.
+- [`src/models/train_evaluate.py`](../../../src/models/train_evaluate.py): entrenamiento, selección y evaluación temporal.
+- [`tests/test_train_evaluate.py`](../../../tests/test_train_evaluate.py): pruebas de modelado y prevención de fuga.
+- [`docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md`](../../memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md): texto completo del apartado 4.3.
+- [`docs/data_samples/model_evaluation_4_3.json`](../../data_samples/model_evaluation_4_3.json): métricas y configuración auditables.
+- [`docs/data_samples/model_predictions_4_3.csv`](../../data_samples/model_predictions_4_3.csv): predicciones del tramo de prueba.
+- [`docs/memoria/TFM_definitivo_2026-10-25.docx`](../../memoria/TFM_definitivo_2026-10-25.docx): memoria actualizada.
 
 ## 5. Reproducción
 

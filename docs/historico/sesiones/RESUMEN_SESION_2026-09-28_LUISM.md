@@ -114,10 +114,10 @@ que el proceso pueda reproducirse.
 
 ## 7. Archivos principales creados
 
-- [`src/features/feature_engineering.py`](../src/features/feature_engineering.py): unión y preparación reproducible de variables.
-- [`tests/test_feature_engineering.py`](../tests/test_feature_engineering.py): pruebas de variables temporales, agronómicas, retardos y calidad.
-- [`docs/memoria/04_02_analisis_exploratorio_preparacion_variables.md`](memoria/04_02_analisis_exploratorio_preparacion_variables.md): texto completo del apartado 4.2.
-- [`docs/memoria/TFM_definitivo_2026-10-25.docx`](memoria/TFM_definitivo_2026-10-25.docx): memoria actualizada con el apartado 4.2.
+- [`src/features/feature_engineering.py`](../../../src/features/feature_engineering.py): unión y preparación reproducible de variables.
+- [`tests/test_feature_engineering.py`](../../../tests/test_feature_engineering.py): pruebas de variables temporales, agronómicas, retardos y calidad.
+- [`docs/memoria/04_02_analisis_exploratorio_preparacion_variables.md`](../../memoria/04_02_analisis_exploratorio_preparacion_variables.md): texto completo del apartado 4.2.
+- [`docs/memoria/TFM_definitivo_2026-10-25.docx`](../../memoria/TFM_definitivo_2026-10-25.docx): memoria actualizada con el apartado 4.2.
 
 ## 8. Reproducción
 

@@ -64,6 +64,7 @@ ENV/
 # Jupyter
 .ipynb_checkpoints/
 .test_tmp/
+tmp/
 
 # Apache Hop (logs y ficheros temporales de ejecución)
 *.hst
