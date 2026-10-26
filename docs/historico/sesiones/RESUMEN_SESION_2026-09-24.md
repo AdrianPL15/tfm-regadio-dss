@@ -29,7 +29,7 @@ conserva la procedencia de cada registro.
 - Aproximadamente 48 horas de predicción municipal horaria.
 
 Los detalles se encuentran en
-[`PRIMERA_EXTRACCION_PILOTO.md`](PRIMERA_EXTRACCION_PILOTO.md).
+[`PRIMERA_EXTRACCION_PILOTO.md`](../../PRIMERA_EXTRACCION_PILOTO.md).
 
 ### Ciclo completo del pimiento
 
@@ -62,8 +62,8 @@ Resultado:
 
 El CSV completo y sus metadatos quedan versionados en:
 
-- [`data/external/siar_necesidades_pimiento_AL01_2025.csv`](../data/external/siar_necesidades_pimiento_AL01_2025.csv)
-- [`data/external/siar_necesidades_pimiento_AL01_2025.metadata.json`](../data/external/siar_necesidades_pimiento_AL01_2025.metadata.json)
+- [`data/external/siar_necesidades_pimiento_AL01_2025.csv`](../../../data/external/siar_necesidades_pimiento_AL01_2025.csv)
+- [`data/external/siar_necesidades_pimiento_AL01_2025.metadata.json`](../../../data/external/siar_necesidades_pimiento_AL01_2025.metadata.json)
 
 ## 3. Tablas normalizadas
 
@@ -121,12 +121,12 @@ La estrategia recomendada es comparar siempre:
 
 ## 6. Archivos principales creados
 
-- [`src/data/extract_pilot.py`](../src/data/extract_pilot.py): primera extracción reproducible.
-- [`src/data/extract_siar_history.py`](../src/data/extract_siar_history.py): histórico por bloques de cuota segura.
-- [`src/data/transform_interim.py`](../src/data/transform_interim.py): normalización y calidad.
-- [`src/visualization/build_etl_visual.py`](../src/visualization/build_etl_visual.py): figura reproducible.
-- [`docs/memoria/04_01_extraccion_transformacion_almacenamiento.md`](memoria/04_01_extraccion_transformacion_almacenamiento.md): texto final del apartado 4.1.
-- [`docs/images/procesamiento_datos_4_1.png`](images/procesamiento_datos_4_1.png): ejemplo visual para la memoria y el equipo.
+- [`src/data/extract_pilot.py`](../../../src/data/extract_pilot.py): primera extracción reproducible.
+- [`src/data/extract_siar_history.py`](../../../src/data/extract_siar_history.py): histórico por bloques de cuota segura.
+- [`src/data/transform_interim.py`](../../../src/data/transform_interim.py): normalización y calidad.
+- [`src/visualization/build_etl_visual.py`](../../../src/visualization/build_etl_visual.py): figura reproducible.
+- [`docs/memoria/04_01_extraccion_transformacion_almacenamiento.md`](../../memoria/04_01_extraccion_transformacion_almacenamiento.md): texto final del apartado 4.1.
+- [`docs/images/procesamiento_datos_4_1.png`](../../images/procesamiento_datos_4_1.png): ejemplo visual para la memoria y el equipo.
 
 ## 7. Reproducción
 

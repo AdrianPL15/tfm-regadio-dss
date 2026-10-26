@@ -34,51 +34,24 @@ El uso de ChatGPT/Codex y Claude como herramientas de apoyo se declara en [`docs
 ## Estructura del repositorio
 
 ```
-├── data/                  Datos del proyecto (se excluyen raw y generados, salvo excepciones públicas aprobadas)
-│   ├── raw/                Datos descargados tal cual llegan de AEMET, SiAR y MITECO
-│   ├── interim/             Datos intermedios, todavía en proceso de limpieza
-│   ├── processed/          Datos ya depurados y listos para el análisis o el modelado
-│   └── external/            Datos auxiliares de terceros que no forman parte del flujo ETL principal
-│
-├── database/               Todo lo relativo al almacenamiento en MySQL
-│   ├── schema/              Scripts de creación de tablas y relaciones
-│   └── etl_apache_hop/      Transformaciones y jobs de Apache Hop
-│
-├── notebooks/              Cuadernos Jupyter de exploración, numerados y con las iniciales del autor
-│
-├── src/                    Código Python reutilizable del proyecto
-│   ├── data/                 Extracción y carga de datos desde las APIs
-│   ├── features/             Construcción de variables (evapotranspiración, retardos, medias móviles...)
-│   ├── models/                Entrenamiento, comparación y evaluación de modelos predictivos
-│   ├── dss/                    Lógica de recomendación del sistema de apoyo a la decisión
-│   └── visualization/       Funciones de apoyo para generar gráficos y figuras
-│
-├── models/                 Modelos entrenados y serializados
-│
-├── results/                Resultados generados por el proyecto
-│   ├── figures/              Gráficos y figuras finales
-│   └── reports/              Informes de evaluación, métricas y análisis
-│
-├── dashboards/              Cuadros de mando (Power BI o Tableau)
-│
-├── docs/                    Documentación del TFM
-│   ├── anteproyecto/         Anteproyecto y propuesta inicial del proyecto
-│   ├── memoria/                Memoria del TFM en curso
-│   ├── entregables_modulos/  Entregas de las distintas prácticas del máster
-│   └── figuras/               Imágenes utilizadas en la documentación
-│
-├── references/              Material de apoyo bibliográfico
-│   └── bibliografia/          Registro de citas y referencias en formato APA
-│
-├── tests/                   Comprobaciones automáticas del código
-├── docker/                  Ficheros de contenedor para el entorno reproducible
-├── .github/workflows/       Automatizaciones (integración continua)
-│
-├── .gitignore
-├── environment.yml
-├── requirements.txt
-├── ORGANIZACION_Y_VERSIONADO.md
-└── README.md
+├── data/                    Instantáneas públicas del piloto y capas locales excluidas
+├── docs/                    Documentación y evidencias (véase docs/README.md)
+│   ├── memoria/             Memoria definitiva y capítulos fuente
+│   ├── data_samples/        Tablas, métricas y muestras verificables
+│   ├── images/              Figuras reproducibles de la memoria
+│   ├── entregables/         Prácticas previas relacionadas
+│   └── historico/           Auditorías, sesiones y gestión conservadas como archivo
+├── models/deployed_etc_2026/ Modelos serializados que consulta la aplicación
+├── notebooks/              Cuaderno de recorrido visual para el tutor
+├── src/                    ETL, variables, modelos, DSS y visualización
+├── tests/                  Pruebas automáticas
+├── references/             Registro bibliográfico de apoyo
+├── database/               Estructura reservada para la arquitectura objetivo
+├── dashboards/             Estructura reservada para cuadros de mando futuros
+├── docker/                 Estructura reservada para contenerización futura
+├── .github/workflows/      Comprobaciones y revisión de datos SiAR
+├── CONTRIBUTING.md         Flujo de ramas, commits y pull requests
+└── README.md               Punto de entrada del proyecto
 ```
 
 ## Entorno de desarrollo y tecnologías
@@ -108,30 +81,15 @@ Para reproducir el entorno de Python se puede usar indistintamente `environment.
 13. Entrenar y comparar Persistencia, Ridge, Random Forest, KNN, SVR y XGBoost con `python -m src.models.train_evaluate`.
 14. Reentrenar por cultivo y estación con los nueve CSV oficiales disponibles de 2025–2026 mediante `python -m src.models.retrain_cases_2026`. Produce [métricas por caso](docs/data_samples/model_retraining_2026.json), [predicciones de prueba](docs/data_samples/model_predictions_retraining_2026.csv) y [comparación visual](docs/images/model_retraining_2026.png); los seis artefactos ajustados se guardan localmente en `models/retrained_2026` y no alimentan Streamlit.
 15. Obtener una recomendación de riego con `python -m src.dss.recommend --fecha 2025-06-28 --horizonte 7 --superficie 1.5`. La salida diaria y el resumen se guardan en CSV y JSON en `results/reports`. Este paso puede ejecutarse sin nuevas credenciales utilizando el CSV oficial versionado.
-16. Abrir la aplicación de demostración con `streamlit run src/dss/app_streamlit.py`. Para compartirla mediante un enlace público, seguir la [guía de despliegue en Streamlit Community Cloud](docs/STREAMLIT_DESPLIEGUE.md). La interfaz permite escoger entre tres casos SiAR de 2025 y seis de 2026; los CSV guardados se pueden explorar sin claves. El botón de consulta actual descarga SiAR sin token y requiere `AEMET_API_KEY` para incorporar la previsión AEMET. Si no se dispone de Streamlit, abrir la [demostración local](docs/DEMO_TFM.md) con `python -m scripts.demo_local`; utiliza el mismo motor y permite probar el caso piloto en el navegador.
+16. Abrir la aplicación con `streamlit run src/dss/app_streamlit.py`. Para compartirla mediante un enlace público, seguir la [guía de despliegue en Streamlit Community Cloud](docs/STREAMLIT_DESPLIEGUE.md). La interfaz permite escoger entre tres casos SiAR de 2025 y seis de 2026; los CSV guardados se pueden explorar sin claves. El botón de consulta actual descarga SiAR sin token y requiere `AEMET_API_KEY` para incorporar la previsión AEMET. Si no se dispone de Streamlit, abrir el [prototipo local](docs/DEMO_TFM.md) con `python -m scripts.demo_local`; utiliza el mismo motor y permite probar el caso piloto en el navegador.
 17. Regenerar la validación del sistema, sus tablas y figuras con `python -m src.analysis.build_validation_5_3` y el esquema del motor con `python -m src.visualization.build_dss_visual`.
 18. Ejecutar las pruebas automáticas con `python -m unittest discover -s tests`.
 
-Las fuentes, variables y controles de calidad del apartado 3.1 se sintetizan en [`docs/memoria/03_01_fuentes_variables_calidad_datos.md`](docs/memoria/03_01_fuentes_variables_calidad_datos.md). Los inventarios técnicos completos se mantienen en [`docs/FUENTE_DATOS_SIAR.md`](docs/FUENTE_DATOS_SIAR.md), [`docs/FUENTE_DATOS_AEMET.md`](docs/FUENTE_DATOS_AEMET.md) y en el [catálogo de variables](docs/data_samples/feature_catalog_4_2.csv), evitando duplicar diccionarios.
-Para reconstruir los resultados sin tokens desde un clon limpio, seguir [`docs/REPRODUCCION_PILOTO.md`](docs/REPRODUCCION_PILOTO.md). El repositorio incluye solo las entradas públicas necesarias del piloto; las demás extracciones siguen excluidas.
-Para repetir el entorno principal comprobado, instalar [`requirements-piloto.txt`](requirements-piloto.txt). La [revisión cruzada de entrega](docs/REVISION_CRUZADA_ENTREGA_2026-10-25.md) recoge la comprobación de memoria, código, pruebas y aplicación pública.
-La arquitectura, las tecnologías y el flujo de información del apartado 3.2 están en [`docs/memoria/03_02_arquitectura_tecnologias_flujo.md`](docs/memoria/03_02_arquitectura_tecnologias_flujo.md), con su [figura reproducible](docs/images/arquitectura_sistema_3_2.png) y el código que la genera en `src/visualization/build_architecture_visual.py`.
-La selección y el tratamiento conjunto de los datos de SiAR y AEMET se documentan en [`docs/ESTRATEGIA_DATOS_DSS.md`](docs/ESTRATEGIA_DATOS_DSS.md).
-Los resultados y las incidencias de la primera carga real se recogen en [`docs/PRIMERA_EXTRACCION_PILOTO.md`](docs/PRIMERA_EXTRACCION_PILOTO.md).
-El texto desarrollado del apartado 4.1 y su ejemplo visual están en [`docs/memoria/04_01_extraccion_transformacion_almacenamiento.md`](docs/memoria/04_01_extraccion_transformacion_almacenamiento.md).
-El desglose reproducible de volumen y calidad está en [`docs/data_samples/etl_volume_summary_4_1.csv`](docs/data_samples/etl_volume_summary_4_1.csv).
-El texto desarrollado del apartado 4.2 y el código de preparación de variables están en [`docs/memoria/04_02_analisis_exploratorio_preparacion_variables.md`](docs/memoria/04_02_analisis_exploratorio_preparacion_variables.md) y `src/features/feature_engineering.py`.
-El resumen de la sesión del apartado 4.2 está en [`docs/RESUMEN_SESION_2026-09-28_LUISM.md`](docs/RESUMEN_SESION_2026-09-28_LUISM.md).
-El desarrollo, los resultados y el resumen del apartado 4.3 están en [`docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md`](docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md), [`docs/data_samples/model_evaluation_4_3.json`](docs/data_samples/model_evaluation_4_3.json) y [`docs/RESUMEN_SESION_2026-09-28_LUISM_4_3.md`](docs/RESUMEN_SESION_2026-09-28_LUISM_4_3.md).
+## Mapa de documentación
 
-La ampliación reproducible a maíz y algodón, con sus métricas y figuras, está en [`docs/EVALUACION_MAIZ_ALGODON_2025.md`](docs/EVALUACION_MAIZ_ALGODON_2025.md).
-La incorporación inicial de AEMET al motor, las pruebas de escenario y la captura de previsiones emitidas se describen en [`docs/INTEGRACION_AEMET_DSS.md`](docs/INTEGRACION_AEMET_DSS.md).
-El cierre conjunto de los capítulos 3 y 4 tras la revisión del tutor se recoge en [`docs/RESUMEN_SESION_2026-10-07.md`](docs/RESUMEN_SESION_2026-10-07.md).
-El diseño del motor de recomendación, la aplicación y la validación del capítulo 5 están en [`docs/memoria/05_01_diseno_sistema_recomendacion.md`](docs/memoria/05_01_diseno_sistema_recomendacion.md), [`docs/memoria/05_02_aplicacion_visualizacion_resultados.md`](docs/memoria/05_02_aplicacion_visualizacion_resultados.md) y [`docs/memoria/05_03_validacion_resultados_analisis_critico.md`](docs/memoria/05_03_validacion_resultados_analisis_critico.md), con el informe reproducible en [`docs/data_samples/dss_validation_5_3.json`](docs/data_samples/dss_validation_5_3.json) y el resumen de trabajo en [`docs/RESUMEN_SESION_2026-10-12_CAPITULO_5.md`](docs/RESUMEN_SESION_2026-10-12_CAPITULO_5.md).
-Las conclusiones del capítulo 6 están en [`docs/memoria/06_01_cumplimiento_objetivos_aportaciones.md`](docs/memoria/06_01_cumplimiento_objetivos_aportaciones.md), [`docs/memoria/06_02_limitaciones_impacto.md`](docs/memoria/06_02_limitaciones_impacto.md) y [`docs/memoria/06_03_mejoras_lineas_futuras.md`](docs/memoria/06_03_mejoras_lineas_futuras.md).
-El estado de la versión presentada y sus evidencias se resumen en [`docs/ENTREGA_FINAL_2026-10-25.md`](docs/ENTREGA_FINAL_2026-10-25.md). Las mejoras posteriores al TFM se describen en el capítulo 6 de la memoria.
+El [índice de documentación](docs/README.md) separa la entrega, las evidencias técnicas, las guías operativas y el archivo histórico. Para revisar el proyecto basta con seguir el recorrido inicial de este README; las notas de sesión y auditorías anteriores se conservan en `docs/historico/`, pero no forman parte del itinerario principal del evaluador.
 
-La forma de trabajar con ramas, commits, push y pull requests se explica en [`CONTRIBUTING.md`](CONTRIBUTING.md). La justificación metodológica para la memoria está en [`docs/memoria/03_03_planificacion_organizacion_proyecto.md`](docs/memoria/03_03_planificacion_organizacion_proyecto.md).
+La forma de trabajar con ramas, commits, push y pull requests se explica en [`CONTRIBUTING.md`](CONTRIBUTING.md). La justificación metodológica se recoge en [`docs/memoria/03_03_planificacion_organizacion_proyecto.md`](docs/memoria/03_03_planificacion_organizacion_proyecto.md).
 
 ## Datos sensibles
 No se almacenan en este repositorio credenciales, contraseñas ni claves de acceso a las APIs. Las variables de entorno se gestionan mediante un fichero `.env` local que queda excluido por el `.gitignore`.

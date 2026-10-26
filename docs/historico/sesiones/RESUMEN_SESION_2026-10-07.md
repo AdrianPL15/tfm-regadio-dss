@@ -37,7 +37,7 @@ de calidad, en lugar de eliminar silenciosamente las filas con incidencias.
 | Tabla analítica processed | 150 × 88 | 148 filas utilizables para modelización. |
 
 Las cifras proceden de
-[`etl_volume_summary_4_1.csv`](data_samples/etl_volume_summary_4_1.csv) y pueden
+[`etl_volume_summary_4_1.csv`](../../data_samples/etl_volume_summary_4_1.csv) y pueden
 regenerarse mediante `src/analysis/build_etl_audit_4_1.py`.
 
 ## 3. Fuentes, variables y calidad
@@ -96,15 +96,15 @@ complejos no superan al baseline de manera estable.
 
 ## 6. Archivos principales
 
-- [`03_01_fuentes_variables_calidad_datos.md`](memoria/03_01_fuentes_variables_calidad_datos.md)
-- [`03_02_arquitectura_tecnologias_flujo.md`](memoria/03_02_arquitectura_tecnologias_flujo.md)
-- [`03_03_planificacion_organizacion_proyecto.md`](memoria/03_03_planificacion_organizacion_proyecto.md)
-- [`04_01_extraccion_transformacion_almacenamiento.md`](memoria/04_01_extraccion_transformacion_almacenamiento.md)
-- [`04_03_desarrollo_evaluacion_modelo_predictivo.md`](memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md)
-- [`arquitectura_sistema_3_2.png`](images/arquitectura_sistema_3_2.png)
-- [`model_evaluation_4_3.json`](data_samples/model_evaluation_4_3.json)
-- [`AP_DEMO_TUTOR_CAPITULO_4.ipynb`](../notebooks/AP_DEMO_TUTOR_CAPITULO_4.ipynb)
-- [`TFM_definitivo_2026-10-25.docx`](memoria/TFM_definitivo_2026-10-25.docx)
+- [`03_01_fuentes_variables_calidad_datos.md`](../../memoria/03_01_fuentes_variables_calidad_datos.md)
+- [`03_02_arquitectura_tecnologias_flujo.md`](../../memoria/03_02_arquitectura_tecnologias_flujo.md)
+- [`03_03_planificacion_organizacion_proyecto.md`](../../memoria/03_03_planificacion_organizacion_proyecto.md)
+- [`04_01_extraccion_transformacion_almacenamiento.md`](../../memoria/04_01_extraccion_transformacion_almacenamiento.md)
+- [`04_03_desarrollo_evaluacion_modelo_predictivo.md`](../../memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md)
+- [`arquitectura_sistema_3_2.png`](../../images/arquitectura_sistema_3_2.png)
+- [`model_evaluation_4_3.json`](../../data_samples/model_evaluation_4_3.json)
+- [`AP_DEMO_TUTOR_CAPITULO_4.ipynb`](../../../notebooks/AP_DEMO_TUTOR_CAPITULO_4.ipynb)
+- [`TFM_definitivo_2026-10-25.docx`](../../memoria/TFM_definitivo_2026-10-25.docx)
 
 ## 7. Verificación y estado final
 
