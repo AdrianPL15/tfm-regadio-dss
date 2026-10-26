@@ -55,6 +55,6 @@ La pantalla permite cambiar fecha, horizonte, sistema y eficiencia de riego, sup
 
 La app pública es la demostración principal. También puede ejecutarse localmente con `streamlit run src/dss/app_streamlit.py` si Streamlit está instalado. La demo histórica evita depender de las APIs durante la presentación; no modifica el método de cálculo.
 
-**Verificación:** el 25/10/2026 pasaron las 104 pruebas automáticas del proyecto, incluida la comprobación XAI y las dos de interfaz Streamlit mediante `AppTest`. Dentro del aislamiento local de sockets estas dos pruebas se bloquean antes de cargar la app; se ejecutaron correctamente en el entorno Windows normal. El recorrido público anterior también se comprobó manualmente en el navegador.
+**Verificación:** el 26/10/2026 pasaron las 105 pruebas automáticas del proyecto, incluidas la comprobación contra fuga temporal, la comprobación XAI y las dos de interfaz Streamlit mediante `AppTest`. Dentro del aislamiento local de sockets estas dos pruebas se bloquean antes de cargar la app; se ejecutaron correctamente en el entorno Windows normal. El recorrido público anterior también se comprobó manualmente en el navegador.
 
 **Alcance:** ninguna pantalla demuestra ahorro de agua, aumento de rendimiento o generalización a otros cultivos y estaciones. Los resultados se contrastan con la necesidad neta calculada por SiAR, no con riegos realmente aplicados ni datos de campo.

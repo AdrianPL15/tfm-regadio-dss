@@ -11,8 +11,9 @@ La memoria tiene contenido en los capítulos 1 a 6. El piloto inicial de
 pimiento en `AL01` (La Mojonera, Almería) durante 2025 permanece como referencia
 de la ETL y del motor. La aplicación Streamlit admite ahora los nueve CSV SiAR
 descargados para tres estaciones, seis cultivos y campañas de 2025 o 2026. El
-experimento predictivo nuevo agrupa esos archivos en seis casos independientes:
-1776 filas de origen y 1584 jornadas completas y activas. La comparación
+experimento predictivo nuevo conserva una instantánea de evaluación cerrada el
+22/10/2026 y agrupa seis casos independientes: 1776 filas de origen y 1584
+jornadas completas y activas. La comparación
 temporal y el reajuste se documentan en `docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md`
 y en `docs/data_samples/model_retraining_2026.json`. No existe un modelo
 único que se haya generalizado a todos los cultivos.
@@ -39,7 +40,7 @@ solo algodón favorece al modelo y está fuera de ciclo en esta revisión.
 | 4. Procesamiento y aprendizaje automático | Piloto original y reentrenamiento independiente en seis casos documentados | Revisar reproducción de cifras y que los resultados no se describan como validación agronómica ni como mejora demostrada. |
 | 5. DSS y resultados | Motor físico y modelos ETc conectados a la app con control comparativo | Validar prospectivamente con usuarios y datos de campo; falta histórico de previsiones alineado. |
 | 6. Conclusiones | Redactado | Revisar con el equipo el grado de cumplimiento de objetivos y las afirmaciones de alcance. |
-| Elementos preliminares y anexos | Revisión de contenido y maquetación completada | La versión candidata actual está en `docs/memoria/TFM_revision_final_2026-10-25.docx` y `docs/memoria/TFM_revision_final_2026-10-25.pdf`. Se revisaron las 85 páginas y los índices con la paginación exportada. El abstract en inglés se eliminó por decisión del equipo. Queda la lectura final del equipo y la confirmación agronómica del encuadre del pimiento. |
+| Elementos preliminares y anexos | Revisión de contenido y maquetación completada | La versión definitiva está en `docs/memoria/TFM_definitivo_2026-10-25.docx` y `docs/memoria/TFM_definitivo_2026-10-25.pdf`. Se revisaron sus 90 páginas y la navegación interna. El abstract en inglés se eliminó por decisión del equipo. Queda la lectura final del equipo. |
 
 ## 3. Qué demuestra el repositorio
 
@@ -54,7 +55,7 @@ solo algodón favorece al modelo y está fuera de ciclo en esta revisión.
 - Motor de recomendación con reglas, dosis neta y bruta, conversión opcional a
   volumen, advertencias y explicación; aplicación Streamlit y línea de comandos.
 - Validación técnica frente a SiAR, análisis por horizonte, 13 escenarios y
-  104 pruebas automáticas definidas. La referencia es calculada, no riego real observado.
+  105 pruebas automáticas definidas. La referencia es calculada, no riego real observado.
 
 Los comandos para reproducir cada fase figuran en el README. No existe un único
 comando que regenere íntegramente todas las salidas de los capítulos 4 y 5.
