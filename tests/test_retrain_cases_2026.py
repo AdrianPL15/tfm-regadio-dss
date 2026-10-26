@@ -18,7 +18,7 @@ class RetrainCases2026Tests(unittest.TestCase):
     def test_missing_meteorology_is_not_relabelled_as_zero(self):
         case = grouped_cases()["algodon_BA08"][-1]
         source, quality = source_for_case(case)
-        self.assertEqual(quality["csv_rows"], 205)
+        self.assertGreaterEqual(quality["csv_rows"], 205)
         self.assertEqual(quality["excluded_incomplete_rows"], 1)
         self.assertEqual(source[TARGET].isna().sum(), 1)
 
@@ -33,8 +33,14 @@ class RetrainCases2026Tests(unittest.TestCase):
             "alcachofa_BA08": 173,
         }
         for key, campaigns in groups.items():
-            active, _ = prepare_group(campaigns)
-            self.assertEqual(len(active), expected[key])
+            active, quality = prepare_group(campaigns)
+            # Los CSV crecen con la actualización diaria. Se conserva el
+            # mínimo validado y se exige que no se pierda ninguna jornada
+            # activa y completa disponible en las fuentes actuales.
+            self.assertGreaterEqual(len(active), expected[key])
+            self.assertEqual(
+                len(active), sum(item["active_complete_rows"] for item in quality)
+            )
             self.assertTrue(active["crop_coefficient_kc"].gt(0).all())
             self.assertTrue(active[TARGET].notna().all())
             self.assertTrue(set(FEATURE_COLUMNS).issubset(active.columns))
