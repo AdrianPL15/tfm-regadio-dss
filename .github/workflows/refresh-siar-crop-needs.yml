@@ -2,6 +2,15 @@ name: Revisar necesidades SiAR 2026
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/refresh-siar-crop-needs.yml'
+      - 'src/data/refresh_siar_crop_needs.py'
+      - 'src/dss/live_calendar.py'
+      - 'tests/test_refresh_siar_crop_needs.py'
+      - 'tests/test_live_calendar_2026.py'
   schedule:
     - cron: '23 9 * * *'
       timezone: Europe/Madrid
