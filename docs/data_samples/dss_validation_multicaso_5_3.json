@@ -1,0 +1,213 @@
+{
+  "objective": "Validación temporal multicaso del motor de recomendación del DSS",
+  "scope": "Tres campañas activas de 2026; evaluación técnica frente a la referencia SiAR",
+  "cases": [
+    {
+      "case_id": "Coliflor_AL01_2026",
+      "crop": "Coliflor",
+      "station_code": "AL01",
+      "station_name": "La Mojonera",
+      "province": "Almería",
+      "campaign_year": 2026,
+      "source_file": "data/external/siar_necesidades_coliflor_AL01_2026.csv",
+      "calendar_start": "2026-06-01",
+      "calendar_end": "2026-10-25",
+      "formula_check": {
+        "days_compared": 147,
+        "max_abs_difference_mm": 0.028
+      },
+      "comparable_days": 146,
+      "development_days": 116,
+      "test_days": 30,
+      "test_start": "2026-09-26",
+      "period_metrics": {
+        "desarrollo": {
+          "dss": {
+            "n": 116,
+            "mae_mm_day": 0.198,
+            "rmse_mm_day": 0.346,
+            "bias_mm_day": 0.047
+          },
+          "persistence": {
+            "n": 116,
+            "mae_mm_day": 0.227,
+            "rmse_mm_day": 0.47,
+            "bias_mm_day": -0.022
+          },
+          "mae_improvement_vs_persistence_pct": 12.8
+        },
+        "prueba": {
+          "dss": {
+            "n": 30,
+            "mae_mm_day": 0.689,
+            "rmse_mm_day": 1.02,
+            "bias_mm_day": 0.302
+          },
+          "persistence": {
+            "n": 30,
+            "mae_mm_day": 0.787,
+            "rmse_mm_day": 1.05,
+            "bias_mm_day": 0.016
+          },
+          "mae_improvement_vs_persistence_pct": 12.5
+        }
+      },
+      "weekly": {
+        "complete_weeks": 20,
+        "mae_mm": 0.962,
+        "max_abs_error_mm": 4.606
+      },
+      "methods_used": {
+        "et0_reciente_kc": 146
+      }
+    },
+    {
+      "case_id": "Alfalfa_Z06_2026",
+      "crop": "Alfalfa",
+      "station_code": "Z06",
+      "station_name": "Ejea de los Caballeros",
+      "province": "Zaragoza",
+      "campaign_year": 2026,
+      "source_file": "data/external/siar_necesidades_alfalfa_Z06_2026.csv",
+      "calendar_start": "2026-03-01",
+      "calendar_end": "2026-10-25",
+      "formula_check": {
+        "days_compared": 239,
+        "max_abs_difference_mm": 0.027
+      },
+      "comparable_days": 238,
+      "development_days": 190,
+      "test_days": 48,
+      "test_start": "2026-09-08",
+      "period_metrics": {
+        "desarrollo": {
+          "dss": {
+            "n": 190,
+            "mae_mm_day": 0.661,
+            "rmse_mm_day": 0.99,
+            "bias_mm_day": 0.052
+          },
+          "persistence": {
+            "n": 190,
+            "mae_mm_day": 0.678,
+            "rmse_mm_day": 0.971,
+            "bias_mm_day": -0.014
+          },
+          "mae_improvement_vs_persistence_pct": 2.5
+        },
+        "prueba": {
+          "dss": {
+            "n": 48,
+            "mae_mm_day": 0.646,
+            "rmse_mm_day": 0.977,
+            "bias_mm_day": 0.313
+          },
+          "persistence": {
+            "n": 48,
+            "mae_mm_day": 0.761,
+            "rmse_mm_day": 1.11,
+            "bias_mm_day": 0.053
+          },
+          "mae_improvement_vs_persistence_pct": 15.1
+        }
+      },
+      "weekly": {
+        "complete_weeks": 34,
+        "mae_mm": 2.895,
+        "max_abs_error_mm": 16.864
+      },
+      "methods_used": {
+        "et0_reciente_kc": 238
+      }
+    },
+    {
+      "case_id": "Alcachofa_BA08_2026",
+      "crop": "Alcachofa",
+      "station_code": "BA08",
+      "station_name": "Don Benito",
+      "province": "Badajoz",
+      "campaign_year": 2026,
+      "source_file": "data/external/siar_necesidades_alcachofa_BA08_2026.csv",
+      "calendar_start": "2026-01-01",
+      "calendar_end": "2026-10-25",
+      "formula_check": {
+        "days_compared": 297,
+        "max_abs_difference_mm": 0.009
+      },
+      "comparable_days": 296,
+      "development_days": 236,
+      "test_days": 60,
+      "test_start": "2026-08-27",
+      "period_metrics": {
+        "desarrollo": {
+          "dss": {
+            "n": 236,
+            "mae_mm_day": 0.237,
+            "rmse_mm_day": 0.484,
+            "bias_mm_day": 0.069
+          },
+          "persistence": {
+            "n": 236,
+            "mae_mm_day": 0.226,
+            "rmse_mm_day": 0.542,
+            "bias_mm_day": -0.004
+          },
+          "mae_improvement_vs_persistence_pct": -4.9
+        },
+        "prueba": {
+          "dss": {
+            "n": 60,
+            "mae_mm_day": 0.548,
+            "rmse_mm_day": 0.854,
+            "bias_mm_day": 0.254
+          },
+          "persistence": {
+            "n": 60,
+            "mae_mm_day": 0.683,
+            "rmse_mm_day": 1.076,
+            "bias_mm_day": -0.014
+          },
+          "mae_improvement_vs_persistence_pct": 19.8
+        }
+      },
+      "weekly": {
+        "complete_weeks": 41,
+        "mae_mm": 1.268,
+        "max_abs_error_mm": 8.693
+      },
+      "methods_used": {
+        "et0_reciente_kc": 296
+      }
+    }
+  ],
+  "aggregate_test": {
+    "pooled_dss": {
+      "n": 138,
+      "mae_mm_day": 0.613,
+      "rmse_mm_day": 0.936,
+      "bias_mm_day": 0.285
+    },
+    "pooled_persistence": {
+      "n": 138,
+      "mae_mm_day": 0.733,
+      "rmse_mm_day": 1.082,
+      "bias_mm_day": 0.016
+    },
+    "macro_mae_dss_mm_day": 0.628,
+    "macro_mae_persistence_mm_day": 0.744,
+    "cases_where_dss_beats_persistence": 3,
+    "total_cases": 3
+  },
+  "method": {
+    "issue_mode": "Recomendación diaria con información disponible hasta t-1",
+    "configured_et0_window_days": 7,
+    "split": "80 % cronológico para desarrollo y 20 % final para prueba en cada caso",
+    "selection": "La ventana no se reajusta por caso ni con el tramo de prueba"
+  },
+  "limitations": [
+    "La referencia es la necesidad neta calculada por SiAR, no el riego aplicado.",
+    "Los tres casos pertenecen a una sola campaña, 2026.",
+    "No se incorporan predicciones AEMET históricas archivadas antes de cada fecha.",
+    "La comparación mide transferencia técnica, no ahorro de agua ni respuesta productiva."
+  ]
+}

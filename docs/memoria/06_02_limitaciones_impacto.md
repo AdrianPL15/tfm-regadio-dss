@@ -17,12 +17,13 @@ que la dosis sea la adecuada para una parcela concreta, cuyo suelo, cubierta,
 marco de plantación y estado del cultivo pueden diferir de los supuestos de la
 estación.
 
-La segunda es de validez externa. Todo se ha evaluado con una estación, un
-cultivo y una campaña. El calendario del pimiento, con saltos bruscos del Kc
-entre fases, favorece precisamente al método propuesto, cuya ventaja sería
-menor en un cultivo con un coeficiente que varíe de forma gradual. El tramo de
-prueba, septiembre, es además atípico: sus necesidades rondan 1 mm diario, por
-lo que sus errores absolutos son poco representativos del verano.
+La segunda es de validez externa. La evaluación detallada se concentra en
+pimiento AL01 durante 2025, aunque se ha añadido una comprobación temporal con
+coliflor AL01, alfalfa Z06 y alcachofa BA08 en 2026. El DSS supera a la
+persistencia en los tres tramos finales reservados, pero cada cultivo adicional
+aporta una sola campaña y no existe una prueba dejando fuera un año completo.
+Por tanto, la ampliación muestra transferencia a tres calendarios y regiones,
+pero no demuestra generalización nacional ni estabilidad interanual.
 
 La tercera afecta a la capacidad predictiva. El sistema no dispone de una ET0
 prevista contrastada. AEMET está integrado y normalizado, pero sus predicciones
@@ -42,9 +43,9 @@ Tampoco conoce si una recomendación anterior llegó a aplicarse, por lo que no
 la trata como riego realizado ni la descuenta de la necesidad posterior. La
 restricción de agua se aplica mediante una reducción proporcional, que no
 reparte el déficit según la sensibilidad de cada fase del cultivo (Fereres &
-Soriano, 2007). La aplicación, por su parte, trabaja con un caso fijo, no
-conserva un histórico de consultas y no se ha probado con agricultores ni
-técnicos.
+Soriano, 2007). La aplicación permite seleccionar nueve combinaciones
+verificadas, pero no conserva un histórico de consultas y no se ha probado con
+agricultores ni técnicos.
 
 La quinta es de arquitectura y supone una desviación respecto al anteproyecto.
 MySQL, Apache Hop, Docker y PySpark no se han implementado, y el cuadro de
@@ -58,7 +59,7 @@ demuestra el flujo de datos y de decisión, no una plataforma desplegable.
 | Limitación | Qué no puede afirmarse todavía | Línea de mejora |
 |---|---|---|
 | Referencia calculada por SiAR, sin riego aplicado ni respuesta del cultivo | Que las dosis sean óptimas para una parcela ni que reduzcan el consumo de agua | Validación en campo (6.3.3) |
-| Una estación, un cultivo y una campaña | Que los resultados se generalicen a otras zonas, cultivos o años | Ampliación de la evidencia (6.3.1) |
+| Tres casos adicionales, pero una sola campaña por cultivo | Que los resultados se generalicen a todo el territorio o a otros años | Ampliación de la evidencia (6.3.1) |
 | Sin ET0 prevista ni histórico de predicciones | Que el sistema anticipe cambios de tiempo en los horizontes largos | ET0 prevista (6.3.2) |
 | Sin balance hídrico del suelo | Que el sistema determine el momento adecuado del riego | Balance hídrico y riego deficitario (6.3.2) |
 | Restricción hídrica introducida como dotación del usuario | Que la recomendación refleje la disponibilidad oficial de agua | Indicadores hidrológicos (6.3.4) |

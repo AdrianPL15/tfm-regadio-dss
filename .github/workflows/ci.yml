@@ -38,3 +38,6 @@ jobs:
 
       - name: Ejecutar pruebas automáticas
         run: python -m unittest discover -s tests
+
+      - name: Regenerar la validación multicaso
+        run: python -m src.analysis.build_validation_multicase_5_3 --output-dir "${{ runner.temp }}/validation" --image-dir "${{ runner.temp }}/images"

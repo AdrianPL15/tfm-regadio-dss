@@ -1,0 +1,4 @@
+case_id,crop,station_code,station_name,province,calendar_start,calendar_end,comparable_days,development_days,test_days,test_start,test_mae_dss_mm_day,test_rmse_dss_mm_day,test_bias_dss_mm_day,test_mae_persistence_mm_day,test_rmse_persistence_mm_day,test_bias_persistence_mm_day,mae_improvement_vs_persistence_pct,weekly_mae_mm
+Coliflor_AL01_2026,Coliflor,AL01,La Mojonera,Almería,2026-06-01,2026-10-25,146,116,30,2026-09-26,0.689,1.02,0.302,0.787,1.05,0.016,12.5,0.962
+Alfalfa_Z06_2026,Alfalfa,Z06,Ejea de los Caballeros,Zaragoza,2026-03-01,2026-10-25,238,190,48,2026-09-08,0.646,0.977,0.313,0.761,1.11,0.053,15.1,2.895
+Alcachofa_BA08_2026,Alcachofa,BA08,Don Benito,Badajoz,2026-01-01,2026-10-25,296,236,60,2026-08-27,0.548,0.854,0.254,0.683,1.076,-0.014,19.8,1.268
