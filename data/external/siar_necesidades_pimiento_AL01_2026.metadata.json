@@ -1,7 +1,7 @@
 {
   "source": "SiAR - Cálculo de necesidades netas",
   "source_url": "https://servicio.mapa.gob.es/siarweb/necesidadesHidricas/calculo",
-  "retrieved_at": "2026-10-26",
+  "retrieved_at": "2026-10-27",
   "community": "Andalucía",
   "province": "Almería",
   "station_code": "AL01",
@@ -18,9 +18,9 @@
   ],
   "frequency": "Diarios",
   "requested_start_date": "2026-05-01",
-  "requested_end_date": "2026-10-26",
+  "requested_end_date": "2026-10-27",
   "first_returned_date": "2026-05-01",
-  "last_returned_date": "2026-10-25",
-  "record_count": 178,
-  "notes": "CSV oficial descargado el 26/10/2026; última jornada publicada 25/10/2026. No son riegos reales ni previsiones futuras. La actualización conserva intacto el histórico previamente versionado."
+  "last_returned_date": "2026-10-26",
+  "record_count": 179,
+  "notes": "CSV oficial descargado el 27/10/2026; última jornada publicada 26/10/2026. No son riegos reales ni previsiones futuras. La actualización conserva intacto el histórico previamente versionado."
 }
