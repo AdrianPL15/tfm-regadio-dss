@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   tests:
-    name: Python 3.11 · 105 pruebas
+    name: Python 3.12 · 105 pruebas
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -27,7 +27,7 @@ jobs:
       - name: Preparar Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '3.12'
           cache: pip
 
       - name: Instalar dependencias
