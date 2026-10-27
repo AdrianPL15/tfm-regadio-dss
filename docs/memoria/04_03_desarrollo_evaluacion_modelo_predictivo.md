@@ -275,7 +275,7 @@ combinaciones. Los retardos proceden únicamente de ETc observada antes del
 día objetivo. La validación temporal selecciona Persistencia en cinco casos y
 Ridge en coliflor. Los resultados, la comparación con el cálculo físico y la
 decisión de uso en Streamlit se documentan en
-[`INTEGRACION_ETC_AEMET_2026.md`](../INTEGRACION_ETC_AEMET_2026.md).
+[`INTEGRACION_ETC_AEMET_2026.md`](../tecnica/INTEGRACION_ETC_AEMET_2026.md).
 
 El cálculo físico obtuvo menor MAE en cinco de los seis tramos de prueba. Por
 ello, los modelos están conectados a la aplicación como estimación contrastable,

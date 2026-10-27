@@ -36,7 +36,7 @@ Cada caso tiene 155 días de desarrollo (01/04–02/09) y 28 días finales de pr
 
 En ambos casos Ridge supera a la persistencia en **esta prueba final concreta**, pero la persistencia obtuvo el menor **MAE medio de los tres cortes** de validación y se mantiene como decisión elegida antes de mirar la prueba. No ganó necesariamente en cada corte individual. Elegir Ridge a posteriori por estos 28 días introduciría sesgo de selección. Como referencia, el experimento original de pimiento AL01 eligió también persistencia (MAE de validación 0,434; MAE de prueba 0,120 mm/día, 148 etiquetas). Las magnitudes entre cultivos no miden transferibilidad: son series, estaciones, ciclos y tramos finales diferentes, y pimiento procede de la tabla analítica original del 4.2.
 
-![Comparación de MAE por modelo y cultivo](images/model_comparison_multicultivo_2025.png)
+![Comparación de MAE por modelo y cultivo](../images/model_comparison_multicultivo_2025.png)
 
 ## Reproducción y límites
 
@@ -47,6 +47,6 @@ python -m src.models.evaluate_crop_cases
 python -m unittest tests.test_evaluate_crop_cases -v
 ```
 
-El script genera el informe íntegro en [`model_evaluation_multicultivo_2025.json`](data_samples/model_evaluation_multicultivo_2025.json), las predicciones diarias y errores de los seis enfoques en [`model_predictions_multicultivo_2025.csv`](data_samples/model_predictions_multicultivo_2025.csv), la figura comparativa anterior y las figuras de predicción de [maíz](images/model_predictions_maiz_Z06_2025.png) y [algodón](images/model_predictions_algodon_BA08_2025.png). El informe incluye los tres cortes, MAE, RMSE, R², sesgo y error semanal de validación/prueba. No requiere token de SiAR ni AEMET porque utiliza las dos instantáneas públicas versionadas; tampoco altera el informe original de pimiento.
+El script genera el informe íntegro en [`model_evaluation_multicultivo_2025.json`](../data_samples/model_evaluation_multicultivo_2025.json), las predicciones diarias y errores de los seis enfoques en [`model_predictions_multicultivo_2025.csv`](../data_samples/model_predictions_multicultivo_2025.csv), la figura comparativa anterior y las figuras de predicción de [maíz](../images/model_predictions_maiz_Z06_2025.png) y [algodón](../images/model_predictions_algodon_BA08_2025.png). El informe incluye los tres cortes, MAE, RMSE, R², sesgo y error semanal de validación/prueba. No requiere token de SiAR ni AEMET porque utiliza las dos instantáneas públicas versionadas; tampoco altera el informe original de pimiento.
 
 La ampliación añade diversidad de cultivos y estaciones, pero cada evaluación sigue disponiendo de **una sola campaña**. No demuestra generalización a otro año, otra finca, otro sistema de cultivo o condiciones meteorológicas nuevas. Los 28 días de prueba coinciden con el final de campaña; el bajo error allí no garantiza el mismo comportamiento en fases de crecimiento ni en episodios de lluvia. Antes de usar el sistema para recomendaciones operativas harían falta más campañas, contraste con riego aplicado, humedad del suelo, respuesta del cultivo y evaluación agronómica independiente.

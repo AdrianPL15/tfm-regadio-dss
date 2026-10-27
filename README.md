@@ -6,30 +6,30 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 
 | Orden | Qué abrir | Qué permite comprobar |
 |---|---|---|
-| 1 | [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía breve de la demostración](docs/DEMO_TFM.md) | Selección de caso, consulta SiAR/AEMET, dosis, explicaciones y CSV descargable. |
+| 1 | [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía breve del prototipo](docs/entrega/DEMO_TFM.md) | Selección de caso, consulta SiAR/AEMET, dosis, explicaciones y CSV descargable. |
 | 2 | [Memoria definitiva en PDF](docs/memoria/TFM_definitivo_2026-10-25.pdf) ([Word editable](docs/memoria/TFM_definitivo_2026-10-25.docx)) | Planteamiento, método, resultados y límites. |
 | 3 | [Código de la interfaz](src/dss/app_streamlit.py), [motor de recomendación](src/dss/engine.py) y [actualización SiAR](src/data/refresh_siar_crop_needs.py) | Implementación que utiliza la aplicación pública. |
 | 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json), [análisis XAI](docs/data_samples/xai_analysis_4_3.json) y [validación del DSS](docs/data_samples/dss_validation_5_3.json) | Entradas, limpieza, explicabilidad y resultados verificables sin ejecutar el proyecto. |
 
-La [guía de entrega](docs/ENTREGA_FINAL_2026-10-25.md) reúne el recorrido para el evaluador, los archivos principales y los límites científicos que deben explicarse.
+La [guía de entrega](docs/entrega/ENTREGA_FINAL_2026-10-25.md) reúne el recorrido para el evaluador, los archivos principales y los límites científicos que deben explicarse.
 
-La reutilización académica se documenta mediante la [ficha de los datos](docs/DATASET_CARD.md), los [principios FAIR y la citación](docs/FAIR_Y_CITACION.md), el [plan de MLOps y monitorización](docs/MLOPS_MONITORIZACION.md), `CITATION.cff` y las [condiciones de los datos](DATA_LICENSE.md).
+La reutilización académica se documenta mediante la [ficha de los datos](docs/tecnica/DATASET_CARD.md), los [principios FAIR y la citación](docs/tecnica/FAIR_Y_CITACION.md), el [plan de MLOps y monitorización](docs/tecnica/MLOPS_MONITORIZACION.md), `CITATION.cff` y las [condiciones de los datos](DATA_LICENSE.md).
 
-La aplicación abre en **Recomendación (hoy o mañana)** y propone hoy por defecto cuando el cultivo está en ciclo y hay una observación SiAR reciente. **Revisión histórica (día cerrado)** utiliza datos observados para analizar días pasados; no mide el riego realmente aplicado. Los demás casos permiten consultar ejemplos históricos, identificados como tales. La [guía de la demostración](docs/DEMO_TFM.md) indica qué enseñar y qué límites explicar al tutor.
+La aplicación abre en **Recomendación (hoy o mañana)** y propone hoy por defecto cuando el cultivo está en ciclo y hay una observación SiAR reciente. **Revisión histórica (día cerrado)** utiliza datos observados para analizar días pasados; no mide el riego realmente aplicado. Los demás casos permiten consultar ejemplos históricos, identificados como tales. La [guía del prototipo](docs/entrega/DEMO_TFM.md) indica qué enseñar y qué límites explicar al tutor.
 
 ## Alcance actual
 
 La visión del producto permite que el usuario elija ubicación, cultivo y periodo para determinar las fuentes y los datos necesarios. El prototipo actual integra SiAR y AEMET mediante una ETL en Python con almacenamiento local por capas. La aplicación de demostración conserva tres combinaciones de 2025 y ofrece seis CSV oficiales de 2026: pimiento y coliflor en `AL01` La Mojonera (Almería), maíz y alfalfa en `Z06` Ejea de los Caballeros (Zaragoza), algodón y alcachofa en `BA08` Don Benito (Badajoz). **No** hay aún selección automática para cualquier estación/cultivo de España. La instantánea versionada el 26/10/2026 contiene observaciones SiAR hasta el 25/10; coliflor, alfalfa y alcachofa mantenían Kc positivo y permitían una estimación orientativa con Kc proyectado y previsión AEMET. La vigencia se verifica de nuevo en cada consulta y la interfaz avisa cuando no procede una predicción actual. Los otros cultivos permanecen como casos históricos. Se han reentrenado y evaluado seis modelos predictivos independientes por cultivo y estación con una instantánea de evaluación cerrada el 22/10/2026; las jornadas operativas posteriores no modifican retrospectivamente esas métricas. [El informe](docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md) distingue esos modelos del motor de reglas que usa Streamlit. No existe un modelo común ni se ha demostrado una mejora general de precisión. Para el piloto se asume pimiento al aire libre; el CSV de SiAR identifica «Pimiento» sin precisar el sistema productivo. La incorporación del Boletín Hidrológico del MITECO y la persistencia operativa permanecen como líneas futuras; la evolución de datos prioriza ingesta ligera, almacenamiento de objetos y Parquet, con una base relacional reservada para usuarios, parcelas y recomendaciones. El sistema está pensado para apoyar, y no sustituir, el criterio agronómico del usuario final.
 
-La app consulta además [modelos de ETc reentrenados](docs/INTEGRACION_ETC_AEMET_2026.md), distintos de los modelos de necesidad neta del experimento original. Compara su estimación previa a lluvia con `ET0 reciente × Kc`; utiliza para la dosis el método que tuvo menor MAE de prueba en cada caso y después aplica la lluvia cuantitativa AEMET, si está disponible. En los tres cultivos activos el método físico fue mejor en esa prueba, por lo que el modelo se muestra como contraste. Esta elección requiere validación prospectiva antes de afirmar que mejora la recomendación.
+La app consulta además [modelos de ETc reentrenados](docs/tecnica/INTEGRACION_ETC_AEMET_2026.md), distintos de los modelos de necesidad neta del experimento original. Compara su estimación previa a lluvia con `ET0 reciente × Kc`; utiliza para la dosis el método que tuvo menor MAE de prueba en cada caso y después aplica la lluvia cuantitativa AEMET, si está disponible. En los tres cultivos activos el método físico fue mejor en esa prueba, por lo que el modelo se muestra como contraste. Esta elección requiere validación prospectiva antes de afirmar que mejora la recomendación.
 
-La aplicación pública se volvió a comprobar el 25/10/2026 sin iniciar sesión, incluida una consulta SiAR/AEMET, un escenario hipotético de lluvia y la descarga del CSV. Los [datos de 2026 y su alcance](docs/CAMPANAS_SIAR_2026.md) complementan los [casos retrospectivos de 2025](docs/DEMO_CASOS_SIAR_2025.md). La aplicación separa la dosis del primer día del panorama provisional de hasta siete días y traduce los mm de riego a L/m², m³/ha y m³ para la parcela. El botón **Actualizar fuentes y generar recomendación** consulta el caso vigente en SiAR y la predicción municipal AEMET, validando la descarga antes de calcular; los CSV versionados siguen siendo instantáneas separadas que requieren su propia actualización.
+La aplicación pública se volvió a comprobar el 25/10/2026 sin iniciar sesión, incluida una consulta SiAR/AEMET, un escenario hipotético de lluvia y la descarga del CSV. Los [datos de 2026 y su alcance](docs/tecnica/CAMPANAS_SIAR_2026.md) complementan los [casos retrospectivos de 2025](docs/tecnica/DEMO_CASOS_SIAR_2025.md). La aplicación separa la dosis del primer día del panorama provisional de hasta siete días y traduce los mm de riego a L/m², m³/ha y m³ para la parcela. El botón **Actualizar fuentes y generar recomendación** consulta el caso vigente en SiAR y la predicción municipal AEMET, validando la descarga antes de calcular; los CSV versionados siguen siendo instantáneas separadas que requieren su propia actualización.
 
 ## Autoría
 
 Luis Moreno Díaz, Adrián Pérez Lombal, Manuel Ramos Alascio y Alicia Santamaría Román. Máster en Data Science, curso 2025 2026.
 
-El uso de ChatGPT/Codex y Claude como herramientas de apoyo se declara en [`docs/USO_ASISTENTES_IA.md`](docs/USO_ASISTENTES_IA.md).
+El uso de ChatGPT/Codex y Claude como herramientas de apoyo se declara en [`docs/entrega/USO_ASISTENTES_IA.md`](docs/entrega/USO_ASISTENTES_IA.md).
 
 ## Estructura del repositorio
 
@@ -37,13 +37,14 @@ El uso de ChatGPT/Codex y Claude como herramientas de apoyo se declara en [`docs
 ├── data/                    Instantáneas públicas del piloto y capas locales excluidas
 ├── docs/                    Documentación y evidencias (véase docs/README.md)
 │   ├── memoria/             Memoria definitiva y capítulos fuente
+│   ├── entrega/             Guía del evaluador, prototipo y declaración de IA
+│   ├── tecnica/             Documentación detallada de datos, modelos y operación
 │   ├── data_samples/        Tablas, métricas y muestras verificables
 │   ├── images/              Figuras reproducibles de la memoria
 │   └── historico/           Material previo conservado fuera del recorrido principal
 ├── models/deployed_etc_2026/ Modelos serializados que consulta la aplicación
 ├── src/                    ETL, variables, modelos, DSS y visualización
 ├── tests/                  Pruebas automáticas
-├── references/             Registro bibliográfico de apoyo
 ├── .github/workflows/      Comprobaciones y revisión de datos SiAR
 ├── CONTRIBUTING.md         Flujo de ramas, commits y pull requests
 └── README.md               Punto de entrada del proyecto
@@ -76,7 +77,7 @@ Para reproducir el entorno de Python se puede usar indistintamente `environment.
 13. Entrenar y comparar Persistencia, Ridge, Random Forest, KNN, SVR y XGBoost con `python -m src.models.train_evaluate`.
 14. Reentrenar por cultivo y estación con los nueve CSV oficiales disponibles de 2025–2026 mediante `python -m src.models.retrain_cases_2026`. Produce [métricas por caso](docs/data_samples/model_retraining_2026.json), [predicciones de prueba](docs/data_samples/model_predictions_retraining_2026.csv) y [comparación visual](docs/images/model_retraining_2026.png); los seis artefactos ajustados se guardan localmente en `models/retrained_2026` y no alimentan Streamlit.
 15. Obtener una recomendación de riego con `python -m src.dss.recommend --fecha 2025-06-28 --horizonte 7 --superficie 1.5`. La salida diaria y el resumen se guardan en CSV y JSON en `results/reports`. Este paso puede ejecutarse sin nuevas credenciales utilizando el CSV oficial versionado.
-16. Abrir la aplicación con `streamlit run src/dss/app_streamlit.py`. Para compartirla mediante un enlace público, seguir la [guía de despliegue en Streamlit Community Cloud](docs/STREAMLIT_DESPLIEGUE.md). La interfaz permite escoger entre tres casos SiAR de 2025 y seis de 2026; los CSV guardados se pueden explorar sin claves. El botón de consulta actual descarga SiAR sin token y requiere `AEMET_API_KEY` para incorporar la previsión AEMET. Si no se dispone de Streamlit, abrir el [prototipo local](docs/DEMO_TFM.md) con `python -m scripts.demo_local`; utiliza el mismo motor y permite probar el caso piloto en el navegador.
+16. Abrir la aplicación con `streamlit run src/dss/app_streamlit.py`. Para compartirla mediante un enlace público, seguir la [guía de despliegue en Streamlit Community Cloud](docs/tecnica/STREAMLIT_DESPLIEGUE.md). La interfaz permite escoger entre tres casos SiAR de 2025 y seis de 2026; los CSV guardados se pueden explorar sin claves. El botón de consulta actual descarga SiAR sin token y requiere `AEMET_API_KEY` para incorporar la previsión AEMET. Si no se dispone de Streamlit, abrir el [prototipo local](docs/entrega/DEMO_TFM.md) con `python -m scripts.demo_local`; utiliza el mismo motor y permite probar el caso piloto en el navegador.
 17. Regenerar la validación del sistema, sus tablas y figuras con `python -m src.analysis.build_validation_5_3` y el esquema del motor con `python -m src.visualization.build_dss_visual`.
 18. Ejecutar las pruebas automáticas con `python -m unittest discover -s tests`.
 

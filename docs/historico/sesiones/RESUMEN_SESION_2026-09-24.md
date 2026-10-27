@@ -29,7 +29,7 @@ conserva la procedencia de cada registro.
 - Aproximadamente 48 horas de predicción municipal horaria.
 
 Los detalles se encuentran en
-[`PRIMERA_EXTRACCION_PILOTO.md`](../../PRIMERA_EXTRACCION_PILOTO.md).
+[`PRIMERA_EXTRACCION_PILOTO.md`](../../tecnica/PRIMERA_EXTRACCION_PILOTO.md).
 
 ### Ciclo completo del pimiento
 

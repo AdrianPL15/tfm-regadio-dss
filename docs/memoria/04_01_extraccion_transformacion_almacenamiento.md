@@ -179,7 +179,7 @@ cargas incrementales sin sobrescribir ejecuciones anteriores. Los archivos raw
 de trabajo no se almacenan por defecto en Git. Como excepción se conserva una
 instantánea pública pequeña del piloto, con observaciones SiAR y una emisión
 AEMET, para reconstruir los resultados sin credenciales. Sus rutas, procedencia
-y huellas SHA-256 están en `docs/REPRODUCCION_PILOTO.md`.
+y huellas SHA-256 están en `docs/tecnica/REPRODUCCION_PILOTO.md`.
 
 ## 4.1.5. Transformación y normalización
 

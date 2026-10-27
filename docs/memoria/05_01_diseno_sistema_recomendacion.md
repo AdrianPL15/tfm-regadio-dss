@@ -143,7 +143,7 @@ como precipitación efectiva medida ni como recomendación agronómica validada.
 La conexión AEMET conserva la fecha de emisión y solo puede emplearse para
 fechas contemporáneas; las predicciones actuales no se combinan con el piloto
 histórico de 2025. Los detalles y límites se documentan en
-`docs/INTEGRACION_AEMET_DSS.md`.
+`docs/tecnica/INTEGRACION_AEMET_DSS.md`.
 
 ## 5.1.4. Reglas de decisión
 
@@ -262,4 +262,4 @@ datos recientes o la previsión cuantitativa, el motor mantiene una salida
 explícita con las advertencias correspondientes. Esta integración se limita al
 primer día; el resto del horizonte conserva el método físico provisional.
 Las cifras y la reproducción se recogen en
-[`INTEGRACION_ETC_AEMET_2026.md`](../INTEGRACION_ETC_AEMET_2026.md).
+[`INTEGRACION_ETC_AEMET_2026.md`](../tecnica/INTEGRACION_ETC_AEMET_2026.md).

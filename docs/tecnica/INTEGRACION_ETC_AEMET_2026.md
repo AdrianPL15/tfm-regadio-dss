@@ -56,7 +56,7 @@ streamlit run src/dss/app_streamlit.py
 ```
 
 El entrenamiento genera el informe
-[`etc_model_deployment_2026.json`](data_samples/etc_model_deployment_2026.json)
+[`etc_model_deployment_2026.json`](../data_samples/etc_model_deployment_2026.json)
 y seis modelos pequeños en `models/deployed_etc_2026/`. Se versionan estos
 artefactos concretos para que Streamlit Community Cloud pueda cargarlos sin
 entrenar al iniciar. La app usa `src/dss/predict_etc.py` para comprobar cultivo,
