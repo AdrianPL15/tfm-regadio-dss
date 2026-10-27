@@ -11,7 +11,7 @@ Esta carpeta está organizada para que la entrega pueda revisarse sin recorrer a
 
 ## Evidencias principales
 
-- `data_samples/`: tablas de volumen, catálogo de variables, métricas y predicciones.
+- `data_samples/`: tablas de volumen, catálogo de variables, métricas y predicciones, incluida la [validación temporal multicaso](data_samples/dss_validation_multicaso_5_3.json).
 - `images/`: figuras reproducibles empleadas en la memoria.
 - `evidencias/`: registro de la comprobación final de Streamlit.
 - `memoria/`: capítulos fuente, Word editable y PDF definitivo.

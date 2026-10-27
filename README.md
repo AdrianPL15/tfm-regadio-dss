@@ -2,7 +2,7 @@
 
 [![Pruebas automáticas](https://github.com/AdrianPL15/tfm-regadio-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/AdrianPL15/tfm-regadio-dss/actions/workflows/ci.yml)
 [![Aplicación Streamlit](https://img.shields.io/badge/Streamlit-aplicación%20pública-FF4B4B?logo=streamlit&logoColor=white)](https://tfm-regadio-dss-adrianpl15.streamlit.app/)
-[![Versión estable](https://img.shields.io/badge/versión-v1.0.4--entrega--final-2ea44f)](https://github.com/AdrianPL15/tfm-regadio-dss/tree/v1.0.4-entrega-final)
+[![Versión estable](https://img.shields.io/badge/versión-v1.0.5--entrega--final-2ea44f)](https://github.com/AdrianPL15/tfm-regadio-dss/tree/v1.0.5-entrega-final)
 
 Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apoyo a la decisión (DSS) orientado a estimar las necesidades de riego de distintos tipos de cultivo a partir de variables meteorológicas, agrometeorológicas e hidrológicas, con el fin de ofrecer recomendaciones de riego comprensibles y trazables para agricultores, cooperativas y gestores de explotaciones.
 
@@ -18,6 +18,8 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 | Escenarios técnicos del DSS | 13 de 13 superados |
 | MAE diario del DSS en la prueba del piloto | 0,09 mm/día |
 | Error semanal relativo del piloto | 4,8 % |
+| Transferencia temporal adicional | 3 de 3 casos por encima de persistencia |
+| MAE agregado de la validación multicaso | 0,613 frente a 0,733 mm/día |
 
 Las métricas evalúan la reproducción de la referencia calculada por SiAR, no el riego óptimo aplicado en una parcela. Por tanto, no demuestran todavía ahorro de agua ni validación agronómica en campo.
 
@@ -34,7 +36,7 @@ El prototipo combina datos SiAR, previsión AEMET, estimaciones físicas, modelo
 | 1 | [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía breve del prototipo](docs/entrega/DEMO_TFM.md) | Selección de caso, consulta SiAR/AEMET, dosis, explicaciones y CSV descargable. |
 | 2 | [Memoria definitiva en PDF](docs/memoria/TFM_definitivo_2026-10-25.pdf) ([Word editable](docs/memoria/TFM_definitivo_2026-10-25.docx)) | Planteamiento, método, resultados y límites. |
 | 3 | [Código de la interfaz](src/dss/app_streamlit.py), [motor de recomendación](src/dss/engine.py) y [actualización SiAR](src/data/refresh_siar_crop_needs.py) | Implementación que utiliza la aplicación pública. |
-| 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json), [análisis XAI](docs/data_samples/xai_analysis_4_3.json) y [validación del DSS](docs/data_samples/dss_validation_5_3.json) | Entradas, limpieza, explicabilidad y resultados verificables sin ejecutar el proyecto. |
+| 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json), [análisis XAI](docs/data_samples/xai_analysis_4_3.json), [validación del piloto](docs/data_samples/dss_validation_5_3.json) y [validación multicaso](docs/data_samples/dss_validation_multicaso_5_3.json) | Entradas, limpieza, explicabilidad y resultados verificables sin ejecutar el proyecto. |
 
 La [guía de entrega](docs/entrega/ENTREGA_FINAL_2026-10-25.md) reúne el recorrido para el evaluador, los archivos principales y los límites científicos que deben explicarse.
 

@@ -305,13 +305,15 @@ Los resultados deben leerse, no obstante, con varias cautelas. La primera es
 que la referencia es la propia SiAR. Un error pequeño frente a ella indica que
 el sistema reproduce bien un cálculo oficial, no que la dosis sea la adecuada
 para una parcela concreta, cuyo suelo, marco de plantación, cubierta y estado
-del cultivo pueden diferir de las hipótesis de la estación. La segunda es que
-todo se ha evaluado con una estación, un cultivo y una campaña. La ventaja del
-sistema en los horizontes largos depende de que existan cambios de fase dentro
-del horizonte, y en un cultivo con un Kc que varíe de forma gradual sería
-menor. La tercera es que el tramo de prueba, septiembre, es atípico: tiene un
-Kc muy bajo, necesidades cercanas a un milímetro y una ET0 en descenso, por lo
-que sus errores absolutos son pequeños y poco representativos del verano.
+del cultivo pueden diferir de las hipótesis de la estación. La evaluación
+detallada anterior corresponde todavía a una estación, un cultivo y una
+campaña. Su ventaja en horizontes largos depende en parte de los cambios de
+fase del pimiento, y el tramo de prueba de septiembre es atípico: tiene un Kc
+muy bajo, necesidades cercanas a un milímetro y una ET0 en descenso. Para
+comprobar si la vía diaria se transfiere a otros calendarios, el apartado
+5.3.10 añade una prueba cronológica con tres cultivos y regiones de 2026. Esta
+ampliación reduce, pero no elimina, la limitación de validez externa porque
+sigue faltando repetir campañas completas en años distintos.
 
 La cuarta cautela se refiere a lo que el sistema no hace. No decide cuándo
 regar, porque sin balance hídrico del suelo todas las necesidades se tratan
@@ -333,12 +335,53 @@ a una referencia, con un error conocido para cada horizonte. La
 valoración de este resultado frente a los objetivos del trabajo se desarrolla
 en el capítulo 6.
 
-## 5.3.10. Reproducibilidad y evidencias
+## 5.3.10. Transferencia temporal a otros cultivos y regiones
+
+La evaluación principal se diseñó sobre el piloto de pimiento AL01 de 2025 y
+permite analizar con detalle cada regla y cada horizonte. Como comprobación de
+transferencia, se repitió la simulación diaria con las tres campañas que
+permanecían activas en octubre de 2026: coliflor en AL01 La Mojonera, alfalfa
+en Z06 Ejea de los Caballeros y alcachofa en BA08 Don Benito. En cada caso el
+80 % cronológicamente inicial se trató como desarrollo y el 20 % final como
+prueba. La ventana de siete días seleccionada con el piloto se mantuvo fija:
+no se reajustó por cultivo ni después de observar el tramo de prueba.
+
+**Tabla 5.8. Validación temporal multicaso a un día frente a la referencia SiAR.**
+
+| Cultivo y estación | Días comparables | Días de prueba | MAE DSS (mm/día) | MAE persistencia (mm/día) | Mejora del MAE |
+|---|---:|---:|---:|---:|---:|
+| Coliflor · AL01 | 146 | 30 | **0,689** | 0,787 | 12,5 % |
+| Alfalfa · Z06 | 238 | 48 | **0,646** | 0,761 | 15,1 % |
+| Alcachofa · BA08 | 296 | 60 | **0,548** | 0,683 | 19,8 % |
+
+![Figura 5.6. MAE de prueba del DSS y la persistencia en tres cultivos y regiones de 2026.](../images/dss_validation_multicaso_5_3.png)
+
+El tramo conjunto de prueba contiene 138 emisiones. El DSS obtiene un MAE
+agregado de 0,613 mm/día y un RMSE de 0,936 mm/día, frente a 0,733 y 1,082
+mm/día para la persistencia. El MAE medio entre casos es de 0,628 mm/día para
+el DSS y de 0,744 mm/día para el baseline. La vía física supera a la
+persistencia en los tres tramos reservados, con mejoras relativas de entre el
+12,5 % y el 19,8 %. En desarrollo, sin embargo, la alcachofa presenta un MAE
+ligeramente peor que la persistencia, 0,237 frente a 0,226 mm/día. Este
+resultado impide presentar la superioridad como universal y refuerza la
+necesidad de evaluar por campaña.
+
+La ampliación aporta evidencia de transferencia temporal a calendarios y
+climas distintos, pero conserva tres límites. Primero, la referencia continúa
+siendo el cálculo de SiAR y no el riego observado. Segundo, cada cultivo aporta
+una sola campaña de 2026. Tercero, la simulación no puede incorporar
+predicciones AEMET históricas emitidas antes de cada fecha. Por ello demuestra
+que el motor reproduce de forma más estable la referencia oficial en estos
+tres casos, no que optimice el agua aplicada ni que vaya a generalizar a todo
+el territorio nacional.
+
+## 5.3.11. Reproducibilidad y evidencias
 
 Las cifras, tablas y figuras de este capítulo se regeneran con:
 
 ```powershell
 python -m src.analysis.build_validation_5_3
+python -m src.analysis.build_validation_multicase_5_3
 python -m src.visualization.build_dss_visual
 python -m unittest discover -s tests
 ```
@@ -346,8 +389,9 @@ python -m unittest discover -s tests
 El primer comando produce el informe completo
 (`docs/data_samples/dss_validation_5_3.json`), los errores por horizonte
 (`dss_horizon_errors_5_3.csv`), los escenarios (`dss_scenarios_5_3.csv`), el
-ejemplo del apartado 5.2 y las Figuras 5.3, 5.4 y 5.5. El segundo genera la
-Figura 5.1 y el tercero ejecuta las 105 pruebas automáticas del
+ejemplo del apartado 5.2 y las Figuras 5.3, 5.4 y 5.5. El segundo produce la
+Tabla 5.8, el informe y el CSV multicaso, además de la Figura 5.6. El tercero
+genera la Figura 5.1 y el cuarto ejecuta las 105 pruebas automáticas del
 proyecto. La captura de la Figura 5.2 se obtiene arrancando la aplicación con
 `streamlit run src/dss/app_streamlit.py` y abriendo la dirección local con los
 parámetros `?fecha=2025-06-28&referencia=1`.
