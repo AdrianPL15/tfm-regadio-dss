@@ -14,7 +14,7 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 | Observaciones activas y completas | 1.584 |
 | Combinaciones cultivo-estación evaluadas | 6 |
 | Enfoques comparados por caso | 6 |
-| Pruebas automáticas | 105 superadas |
+| Pruebas automáticas | 108 superadas |
 | Escenarios técnicos del DSS | 13 de 13 superados |
 | MAE diario del DSS en la prueba del piloto | 0,09 mm/día |
 | Error semanal relativo del piloto | 4,8 % |
@@ -34,7 +34,7 @@ El prototipo combina datos SiAR, previsión AEMET, estimaciones físicas, modelo
 | Orden | Qué abrir | Qué permite comprobar |
 |---|---|---|
 | 1 | [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía breve del prototipo](docs/entrega/DEMO_TFM.md) | Selección de caso, consulta SiAR/AEMET, dosis, explicaciones y CSV descargable. |
-| 2 | [Memoria definitiva en PDF](docs/memoria/TFM_definitivo_2026-10-27.pdf) ([Word editable](docs/memoria/TFM_definitivo_2026-10-27.docx)) | Planteamiento, método, resultados y límites. |
+| 2 | [Memoria definitiva en PDF](docs/memoria/TFM_definitivo_2026-10-28.pdf) ([Word editable](docs/memoria/TFM_definitivo_2026-10-28.docx)) | Planteamiento, método, resultados y límites. |
 | 3 | [Código de la interfaz](src/dss/app_streamlit.py), [motor de recomendación](src/dss/engine.py) y [actualización SiAR](src/data/refresh_siar_crop_needs.py) | Implementación que utiliza la aplicación pública. |
 | 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json), [análisis XAI](docs/data_samples/xai_analysis_4_3.json), [validación del piloto](docs/data_samples/dss_validation_5_3.json) y [validación multicaso](docs/data_samples/dss_validation_multicaso_5_3.json) | Entradas, limpieza, explicabilidad y resultados verificables sin ejecutar el proyecto. |
 

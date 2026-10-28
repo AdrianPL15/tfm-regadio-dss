@@ -199,13 +199,8 @@ manteniendo grupos temporales independientes.
 
 ## 4.3.9. Reproducibilidad y evidencias
 
-El flujo se implementa en `src/models/train_evaluate.py` y se ejecuta con:
-
-```powershell
-python -m src.models.train_evaluate
-```
-
-El comando genera el informe completo de validación y prueba
+El flujo se implementa en el módulo de entrenamiento y evaluación identificado
+en el Anexo A. Su ejecución genera el informe completo de validación y prueba
 (`docs/data_samples/model_evaluation_4_3.json`), las predicciones de los seis
 enfoques para los 23 días finales
 (`docs/data_samples/model_predictions_4_3.csv`), las Figuras 4.6 y 4.7 y el
@@ -265,8 +260,8 @@ y presupone que la necesidad del día anterior ya se conoce. La dosis mostrada
 en Streamlit sigue procediendo del motor agronómico y de reglas, no de estos
 modelos serializados.
 
-El experimento se reproduce con `python -m src.models.retrain_cases_2026`.
-Genera `docs/data_samples/model_retraining_2026.json`,
+El experimento se reproduce con el módulo indicado en el Anexo A. Genera
+`docs/data_samples/model_retraining_2026.json`,
 `docs/data_samples/model_predictions_retraining_2026.csv`, la Figura 4.8 y
 seis artefactos locales excluidos de Git en `models/retrained_2026`.
 
@@ -304,12 +299,12 @@ demuestran causalidad ni bastan por sí solas para explicar el error.
 
 | Modelo | Variable | Contribución media absoluta | Porcentaje del total |
 |---|---|---:|---:|
-| Random Forest | Kc | 1,870 mm/día | 73,4 % |
-| Random Forest | Necesidad t-1 | 0,335 mm/día | 13,2 % |
-| Random Forest | Día del año (coseno) | 0,124 mm/día | 4,9 % |
-| XGBoost | Kc | 1,433 mm/día | 53,6 % |
-| XGBoost | Necesidad t-1 | 0,490 mm/día | 18,3 % |
-| XGBoost | Día del año (coseno) | 0,299 mm/día | 11,2 % |
+| Random Forest | Kc | 1,898 mm/día | 74,0 % |
+| Random Forest | Necesidad t-1 | 0,275 mm/día | 10,7 % |
+| Random Forest | Día del año (coseno) | 0,111 mm/día | 4,3 % |
+| XGBoost | Kc | 1,292 mm/día | 45,2 % |
+| XGBoost | Necesidad t-1 | 0,454 mm/día | 15,9 % |
+| XGBoost | Día del año (coseno) | 0,252 mm/día | 8,8 % |
 
 ![Figura 4.9. Importancia global y explicaciones locales de Random Forest y XGBoost mediante TreeSHAP.](../images/model_xai_4_3.png)
 
@@ -317,21 +312,18 @@ El resultado debe interpretarse junto con la distribución temporal. El periodo
 de desarrollo contiene valores de Kc entre 0,3 y 1,0 y una necesidad media de
 4,041 mm/día, mientras que toda la prueba corresponde a Kc igual a 0,3 y su
 media desciende a 1,130 mm/día. En ambos modelos, Kc y la necesidad del día
-anterior reducen una referencia interna aprendida cercana a 4,0 mm/día, pero
-los árboles no se ajustan completamente al tramo final y mantienen un sesgo
-positivo. La suma de los siete días anteriores aporta además una pequeña
-contribución positiva.
+anterior concentran la mayor parte de la contribución. Las variables de ET0
+pasada aportan información adicional, pero los árboles no se ajustan
+completamente al tramo final y mantienen un sesgo positivo.
 
 La explicación local del 29 de septiembre, el día de mayor error para ambos
 modelos, muestra ese mismo patrón: frente a una referencia SiAR de 0,89 mm/día,
-Random Forest estima 1,72 y XGBoost 1,92 mm/día. Este análisis no convierte el
+Random Forest estima 1,70 y XGBoost 1,95 mm/día. Este análisis no convierte el
 resultado en una relación causal, pero sí permite identificar una dependencia
 fuerte del estado fenológico y de los retardos. La persistencia se adapta mejor
 al nivel local del tramo final porque utiliza directamente la observación más
 reciente. Por tanto, la evidencia XAI refuerza, en lugar de sustituir, la
 decisión de no desplegar los árboles con los datos actuales.
 
-El análisis se reproduce con `python -m src.analysis.build_xai_4_3`. El comando
-genera el informe JSON, las importancias globales, las explicaciones locales y
-la Figura 4.9. Los tres resultados tabulares se conservan en
-`docs/data_samples/`.
+El Anexo A recoge el comando y las rutas que regeneran el informe XAI, las
+importancias globales, las explicaciones locales y la Figura 4.9.

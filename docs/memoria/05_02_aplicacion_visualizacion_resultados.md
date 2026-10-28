@@ -17,15 +17,14 @@ comprobó que la herramienta debía cumplir dos condiciones que un cuadro de
 mando convencional resuelve con dificultad. La primera es interactiva: cambiar
 la fecha de emisión, el horizonte o la eficiencia tiene que volver a ejecutar
 el motor, no solo filtrar una tabla ya calculada. La segunda es de
-reproducibilidad: cualquier miembro del tribunal o del equipo debería poder
+reproducibilidad: cualquier evaluador o miembro del equipo debería poder
 lanzar la aplicación desde el repositorio con las mismas dependencias que el
 resto del proyecto.
 
 Por esas razones se optó por Streamlit, una librería de Python que construye
 la interfaz a partir de un único script y vuelve a ejecutarlo cada vez que el
-usuario modifica un control (Streamlit, 2024). La aplicación se encuentra en
-`src/dss/app_streamlit.py` y se arranca desde la raíz del repositorio con
-`streamlit run src/dss/app_streamlit.py`. Power BI y Tableau quedan como
+usuario modifica un control (Streamlit, 2024). La aplicación y su procedimiento
+de ejecución se identifican en el Anexo A. Power BI y Tableau quedan como
 alternativa para un uso agregado, por ejemplo para una cooperativa que quiera
 comparar parcelas a partir de las recomendaciones archivadas en CSV, pero no
 se presentan como implementados porque no existe un archivo funcional en el
@@ -125,14 +124,10 @@ error medio esperado para cada día del horizonte.
 
 ## 5.2.4. Uso desde la línea de comandos
 
-La misma consulta puede lanzarse sin interfaz, lo que resulta útil para
-programar una recomendación diaria o para integrarla en otro sistema:
-
-```powershell
-python -m src.dss.recommend --fecha 2025-06-28 --horizonte 7 --superficie 1.5
-```
-
-El comando escribe en la consola la explicación de cada día y los totales, y
+La misma consulta puede lanzarse sin interfaz mediante el procedimiento
+documentado en el Anexo A, lo que resulta útil para programar una recomendación
+diaria o integrarla en otro sistema. El comando escribe en la consola la
+explicación de cada día y los totales, y
 guarda la tabla diaria y el resumen en `results/reports` en formato CSV y JSON.
 Los argumentos opcionales permiten indicar otro sistema de riego, una
 eficiencia propia, una dotación semanal, el modo de seguimiento o un archivo

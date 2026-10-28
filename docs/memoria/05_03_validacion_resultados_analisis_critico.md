@@ -272,7 +272,7 @@ apartado 2.3, de que la incertidumbre debe formar parte de la salida.
 Las comprobaciones de la Tabla 5.7 se complementan con veinte pruebas
 definidas en `tests/test_dss_engine.py`. Tras añadir controles de selección
 de archivos, compatibilidad de estación y campaña e integración de la aplicación,
-el repositorio contiene 105 pruebas definidas. Entre otras cosas, verifican que la
+el repositorio contiene 108 pruebas definidas. Entre otras cosas, verifican que la
 planificación no cambia si se alteran los datos posteriores a la fecha de
 emisión, que es la garantía formal de que el sistema no utiliza información
 futura.
@@ -350,11 +350,11 @@ no se reajustó por cultivo ni después de observar el tramo de prueba.
 
 **Tabla 5.8. Validación temporal multicaso a un día frente a la referencia SiAR.**
 
-| Cultivo y estación | Días comparables | Días de prueba | MAE DSS (mm/día) | MAE persistencia (mm/día) | Mejora del MAE |
+| Cultivo y estación | Días comparables | Días de prueba | MAE DSS (mm/día) | MAE persistencia (mm/día) | Diferencia MAE [IC 95 %] (mm/día) |
 |---|---:|---:|---:|---:|---:|
-| Coliflor · AL01 | 146 | 22 | **0,694** | 0,765 | 9,3 % |
-| Alfalfa · Z06 | 238 | 36 | **0,666** | 0,816 | 18,4 % |
-| Alcachofa · BA08 | 175 | 27 | **0,521** | 0,779 | 33,1 % |
+| Coliflor · AL01 | 146 | 22 | **0,694** | 0,765 | 0,071 [−0,194; 0,321] |
+| Alfalfa · Z06 | 238 | 36 | **0,666** | 0,816 | 0,150 [−0,036; 0,345] |
+| Alcachofa · BA08 | 175 | 27 | **0,521** | 0,779 | 0,258 [0,000; 0,540] |
 
 ![Figura 5.6. MAE de prueba del DSS y la persistencia en tres cultivos y regiones de 2026.](../images/dss_validation_multicaso_5_3.png)
 
@@ -367,9 +367,11 @@ persistencia en los tres tramos reservados, con mejoras relativas de entre el
 
 Para no reducir la comparación a un promedio puntual se aplicó un bootstrap
 pareado por bloques temporales de siete días, con 5.000 remuestreos y semilla
-fija. La diferencia observada, MAE de persistencia menos MAE del DSS, fue de
-0,164 mm/día y su intervalo percentil del 95 % quedó entre 0,030 y 0,305
-mm/día. El 99,2 % de los remuestreos favoreció al DSS. Este intervalo refleja
+42. La diferencia observada, MAE de persistencia menos MAE del DSS, fue de
+0,164 mm/día y su intervalo percentil del 95 % quedó entre 0,026 y 0,303
+mm/día. El 99,1 % de los remuestreos favoreció al DSS. Los intervalos por caso
+de la Tabla 5.8 muestran que coliflor y alfalfa todavía incluyen el cero; solo
+alcachofa alcanza un límite inferior no negativo con este remuestreo. Estos intervalos reflejan
 la incertidumbre interna de los tres tramos analizados; no permite extrapolar
 el resultado a otras campañas o años.
 
@@ -384,21 +386,8 @@ el territorio nacional.
 
 ## 5.3.11. Reproducibilidad y evidencias
 
-Las cifras, tablas y figuras de este capítulo se regeneran con:
-
-```powershell
-python -m src.analysis.build_validation_5_3
-python -m src.analysis.build_validation_multicase_5_3
-python -m src.visualization.build_dss_visual
-python -m unittest discover -s tests
-```
-
-El primer comando produce el informe completo
-(`docs/data_samples/dss_validation_5_3.json`), los errores por horizonte
-(`dss_horizon_errors_5_3.csv`), los escenarios (`dss_scenarios_5_3.csv`), el
-ejemplo del apartado 5.2 y las Figuras 5.3, 5.4 y 5.5. El segundo produce la
-Tabla 5.8, el informe y el CSV multicaso, además de la Figura 5.6. El tercero
-genera la Figura 5.1 y el cuarto ejecuta las 105 pruebas automáticas del
-proyecto. La captura de la Figura 5.2 se obtiene arrancando la aplicación con
-`streamlit run src/dss/app_streamlit.py` y abriendo la dirección local con los
-parámetros `?fecha=2025-06-28&referencia=1`.
+El Anexo A reúne los comandos y las rutas que regeneran las cifras, tablas y
+figuras de este capítulo. La secuencia incluye la validación del piloto, la
+comprobación multicaso, la figura del motor y las 108 pruebas automáticas. Esta
+separación mantiene en el cuerpo el razonamiento y concentra la reproducción
+técnica en un único lugar.

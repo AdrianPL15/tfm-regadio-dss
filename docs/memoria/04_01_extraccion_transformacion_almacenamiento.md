@@ -281,8 +281,8 @@ se utilizan 148 observaciones: 125 en desarrollo y 23 en prueba final. AEMET no
 se une todavía al entrenamiento porque la predicción disponible corresponde a
 2026 y el ciclo histórico de SiAR corresponde a 2025.
 
-Estas cifras se regeneran mediante
-`python -m src.analysis.build_etl_audit_4_1` y quedan registradas en
+Estas cifras se regeneran mediante el script de auditoría descrito en el
+Anexo A y quedan registradas en
 `docs/data_samples/etl_volume_summary_4_1.csv`. De esta forma, la tabla de la
 memoria puede contrastarse con los archivos reales del proyecto.
 
@@ -335,15 +335,9 @@ compatible con ejecución local y despliegue cloud.
 
 ## 4.1.10. Reproducibilidad y seguridad
 
-El proceso se reproduce mediante:
-
-```powershell
-python -m src.data.extract_pilot
-python -m src.data.extract_siar_history --start-date 2025-05-01 --end-date 2025-09-30
-python -m src.data.transform_interim --siar-weather-file data/raw/siar/weather/daily/station=AL01/period=2025-05-01_2025-09-30/history__20260924T113344Z.json --crop-needs-file data/external/siar_necesidades_pimiento_AL01_2025.csv
-python -m src.analysis.build_etl_audit_4_1
-python -m src.visualization.build_etl_visual
-```
+El proceso completo puede reproducirse con los comandos y rutas recogidos en
+el Anexo A, evitando interrumpir la exposición metodológica con instrucciones
+operativas extensas.
 
 Las pruebas automatizadas verifican construcción de consultas, fechas, descarga
 en dos pasos, ocultación de credenciales, validación de URLs, estructura de los

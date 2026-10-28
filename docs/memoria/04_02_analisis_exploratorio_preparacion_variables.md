@@ -94,7 +94,8 @@ El conjunto detallado de este apartado es suficiente para verificar el flujo té
 
 ## 4.2.7. Resultados reproducibles
 
-La ejecución de `python -m src.analysis.build_eda_4_2` genera:
+La ejecución del módulo de análisis exploratorio, cuyo comando se recoge en el
+Anexo A, genera:
 
 - `data/processed/modeling_dataset_daily.csv`, tabla completa para modelización, excluida de Git por tratarse de un dato generado.
 - `docs/data_samples/eda_summary_4_2.json`, resumen verificable de cobertura, calidad, objetivo y correlaciones.
