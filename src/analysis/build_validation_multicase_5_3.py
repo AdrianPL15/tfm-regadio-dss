@@ -3,7 +3,8 @@
 Amplía el piloto histórico de pimiento con tres campañas activas de 2026:
 coliflor en AL01, alfalfa en Z06 y alcachofa en BA08. En cada caso se simula
 una recomendación a un día usando solo la información disponible hasta el día
-anterior. El 20 % cronológicamente final se reserva como prueba y no se usa
+anterior. Solo se evalúan jornadas activas (Kc > 0). El 15 % cronológicamente
+final se reserva como prueba y no se usa
 para ajustar la ventana de ET0, que permanece fijada en siete días por el
 experimento original.
 
@@ -34,7 +35,10 @@ from src.dss.engine import campaign_plan
 DATA_SAMPLES = Path("docs/data_samples")
 IMAGES = Path("docs/images")
 ACTIVE_CASE_NAMES = ("Coliflor", "Alfalfa", "Alcachofa")
-TEST_FRACTION = 0.20
+TEST_FRACTION = 0.15
+BOOTSTRAP_REPLICATES = 5_000
+BOOTSTRAP_BLOCK_DAYS = 7
+BOOTSTRAP_SEED = 20261027
 
 
 def _metrics(error: pd.Series) -> dict[str, float | int]:
@@ -44,6 +48,65 @@ def _metrics(error: pd.Series) -> dict[str, float | int]:
         "mae_mm_day": round(float(clean.abs().mean()), 3),
         "rmse_mm_day": round(float(np.sqrt((clean**2).mean())), 3),
         "bias_mm_day": round(float(clean.mean()), 3),
+    }
+
+
+def _paired_block_bootstrap(
+    frame: pd.DataFrame,
+    *,
+    replicates: int = BOOTSTRAP_REPLICATES,
+    block_days: int = BOOTSTRAP_BLOCK_DAYS,
+    seed: int = BOOTSTRAP_SEED,
+) -> dict[str, float | int | str]:
+    """Intervalo del cambio de MAE con remuestreo temporal por bloques.
+
+    El estimando es MAE(persistencia) - MAE(DSS): un valor positivo favorece
+    al DSS. Los bloques conservan parte de la autocorrelación diaria y el
+    remuestreo es estratificado por caso cuando se calcula el agregado.
+    """
+
+    rng = np.random.default_rng(seed)
+    groups = [
+        (
+            group["error_dss_mm"].abs().to_numpy(),
+            group["error_persistence_mm"].abs().to_numpy(),
+        )
+        for _, group in frame.groupby("case_id")
+    ]
+    if not groups:
+        raise ValueError("No hay observaciones para calcular la incertidumbre.")
+
+    differences = np.empty(replicates, dtype=float)
+    for replicate in range(replicates):
+        sampled_dss: list[np.ndarray] = []
+        sampled_persistence: list[np.ndarray] = []
+        for dss_error, persistence_error in groups:
+            n = len(dss_error)
+            effective_block = min(block_days, n)
+            block_starts = rng.integers(0, n, size=int(np.ceil(n / effective_block)))
+            indices = np.concatenate(
+                [(start + np.arange(effective_block)) % n for start in block_starts]
+            )[:n]
+            sampled_dss.append(dss_error[indices])
+            sampled_persistence.append(persistence_error[indices])
+        dss_mae = np.concatenate(sampled_dss).mean()
+        persistence_mae = np.concatenate(sampled_persistence).mean()
+        differences[replicate] = persistence_mae - dss_mae
+
+    observed = (
+        frame["error_persistence_mm"].abs().mean()
+        - frame["error_dss_mm"].abs().mean()
+    )
+    lower, upper = np.quantile(differences, [0.025, 0.975])
+    return {
+        "estimand": "MAE persistencia - MAE DSS; positivo favorece al DSS",
+        "observed_difference_mm_day": round(float(observed), 3),
+        "ci_95_lower_mm_day": round(float(lower), 3),
+        "ci_95_upper_mm_day": round(float(upper), 3),
+        "probability_difference_positive": round(float((differences > 0).mean()), 3),
+        "replicates": replicates,
+        "block_days": block_days,
+        "seed": seed,
     }
 
 
@@ -87,7 +150,7 @@ def evaluate_case(case: CropCase) -> tuple[dict[str, Any], pd.DataFrame]:
         history,
         metadata,
     )
-    comparable = plan.dropna(
+    comparable = plan.loc[plan["kc"] > 0].dropna(
         subset=["net_need_mm", "persistence_baseline_mm", "reference_need_mm"]
     ).sort_values("date").reset_index(drop=True)
     if len(comparable) < 30:
@@ -118,6 +181,8 @@ def evaluate_case(case: CropCase) -> tuple[dict[str, Any], pd.DataFrame]:
             "persistence": persistence,
             "mae_improvement_vs_persistence_pct": round(improvement, 1),
         }
+        if period == "prueba":
+            periods[period]["paired_block_bootstrap"] = _paired_block_bootstrap(group)
 
     weekly_error = _complete_week_error(comparable)
     report = {
@@ -170,7 +235,7 @@ def _plot(summary: pd.DataFrame, output: Path) -> None:
     )
     axis.set_xticks(x, labels)
     axis.set_ylabel("MAE en prueba (mm/día)")
-    axis.set_title("Transferencia temporal del motor a tres cultivos y regiones")
+    axis.set_title("Comprobación cronológica en tres cultivos y regiones")
     axis.spines[["top", "right"]].set_visible(False)
     axis.grid(axis="y", color="#D9E2EC", linewidth=0.6)
     axis.set_axisbelow(True)
@@ -226,6 +291,7 @@ def build(output_dir: Path = DATA_SAMPLES, image_dir: Path = IMAGES) -> dict[str
     pooled_test = pooled[pooled["period"] == "prueba"]
     pooled_dss = _metrics(pooled_test["error_dss_mm"])
     pooled_persistence = _metrics(pooled_test["error_persistence_mm"])
+    pooled_uncertainty = _paired_block_bootstrap(pooled_test)
     macro_dss = round(float(summary["test_mae_dss_mm_day"].mean()), 3)
     macro_persistence = round(float(summary["test_mae_persistence_mm_day"].mean()), 3)
     report = {
@@ -241,18 +307,22 @@ def build(output_dir: Path = DATA_SAMPLES, image_dir: Path = IMAGES) -> dict[str
                 (summary["test_mae_dss_mm_day"] < summary["test_mae_persistence_mm_day"]).sum()
             ),
             "total_cases": int(len(summary)),
+            "paired_block_bootstrap": pooled_uncertainty,
         },
         "method": {
             "issue_mode": "Recomendación diaria con información disponible hasta t-1",
             "configured_et0_window_days": ET0_WINDOW_DAYS,
-            "split": "80 % cronológico para desarrollo y 20 % final para prueba en cada caso",
+            "split": "85 % cronológico para desarrollo y 15 % final para prueba en cada caso",
             "selection": "La ventana no se reajusta por caso ni con el tramo de prueba",
+            "active_day_filter": "Solo jornadas con Kc > 0",
+            "uncertainty": "Bootstrap pareado temporal por bloques de siete días",
         },
         "limitations": [
             "La referencia es la necesidad neta calculada por SiAR, no el riego aplicado.",
             "Los tres casos pertenecen a una sola campaña, 2026.",
             "No se incorporan predicciones AEMET históricas archivadas antes de cada fecha.",
-            "La comparación mide transferencia técnica, no ahorro de agua ni respuesta productiva.",
+            "La comparación mide consistencia técnica entre casos, no ahorro de agua ni respuesta productiva.",
+            "Los intervalos bootstrap describen incertidumbre muestral interna, no generalización a otras campañas.",
         ],
     }
     (output_dir / "dss_validation_multicaso_5_3.json").write_text(

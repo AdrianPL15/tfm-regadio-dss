@@ -82,7 +82,10 @@ disponen de diversidad suficiente para demostrar una mejora estable. La
 validez de la comparación de los seis enfoques del capítulo 4 descansa en dos decisiones documentadas. La primera
 fue excluir la ET0, la ETc y la precipitación efectiva del mismo día, que
 habrían permitido reconstruir el objetivo de forma algebraica y producir
-métricas aparentemente excelentes. La segunda, seleccionar el enfoque antes de
+métricas aparentemente excelentes. Para hacer la comparación más equitativa,
+los algoritmos recibieron también retardos y medias móviles de ET0 calculados
+solo con fechas anteriores; aun así, no mejoraron de forma estable a la
+persistencia. La segunda decisión fue seleccionar el enfoque antes de
 consultar la prueba final. El método ET0 reciente × Kc se desarrolló y evaluó
 después usando las mismas fechas de septiembre; su resultado no constituye una
 validación independiente adicional. Leídos conjuntamente, los capítulos 4 y 5 respaldan

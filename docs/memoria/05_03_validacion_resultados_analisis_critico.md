@@ -306,12 +306,12 @@ que la referencia es la propia SiAR. Un error pequeño frente a ella indica que
 el sistema reproduce bien un cálculo oficial, no que la dosis sea la adecuada
 para una parcela concreta, cuyo suelo, marco de plantación, cubierta y estado
 del cultivo pueden diferir de las hipótesis de la estación. La evaluación
-detallada anterior corresponde todavía a una estación, un cultivo y una
+detallada anterior corresponde al piloto principal de una estación, un cultivo y una
 campaña. Su ventaja en horizontes largos depende en parte de los cambios de
 fase del pimiento, y el tramo de prueba de septiembre es atípico: tiene un Kc
 muy bajo, necesidades cercanas a un milímetro y una ET0 en descenso. Para
-comprobar si la vía diaria se transfiere a otros calendarios, el apartado
-5.3.10 añade una prueba cronológica con tres cultivos y regiones de 2026. Esta
+comprobar su comportamiento en otros calendarios, el apartado
+5.3.10 añade una comprobación cronológica con tres cultivos y regiones de 2026. Esta
 ampliación reduce, pero no elimina, la limitación de validez externa porque
 sigue faltando repetir campañas completas en años distintos.
 
@@ -335,43 +335,50 @@ a una referencia, con un error conocido para cada horizonte. La
 valoración de este resultado frente a los objetivos del trabajo se desarrolla
 en el capítulo 6.
 
-## 5.3.10. Transferencia temporal a otros cultivos y regiones
+## 5.3.10. Comprobación cronológica en otros cultivos y regiones
 
 La evaluación principal se diseñó sobre el piloto de pimiento AL01 de 2025 y
 permite analizar con detalle cada regla y cada horizonte. Como comprobación de
 transferencia, se repitió la simulación diaria con las tres campañas que
 permanecían activas en octubre de 2026: coliflor en AL01 La Mojonera, alfalfa
 en Z06 Ejea de los Caballeros y alcachofa en BA08 Don Benito. En cada caso el
-80 % cronológicamente inicial se trató como desarrollo y el 20 % final como
-prueba. La ventana de siete días seleccionada con el piloto se mantuvo fija:
+85 % cronológicamente inicial se trató como desarrollo y el 15 % final como
+prueba, el mismo criterio del capítulo 4. Solo se evaluaron jornadas activas
+con Kc mayor que cero, para impedir que los días fuera del ciclo mejorasen
+artificialmente las métricas. La ventana de siete días seleccionada con el piloto se mantuvo fija:
 no se reajustó por cultivo ni después de observar el tramo de prueba.
 
 **Tabla 5.8. Validación temporal multicaso a un día frente a la referencia SiAR.**
 
 | Cultivo y estación | Días comparables | Días de prueba | MAE DSS (mm/día) | MAE persistencia (mm/día) | Mejora del MAE |
 |---|---:|---:|---:|---:|---:|
-| Coliflor · AL01 | 146 | 30 | **0,689** | 0,787 | 12,5 % |
-| Alfalfa · Z06 | 238 | 48 | **0,646** | 0,761 | 15,1 % |
-| Alcachofa · BA08 | 296 | 60 | **0,548** | 0,683 | 19,8 % |
+| Coliflor · AL01 | 146 | 22 | **0,694** | 0,765 | 9,3 % |
+| Alfalfa · Z06 | 238 | 36 | **0,666** | 0,816 | 18,4 % |
+| Alcachofa · BA08 | 175 | 27 | **0,521** | 0,779 | 33,1 % |
 
 ![Figura 5.6. MAE de prueba del DSS y la persistencia en tres cultivos y regiones de 2026.](../images/dss_validation_multicaso_5_3.png)
 
-El tramo conjunto de prueba contiene 138 emisiones. El DSS obtiene un MAE
-agregado de 0,613 mm/día y un RMSE de 0,936 mm/día, frente a 0,733 y 1,082
-mm/día para la persistencia. El MAE medio entre casos es de 0,628 mm/día para
-el DSS y de 0,744 mm/día para el baseline. La vía física supera a la
+El tramo conjunto de prueba contiene 85 emisiones. El DSS obtiene un MAE
+agregado de 0,627 mm/día y un RMSE de 1,007 mm/día, frente a 0,791 y 1,169
+mm/día para la persistencia. El MAE medio entre casos es de 0,627 mm/día para
+el DSS y de 0,787 mm/día para el baseline. La vía física supera a la
 persistencia en los tres tramos reservados, con mejoras relativas de entre el
-12,5 % y el 19,8 %. En desarrollo, sin embargo, la alcachofa presenta un MAE
-ligeramente peor que la persistencia, 0,237 frente a 0,226 mm/día. Este
-resultado impide presentar la superioridad como universal y refuerza la
-necesidad de evaluar por campaña.
+9,3 % y el 33,1 %.
 
-La ampliación aporta evidencia de transferencia temporal a calendarios y
+Para no reducir la comparación a un promedio puntual se aplicó un bootstrap
+pareado por bloques temporales de siete días, con 5.000 remuestreos y semilla
+fija. La diferencia observada, MAE de persistencia menos MAE del DSS, fue de
+0,164 mm/día y su intervalo percentil del 95 % quedó entre 0,030 y 0,305
+mm/día. El 99,2 % de los remuestreos favoreció al DSS. Este intervalo refleja
+la incertidumbre interna de los tres tramos analizados; no permite extrapolar
+el resultado a otras campañas o años.
+
+La ampliación aporta una comprobación cronológica en calendarios y
 climas distintos, pero conserva tres límites. Primero, la referencia continúa
 siendo el cálculo de SiAR y no el riego observado. Segundo, cada cultivo aporta
 una sola campaña de 2026. Tercero, la simulación no puede incorporar
 predicciones AEMET históricas emitidas antes de cada fecha. Por ello demuestra
-que el motor reproduce de forma más estable la referencia oficial en estos
+que el motor se aproxima a la referencia oficial con menor MAE en estos
 tres casos, no que optimice el agua aplicada ni que vaya a generalizar a todo
 el territorio nacional.
 

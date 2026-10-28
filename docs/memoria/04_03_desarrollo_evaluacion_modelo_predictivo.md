@@ -19,9 +19,10 @@ disponen de objetivo válido y participan en el experimento.
 De las 88 columnas de la tabla analítica no se introducen todas en los modelos:
 incluyen identificadores, campos de control, variables derivadas de la propia
 etiqueta y meteorología del día que no estaría disponible al emitir una
-predicción. Los nueve predictores utilizados son el coeficiente de cultivo conocido para
+predicción. Los quince predictores utilizados son el coeficiente de cultivo conocido para
 la fecha; la codificación cíclica del día del año; los retardos de 1, 3 y 7 días
-de la necesidad neta; y sus acumulados históricos de 3, 7 y 14 días. Todos
+de la necesidad neta y de la ET0; los acumulados históricos de necesidad de
+3, 7 y 14 días; y las medias previas de ET0 en esas mismas ventanas. Todos
 ellos están disponibles antes del día que se desea estimar. Los retardos se
 calculan por fecha de calendario: si falta el día anterior, el retardo de un
 día queda ausente y no se sustituye por la última fila disponible.
@@ -32,6 +33,9 @@ se aproxima mediante `max(ET0 × Kc − Pe, 0)`; incluir esos campos permitiría
 reconstruir el objetivo de forma algebraica y produciría métricas aparentemente
 buenas sin capacidad predictiva real. Los valores ausentes restantes se imputan
 con la mediana aprendida exclusivamente en cada periodo de entrenamiento.
+La incorporación de ET0 retardada corrige una asimetría de la comparación
+inicial: los algoritmos disponen ahora del mismo tipo de memoria meteorológica
+reciente que utiliza la vía física, pero nunca de la ET0 del día objetivo.
 
 ## 4.3.2. Diseño de validación temporal
 
@@ -112,18 +116,18 @@ el modelo.
 | Enfoque | MAE diario (media ± desv.) | RMSE diario | Sesgo diario | MAE semanal |
 |---|---:|---:|---:|---:|
 | Persistencia | **0,434 ± 0,075** | **0,644** | **0,013** | **0,926** |
-| Ridge | 0,602 ± 0,303 | 0,742 | 0,292 | 2,803 |
-| Random Forest | 1,118 ± 0,090 | 1,385 | -0,432 | 6,396 |
-| KNN | 0,937 ± 0,284 | 1,113 | -0,413 | 5,383 |
-| SVR | 1,052 ± 0,136 | 1,263 | -0,731 | 5,876 |
-| XGBoost | 1,141 ± 0,340 | 1,378 | -0,535 | 6,607 |
+| Ridge | 0,600 ± 0,322 | 0,743 | 0,369 | 2,886 |
+| Random Forest | 1,096 ± 0,095 | 1,372 | -0,422 | 6,268 |
+| KNN | 0,933 ± 0,295 | 1,073 | -0,488 | 5,384 |
+| SVR | 0,944 ± 0,154 | 1,160 | -0,614 | 5,228 |
+| XGBoost | 0,993 ± 0,144 | 1,289 | -0,324 | 5,591 |
 
-La persistencia obtiene el menor MAE medio. Ridge solo supera ligeramente al
-baseline en el tercer corte (0,356 frente a 0,408 mm/día), pero su MAE aumenta
-hasta 1,029 mm/día en el segundo. KNN queda en una posición intermedia, mientras
-que Random Forest, SVR y XGBoost no compensan su mayor complejidad. Ningún
+La persistencia obtiene el menor MAE medio. Ridge sigue siendo el candidato de
+aprendizaje automático más competitivo, pero presenta mayor variabilidad entre
+cortes. KNN queda en una posición intermedia, mientras que Random Forest, SVR
+y XGBoost no compensan su mayor complejidad. Ningún
 algoritmo de aprendizaje supera de forma estable a la persistencia en los tres
-cortes. La Figura 4.6 hace visible esta inestabilidad y justifica seleccionar
+cortes incluso después de incorporar ET0 histórica retardada. La Figura 4.6 hace visible esta inestabilidad y justifica seleccionar
 el baseline antes de consultar la prueba final.
 
 ![Figura 4.6. Estabilidad temporal de los modelos durante la validación y comparación con la prueba final.](../images/model_validation_4_3.png)
@@ -135,14 +139,15 @@ el baseline antes de consultar la prueba final.
 | Enfoque | MAE diario | RMSE diario | R² | Sesgo diario | MAE semanal |
 |---|---:|---:|---:|---:|---:|
 | Persistencia | **0,120** | **0,156** | -0,561 | **-0,000** | **0,172** |
-| Ridge | 0,314 | 0,352 | -6,962 | -0,310 | 1,784 |
-| Random Forest | 0,562 | 0,583 | -20,780 | 0,562 | 3,232 |
-| KNN | 0,544 | 0,562 | -19,211 | 0,544 | 3,128 |
-| SVR | 1,486 | 1,503 | -143,726 | 1,486 | 8,543 |
-| XGBoost | 0,766 | 0,782 | -38,145 | 0,766 | 4,402 |
+| Ridge | 0,201 | 0,237 | -2,602 | -0,097 | 0,775 |
+| Random Forest | 0,560 | 0,577 | -20,311 | 0,560 | 3,219 |
+| KNN | 0,642 | 0,671 | -27,840 | 0,642 | 3,692 |
+| SVR | 1,890 | 1,928 | -237,156 | 1,890 | 10,870 |
+| XGBoost | 0,800 | 0,814 | -41,423 | 0,800 | 4,598 |
 
 La persistencia sigue de cerca la referencia SiAR y no presenta sesgo
-apreciable. Ridge conserva el segundo mejor resultado y tiende a infraestimar
+apreciable. Ridge conserva el segundo mejor resultado y reduce su error al
+disponer de la ET0 reciente, aunque todavía tiende a infraestimar
 conforme avanza septiembre. KNN, Random Forest, SVR y XGBoost sobreestiman el
 tramo final. El R² negativo de la persistencia no contradice su MAE de 0,120
 mm/día: durante la prueba la referencia se concentra en un intervalo estrecho,
@@ -221,7 +226,7 @@ Las fechas incompletas no se convirtieron en ceros y los días fuera del ciclo
 quedaron excluidos de las métricas, para evitar un resultado artificialmente
 favorable al predecir ausencia de cultivo.
 
-Se mantuvieron la variable objetivo, los nueve predictores y los seis enfoques
+Se mantuvieron la variable objetivo, los quince predictores y los seis enfoques
 del apartado 4.3.3. Los retardos se calcularon sobre el calendario antes de
 filtrar los días válidos: el primer día de 2026 no hereda el último valor de
 2025. Para cada combinación se reservó el 15 % final de las jornadas activas
@@ -236,17 +241,17 @@ posterior y no se utiliza en la aplicación Streamlit.
 | Caso | Jornadas activas válidas | Prueba final | Modelo elegido | MAE validación (mm/día) | MAE prueba (mm/día) |
 |---|---:|---:|---|---:|---:|
 | Pimiento AL01, 2025–2026 | 300 | 45 | Persistencia | 0,501 | 0,390 |
-| Coliflor AL01, 2026 | 144 | 22 | Ridge | 0,264 | 0,892 |
+| Coliflor AL01, 2026 | 147 | 23 | Ridge | 0,313 | 0,904 |
 | Maíz Z06, 2025–2026 | 366 | 55 | Persistencia | 0,782 | 0,814 |
 | Algodón BA08, 2025–2026 | 365 | 55 | Persistencia | 0,626 | 0,457 |
-| Alfalfa Z06, 2026 | 236 | 36 | Persistencia | 0,697 | 0,786 |
-| Alcachofa BA08, 2026 | 173 | 26 | Persistencia | 0,475 | 0,896 |
+| Alfalfa Z06, 2026 | 239 | 36 | Persistencia | 0,699 | 0,816 |
+| Alcachofa BA08, 2026 | 176 | 27 | Persistencia | 0,504 | 0,779 |
 
 ![Figura 4.8. MAE del modelo elegido en validación temporal y prueba final para seis casos.](../images/model_retraining_2026.png)
 
 En cinco casos la selección favoreció la persistencia. En coliflor se eligió
-Ridge por validación, pero en la prueba obtuvo 0,892 mm/día frente a 0,885 de
-persistencia; la diferencia no acredita una mejora. El aumento de error entre
+Ridge por validación, pero en la prueba obtuvo 0,904 mm/día; la diferencia
+entre validación y prueba no acredita una mejora estable. El aumento de error entre
 validación y prueba en coliflor y alcachofa advierte de cambios de fase y de la
 escasa estabilidad de una única campaña parcial. Tampoco se comparan los MAE
 de esta tabla con los de la Tabla 4.14 como si compartieran el mismo tramo de

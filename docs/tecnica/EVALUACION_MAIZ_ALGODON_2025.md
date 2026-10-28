@@ -13,7 +13,7 @@ Son descargas CSV del cálculo de necesidades netas de [SiAR](https://servicio.m
 
 ## Protocolo
 
-Se reutiliza `src/models/train_evaluate.py`, con el mismo objetivo y los mismos nueve predictores que en pimiento: Kc, seno/coseno del día del año y retardos/sumas de la necesidad neta de días anteriores. No se introducen ET0, ETc, Pe ni necesidad neta del propio día entre los predictores, porque darían información no disponible en el instante de predicción o fuga de la fórmula de la etiqueta. Las variables históricas se generan en un calendario diario completo, siempre desplazadas al menos un día.
+Se reutiliza `src/models/train_evaluate.py`, con el mismo objetivo y los mismos quince predictores seguros que en pimiento: Kc, seno/coseno del día del año, retardos y medias previas de la necesidad neta, y retardos y medias previas de ET0. No se introducen ET0, ETc, Pe ni necesidad neta del propio día entre los predictores, porque darían información no disponible en el instante de predicción o fuga de la fórmula de la etiqueta. Las variables históricas se generan en un calendario diario completo y se desplazan al menos un día.
 
 Cada caso tiene 155 días de desarrollo (01/04–02/09) y 28 días finales de prueba (03/09–30/09). En el desarrollo se hacen tres cortes cronológicos con ventana de entrenamiento expansiva. Se selecciona el modelo con menor MAE medio de validación y solo después se mide en el tramo final reservado. Se comparan persistencia de un día, Ridge, Random Forest, KNN, SVR y XGBoost; las configuraciones y la semilla fija son las mismas del piloto. La persistencia en prueba utiliza la referencia **ya conocida del día anterior**: es una evaluación rodante a un día, no una predicción recursiva de 28 días.
 
@@ -22,19 +22,19 @@ Cada caso tiene 155 días de desarrollo (01/04–02/09) y 28 días finales de pr
 | Caso | Modelo | MAE medio validación (mm/día) | MAE prueba (mm/día) |
 | --- | --- | ---: | ---: |
 | Maíz Z06 | Persistencia **(seleccionado)** | **1,022** | 0,725 |
-| Maíz Z06 | Ridge (mejor candidato ML) | 1,371 | **0,519** |
-| Maíz Z06 | Random Forest | 1,646 | 1,133 |
-| Maíz Z06 | KNN | 1,879 | 1,588 |
-| Maíz Z06 | SVR | 2,349 | 0,778 |
-| Maíz Z06 | XGBoost | 1,909 | 0,757 |
+| Maíz Z06 | Ridge (mejor candidato ML en validación) | 1,347 | 0,588 |
+| Maíz Z06 | Random Forest | 1,617 | 1,107 |
+| Maíz Z06 | KNN | 1,857 | 1,226 |
+| Maíz Z06 | SVR | 2,398 | **0,586** |
+| Maíz Z06 | XGBoost | 1,818 | 0,676 |
 | Algodón BA08 | Persistencia **(seleccionado)** | **0,776** | 0,458 |
-| Algodón BA08 | Ridge (mejor candidato ML) | 1,250 | **0,355** |
-| Algodón BA08 | Random Forest | 1,918 | 0,703 |
-| Algodón BA08 | KNN | 2,279 | 0,776 |
-| Algodón BA08 | SVR | 2,323 | 0,580 |
-| Algodón BA08 | XGBoost | 2,430 | 0,596 |
+| Algodón BA08 | Ridge (mejor candidato ML en validación) | 1,623 | **0,434** |
+| Algodón BA08 | Random Forest | 1,808 | 0,636 |
+| Algodón BA08 | KNN | 2,243 | 1,073 |
+| Algodón BA08 | SVR | 2,365 | **0,434** |
+| Algodón BA08 | XGBoost | 2,264 | 0,520 |
 
-En ambos casos Ridge supera a la persistencia en **esta prueba final concreta**, pero la persistencia obtuvo el menor **MAE medio de los tres cortes** de validación y se mantiene como decisión elegida antes de mirar la prueba. No ganó necesariamente en cada corte individual. Elegir Ridge a posteriori por estos 28 días introduciría sesgo de selección. Como referencia, el experimento original de pimiento AL01 eligió también persistencia (MAE de validación 0,434; MAE de prueba 0,120 mm/día, 148 etiquetas). Las magnitudes entre cultivos no miden transferibilidad: son series, estaciones, ciclos y tramos finales diferentes, y pimiento procede de la tabla analítica original del 4.2.
+En ambos casos algún algoritmo obtiene un MAE ligeramente menor que persistencia en **esta prueba final concreta** (SVR en maíz; Ridge y SVR en algodón), pero persistencia obtuvo el menor **MAE medio de los tres cortes** de validación y se mantiene como decisión elegida antes de mirar la prueba. No ganó necesariamente en cada corte individual. Elegir otro algoritmo a posteriori por estos 28 días introduciría sesgo de selección. Como referencia, el experimento original de pimiento AL01 eligió también persistencia (MAE de validación 0,434; MAE de prueba 0,120 mm/día, 148 etiquetas). Las magnitudes entre cultivos no miden transferibilidad: son series, estaciones, ciclos y tramos finales diferentes, y pimiento procede de la tabla analítica original del 4.2.
 
 ![Comparación de MAE por modelo y cultivo](../images/model_comparison_multicultivo_2025.png)
 

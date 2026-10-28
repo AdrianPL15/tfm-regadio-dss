@@ -90,7 +90,7 @@ La división de entrenamiento, validación y prueba debe respetar el orden tempo
 
 Las imputaciones y escalados se ajustarán únicamente con el conjunto de entrenamiento. Las filas sin objetivo no pueden utilizarse para supervisar el modelo. Los retardos generarán ausencias esperadas al inicio de la serie y después de huecos del calendario; dichas ausencias se tratarán mediante un `Pipeline` reproducible, sin reemplazarlas por cero salvo que el significado agronómico lo justifique.
 
-El conjunto actual es suficiente para verificar el flujo técnico, crear una línea base y detectar problemas de integración. No es suficiente para afirmar que el modelo se generaliza a otras campañas, estaciones, zonas o cultivos: solo existen una estación, un cultivo, una campaña y 148 etiquetas válidas. Esta limitación condicionará la interpretación de las métricas del apartado 4.3.
+El conjunto detallado de este apartado es suficiente para verificar el flujo técnico, crear una línea base y detectar problemas de integración. No es suficiente para afirmar que el modelo se generaliza: el piloto principal contiene una estación, un cultivo, una campaña y 148 etiquetas válidas. El apartado 4.3 amplía después la comprobación a otras combinaciones, pero sin disponer todavía de varias campañas completas para todos los cultivos.
 
 ## 4.2.7. Resultados reproducibles
 

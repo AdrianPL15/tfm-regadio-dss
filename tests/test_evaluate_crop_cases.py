@@ -23,7 +23,8 @@ class EvaluateCropCasesTests(unittest.TestCase):
             self.assertEqual(source["station_code"].unique().tolist(), [case.station_code])
             self.assertEqual(source["crop"].unique().tolist(), [case.crop])
             self.assertTrue((source[TARGET] >= 0).all())
-            self.assertTrue(set(EXCLUDED_SAME_DAY_FEATURES).isdisjoint(source.columns))
+            self.assertIn("et0_pm_mm", source.columns)
+            self.assertTrue(source["et0_pm_mm"].notna().all())
 
     def test_metadata_mismatch_is_rejected(self):
         bad_case = replace(EXTENSION_CASES[0], crop="Otro cultivo")

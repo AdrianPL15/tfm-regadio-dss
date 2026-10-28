@@ -1,8 +1,9 @@
 """Extiende la evaluación temporal del 4.3 a maíz y algodón de SiAR.
 
-Se entrena un modelo *por caso* con exactamente los nueve predictores del
+Se entrena un modelo *por caso* con los quince predictores seguros del
 piloto. No se mezclan cultivos ni se emplean ET0, ETc, Pe o la etiqueta del
-mismo día como entrada. Los CSV originales permanecen sin modificar.
+mismo día como entrada; ET0 y necesidad solo entran mediante históricos
+desplazados. Los CSV originales permanecen sin modificar.
 """
 
 from __future__ import annotations
@@ -39,7 +40,7 @@ EXTENSION_CASES = tuple(
 
 
 def modeling_source_for_case(case: CropCase) -> tuple[pd.DataFrame, dict[str, Any]]:
-    """Prepara únicamente Kc, fecha y etiqueta, comprobando calidad y alcance."""
+    """Prepara Kc, ET0 histórica, fecha y etiqueta con controles de calidad."""
     daily, metadata = load_case(case)
     if metadata.get("crop") != case.crop or metadata.get("station_code") != case.station_code:
         raise ValueError(f"Metadatos incoherentes para {case.crop}/{case.station_code}.")
@@ -63,6 +64,7 @@ def modeling_source_for_case(case: CropCase) -> tuple[pd.DataFrame, dict[str, An
             "station_code": case.station_code,
             "crop": case.crop,
             "crop_coefficient_kc": daily["kc"],
+            "et0_pm_mm": daily["et0_mm"],
             TARGET: daily["net_need_mm"],
         }
     )

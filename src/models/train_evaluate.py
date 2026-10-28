@@ -52,6 +52,12 @@ FEATURE_COLUMNS = [
     "crop_coefficient_kc",
     "day_of_year_sin",
     "day_of_year_cos",
+    "et0_pm_mm_lag_1d",
+    "et0_pm_mm_lag_3d",
+    "et0_pm_mm_lag_7d",
+    "et0_pm_mm_mean_3d",
+    "et0_pm_mm_mean_7d",
+    "et0_pm_mm_mean_14d",
     TARGET_LAG_1D,
     "net_irrigation_need_mm_lag_3d",
     "net_irrigation_need_mm_lag_7d",
@@ -153,17 +159,45 @@ def prepare_modeling_data(source: pd.DataFrame) -> pd.DataFrame:
         calendar = pd.date_range(dates.min(), dates.max(), freq="D")
         daily_target = pd.Series(data[TARGET].to_numpy(), index=dates).reindex(calendar)
         for lag in (1, 3, 7):
-            data[f"net_irrigation_need_mm_lag_{lag}d"] = (
-                daily_target.shift(lag).reindex(dates).to_numpy()
-            )
+            column = f"net_irrigation_need_mm_lag_{lag}d"
+            if column not in data:
+                data[column] = daily_target.shift(lag).reindex(dates).to_numpy()
         for window in (3, 7, 14):
-            data[f"net_irrigation_need_mm_sum_{window}d"] = (
-                daily_target.shift(1)
-                .rolling(window, min_periods=1)
-                .sum()
-                .reindex(dates)
-                .to_numpy()
-            )
+            column = f"net_irrigation_need_mm_sum_{window}d"
+            if column not in data:
+                data[column] = (
+                    daily_target.shift(1)
+                    .rolling(window, min_periods=1)
+                    .sum()
+                    .reindex(dates)
+                    .to_numpy()
+                )
+        if "et0_pm_mm" in data:
+            daily_et0 = pd.Series(data["et0_pm_mm"].to_numpy(), index=dates).reindex(calendar)
+            for lag in (1, 3, 7):
+                data[f"et0_pm_mm_lag_{lag}d"] = (
+                    daily_et0.shift(lag).reindex(dates).to_numpy()
+                )
+            for window in (3, 7, 14):
+                data[f"et0_pm_mm_mean_{window}d"] = (
+                    daily_et0.shift(1)
+                    .rolling(window, min_periods=1)
+                    .mean()
+                    .reindex(dates)
+                    .to_numpy()
+                )
+        else:
+            # Compatibilidad con conjuntos sintéticos y fuentes antiguas: en
+            # producción/reentrenamiento ET0 sí es obligatoria y se audita.
+            for column in (
+                "et0_pm_mm_lag_1d",
+                "et0_pm_mm_lag_3d",
+                "et0_pm_mm_lag_7d",
+                "et0_pm_mm_mean_3d",
+                "et0_pm_mm_mean_7d",
+                "et0_pm_mm_mean_14d",
+            ):
+                data[column] = np.nan
 
     remaining = sorted(set(FEATURE_COLUMNS) - set(data.columns))
     if remaining:
@@ -421,6 +455,11 @@ def train_and_evaluate(data: pd.DataFrame) -> tuple[dict[str, Any], pd.DataFrame
             "svr": "Support Vector Regression con kernel RBF, imputación y escalado.",
             "xgboost": "Gradient boosting de árboles con regularización y semilla fija.",
         },
+        "feature_timing": (
+            "ET0 y necesidad de riego entran solo mediante retardos o medias "
+            "móviles desplazadas; ninguna variable meteorológica del día objetivo "
+            "se usa como predictor."
+        ),
         "persistence_horizon": "one_step_ahead",
         "split": {
             "development_rows": int(len(holdout.development)),

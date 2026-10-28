@@ -22,6 +22,7 @@ import pandas as pd
 from src.dss.config import CropCase, DEMO_CASES
 from src.dss.data_access import load_case
 from src.models.train_evaluate import (
+    EXCLUDED_SAME_DAY_FEATURES,
     FEATURE_COLUMNS,
     MODEL_LABELS,
     TARGET,
@@ -69,6 +70,7 @@ def source_for_case(case: CropCase) -> tuple[pd.DataFrame, dict[str, Any]]:
         "crop": case.crop,
         "campaign_year": case.campaign_year,
         "crop_coefficient_kc": daily["kc"],
+        "et0_pm_mm": daily["et0_mm"].where(complete),
         TARGET: daily["net_need_mm"].where(complete),
     })
     quality = {
@@ -90,6 +92,7 @@ def prepare_group(campaigns: list[CropCase]) -> tuple[pd.DataFrame, list[dict[st
     prepared = prepare_modeling_data(combined)
     # El test de final de campaña no debe ganar por predecir ceros fuera del ciclo.
     active = prepared.loc[prepared["crop_coefficient_kc"].gt(0)].reset_index(drop=True)
+    active = active.drop(columns=EXCLUDED_SAME_DAY_FEATURES, errors="ignore")
     if len(active) < 30:
         raise ValueError(f"Muestra activa insuficiente para {campaigns[0].crop}.")
     return active, list(quality)
@@ -132,7 +135,7 @@ def evaluate_and_refit(
             },
         }
     report = {
-        "experiment": "Reentrenamiento por cultivo y estación con campañas SiAR disponibles hasta el 22/10/2026",
+        "experiment": "Reentrenamiento por cultivo y estación con campañas SiAR disponibles hasta el 22/10/2026 y ET0 histórica retardada",
         "scope": "Seis modelos independientes; no se ha entrenado un modelo nacional compartido",
         "target": TARGET,
         "features": FEATURE_COLUMNS,
@@ -146,6 +149,7 @@ def evaluate_and_refit(
             "Persistencia es una predicción rodante a un día con el dato del día anterior disponible.",
             "El reajuste final usa todo el histórico y no tiene una prueba independiente posterior.",
             "AEMET no entra en este entrenamiento: faltan emisiones históricas archivadas antes de cada fecha objetivo.",
+            "La ET0 de SiAR se usa solo con retardos y medias móviles desplazadas; no se usa la ET0 del día objetivo.",
             "Streamlit sigue usando el motor físico y de reglas; no consume estos artefactos predictivos.",
         ],
     }
