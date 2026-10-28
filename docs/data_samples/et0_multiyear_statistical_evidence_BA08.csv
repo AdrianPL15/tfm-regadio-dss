@@ -1,0 +1,5 @@
+comparison,n,estimand,observed_difference_mm_day,ci_95_lower_mm_day,ci_95_upper_mm_day,probability_difference_positive,replicates,block_days,seed
+Persistencia frente a Ridge,365,MAE referencia - MAE candidato; positivo favorece al candidato,0.064,0.036,0.092,1.0,5000,7,42
+Persistencia frente a Random Forest,365,MAE referencia - MAE candidato; positivo favorece al candidato,0.041,0.006,0.076,0.99,5000,7,42
+Persistencia frente a HistGradientBoosting,365,MAE referencia - MAE candidato; positivo favorece al candidato,0.024,-0.018,0.065,0.866,5000,7,42
+Persistencia frente a XGBoost,365,MAE referencia - MAE candidato; positivo favorece al candidato,0.042,0.005,0.08,0.986,5000,7,42

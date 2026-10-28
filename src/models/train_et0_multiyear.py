@@ -1,4 +1,4 @@
-"""Experimento aislado de predicción de ET0 a un día para AL01.
+"""Experimento aislado de predicción de ET0 a un día para una estación SiAR.
 
 Entrena con 2021-2024 y reserva 2025 completo como prueba. Todas las variables
 se construyen con información disponible hasta el día anterior a la fecha que
@@ -152,6 +152,8 @@ def _metric_row(phase: str, model: str, y_true: pd.Series, prediction: np.ndarra
 
 
 def run_experiment(history: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, object]]:
+    station_codes = history.get("station_code", pd.Series(dtype=str)).dropna().astype(str).unique()
+    station_code = str(station_codes[0]) if len(station_codes) == 1 else "UNKNOWN"
     table, features = build_feature_table(history)
     table = table[table["target_et0_mm"].notna()].copy()
     train = table[table["prediction_date"].dt.year <= 2024].copy()
@@ -215,7 +217,7 @@ def run_experiment(history: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame, d
     selected = str(validation.iloc[0]["model"])
     test_metrics = metrics_frame[metrics_frame["phase"] == "test_2025"].sort_values("mae_mm")
     summary = {
-        "station_code": "AL01",
+        "station_code": station_code,
         "target": "ET0 del día siguiente (mm/día)",
         "train_period": [train["prediction_date"].min().date().isoformat(), train["prediction_date"].max().date().isoformat()],
         "test_period": [fair_test["prediction_date"].min().date().isoformat(), fair_test["prediction_date"].max().date().isoformat()],

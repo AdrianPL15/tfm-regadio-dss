@@ -42,6 +42,16 @@ class PrepareEt0HistoryTests(unittest.TestCase):
         self.assertEqual(int(quality.iloc[0]["observed_days"]), 2)
         self.assertEqual(int(quality.iloc[0]["missing_calendar_days"]), 363)
 
+    def test_station_code_is_parameterised(self):
+        with TemporaryDirectory(dir=".test_tmp") as folder:
+            path = Path(folder) / "sample.csv"
+            path.write_text(
+                HEADER + "01/01/2023;12,0;18,0;7,0;60,0;1,2;10,5;0,0;2,3\n",
+                encoding="cp1252",
+            )
+            result = prepare_history(Path(folder), "Z06")
+            self.assertEqual(result.iloc[0]["station_code"], "Z06")
+
 
 if __name__ == "__main__":
     unittest.main()

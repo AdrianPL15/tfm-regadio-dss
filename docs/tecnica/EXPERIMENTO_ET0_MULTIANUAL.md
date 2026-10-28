@@ -19,18 +19,20 @@ El token actual de la API de SiAR solo autoriza fechas desde el 1 de mayo de
 consulta pública oficial de SiAR, que permite recuperar años anteriores en
 bloques de hasta 365 registros.
 
-Se obtuvo la serie diaria de la estación AL01 (La Mojonera) entre el 1 de enero
-de 2021 y el 31 de diciembre de 2025:
+Se obtuvieron series diarias de tres estaciones entre el 1 de enero de 2021 y
+el 31 de diciembre de 2025:
 
-- 1.826 fechas, con cobertura completa del calendario;
-- 34 valores ausentes de ET0: 29 en 2022 y 5 en 2025;
+- AL01 (La Mojonera): 1.826 fechas y 34 valores ausentes de ET0;
+- Z06 (Ejea de los Caballeros): 1.826 fechas y 72 valores ausentes de ET0;
+- BA08 (Don Benito): 1.826 fechas y ningún valor ausente de ET0;
+- las tres series presentan cobertura completa del calendario;
 - temperatura, humedad, radiación, viento y precipitación como variables
   meteorológicas auxiliares;
 - los ficheros originales se conservan en `data/raw/siar/public_history/`, ruta
   excluida del control de versiones por tratarse de datos regenerables;
 - el inventario y el resumen de calidad quedan trazados en
   `docs/data_samples/et0_history_inventory.*` y
-  `docs/data_samples/et0_history_quality_AL01_2021_2025.csv`.
+  `docs/data_samples/et0_history_quality_<ESTACION>_2021_2025.csv`.
 
 La normalización reproducible se ejecuta con:
 
@@ -80,17 +82,34 @@ Ridge fue seleccionado en validación y también obtuvo el menor error sobre los
 La mejora puntual de Ridge frente a persistencia fue de 0,074 mm/día, un
 16,1 % del MAE de la referencia.
 
+## Validación geográfica sin reajuste
+
+El protocolo definido con AL01 se congeló y se repitió sin cambiar variables,
+modelos, hiperparámetros, particiones ni semilla en Z06 y BA08. Ridge volvió a
+ser seleccionado mediante la validación temporal de 2021–2024 y superó a la
+persistencia en el año externo 2025 en las tres estaciones:
+
+| Estación | Cultivo de impacto | Días ET0 comparables | MAE Ridge | MAE persistencia | Mejora relativa |
+|---|---|---:|---:|---:|---:|
+| AL01 | Pimiento | 357 | 0,389 | 0,463 | 16,1 % |
+| Z06 | Maíz | 293 | 0,558 | 0,688 | 18,9 % |
+| BA08 | Algodón | 365 | 0,403 | 0,466 | 13,7 % |
+
+Los 293 días comparables de Z06 se explican por la ausencia de ET0 en 72 fechas,
+no por una selección favorable posterior. La evidencia consolidada se conserva
+en `docs/data_samples/et0_multiyear_geographic_validation.csv`.
+
 ## Incertidumbre estadística
 
 Se aplicó un bootstrap pareado por bloques temporales circulares de siete días,
 con 5.000 réplicas y semilla 42. El estimando es `MAE de persistencia − MAE del
 modelo`; un resultado positivo favorece al modelo.
 
-Para Ridge, la diferencia fue 0,074 mm/día, con IC del 95 % de 0,049 a 0,103
-mm/día y una proporción de réplicas positivas de 1,000. El intervalo no cruza
-cero dentro de esta campaña, por lo que la mejora no parece explicarse solo por
-la variación muestral interna de 2025. Esta inferencia no acredita transferencia
-a otras estaciones ni años.
+Los intervalos del 95 % de la diferencia `MAE persistencia − MAE Ridge` fueron
+[0,049; 0,103] mm/día en AL01, [0,075; 0,185] en Z06 y [0,036; 0,092] en BA08.
+La proporción de réplicas positivas fue 1,000 en las tres estaciones. Ningún
+intervalo cruza cero dentro de 2025; la mejora es consistente geográficamente
+en este conjunto, aunque todavía no acredita estabilidad en otros años futuros.
 
 La evaluación se reproduce con:
 
@@ -112,18 +131,19 @@ validación de la previsión operativa de AEMET.
 | Ridge | 0,266 | 0,262 | 515,791 |
 | Referencia SiAR | — | — | 515,840 |
 
-Ridge reduce el MAE diario de necesidad neta un 18,6 % frente a persistencia y
-su acumulado queda muy próximo al de SiAR. El interés no está en ese parecido
-acumulado aislado —los errores positivos y negativos pueden compensarse—, sino
-en la reducción del error diario.
+Ridge reduce el MAE diario de necesidad neta frente a persistencia un 18,6 % en
+pimiento/AL01, un 23,3 % en maíz/Z06 y un 18,2 % en algodón/BA08. El interés no
+está en el parecido acumulado aislado —los errores positivos y negativos pueden
+compensarse—, sino en la reducción del error diario. En todos los casos se usó
+Pe observada únicamente para esta evaluación retrospectiva.
 
 ## Limitaciones y decisión provisional
 
-El experimento aporta evidencia favorable, pero todavía procede mantenerlo
-separado de la entrega estable:
+El experimento aporta evidencia favorable y transferible entre las tres zonas,
+pero todavía procede mantenerlo separado de la entrega estable:
 
-1. solo se ha evaluado una estación (AL01) y un año de prueba;
-2. el impacto agronómico solo se ha contrastado con el ciclo del pimiento;
+1. solo se ha evaluado un año externo completo (2025);
+2. las tres estaciones no representan toda la diversidad agroclimática española;
 3. las variables meteorológicas observadas del día anterior no equivalen a
    integrar previsiones meteorológicas futuras completas;
 4. la evaluación con precipitación observada aísla el efecto de ET0, pero no
@@ -131,10 +151,12 @@ separado de la entrega estable:
 5. faltaría definir el artefacto de modelo, su actualización y el comportamiento
    de respaldo si la predicción no está disponible.
 
-La decisión provisional es **continuar la validación geográfica antes de
-integrar**. El siguiente hito recomendable es repetir el protocolo con Z06 y
-BA08 —sin ajustar el método al resultado de AL01— y decidir después si Ridge
-debe sustituir a la persistencia en la aplicación o quedar como experimento.
+La decisión provisional pasa a ser **candidato favorable a integración
+controlada**, no integración automática. Antes de sustituir a la persistencia
+en la aplicación debe serializarse y versionarse el modelo, definir el respaldo
+cuando falten variables, comparar su entrada operativa con la disponibilidad
+real de AEMET y ejecutar una prueba de regresión completa de Streamlit. Hasta
+entonces la persistencia continúa siendo el comportamiento estable del DSS.
 
 ## Artefactos generados
 
@@ -147,6 +169,9 @@ debe sustituir a la persistencia en la aplicación o quedar como experimento.
 - `docs/data_samples/et0_multiyear_statistical_evidence.csv`: incertidumbre;
 - `docs/data_samples/et0_multiyear_irrigation_impact.csv`: efecto en el riego;
 - `docs/data_samples/et0_multiyear_evaluation_summary.json`: síntesis auditable.
+- `docs/data_samples/et0_multiyear_*_Z06.*` y `*_BA08.*`: réplica geográfica;
+- `docs/data_samples/et0_multiyear_geographic_validation.csv`: comparación
+  consolidada de las tres estaciones.
 
 Las pruebas automatizadas comprueban la construcción de objetivo a un día, la
 ausencia de fuga temporal, la calidad del calendario, la reproducibilidad del

@@ -32,6 +32,10 @@ def _read_crop(path: Path) -> pd.DataFrame:
             "ETc (mm)": "siar_etc_mm",
             "Pe (mm)": "effective_precipitation_mm",
             "ETc - Pe (mm)": "siar_net_need_mm",
+            "ET0": "siar_et0_mm",
+            "ETc": "siar_etc_mm",
+            "Pe": "effective_precipitation_mm",
+            "ETc - Pe": "siar_net_need_mm",
         }
     )
     crop["date"] = pd.to_datetime(crop["date"], dayfirst=True)
@@ -93,6 +97,8 @@ def build(
     statistics_path: Path = DEFAULT_STATISTICS,
     impact_path: Path = DEFAULT_IMPACT,
     summary_path: Path = DEFAULT_SUMMARY,
+    crop_name: str = "Pimiento",
+    station_code: str = "AL01",
 ) -> dict:
     predictions = pd.read_csv(predictions_path)
     predictions["prediction_date"] = pd.to_datetime(predictions["prediction_date"])
@@ -123,8 +129,8 @@ def build(
             "probability_difference_positive": float(ridge_stat["probability_difference_positive"]),
         },
         "irrigation_impact": {
-            "crop": "Pimiento",
-            "station": "AL01",
+            "crop": crop_name,
+            "station": station_code,
             "paired_days": int(len(detail)),
             "persistence_net_need_mae_mm_day": float(persistence["net_need_mae_mm_day"]),
             "ridge_net_need_mae_mm_day": float(ridge["net_need_mae_mm_day"]),
@@ -147,8 +153,24 @@ def main() -> None:
     parser.add_argument("--statistics", type=Path, default=DEFAULT_STATISTICS)
     parser.add_argument("--impact", type=Path, default=DEFAULT_IMPACT)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
+    parser.add_argument("--crop-name", default="Pimiento")
+    parser.add_argument("--station-code", default="AL01")
     args = parser.parse_args()
-    print(json.dumps(build(args.predictions, args.crop, args.statistics, args.impact, args.summary), ensure_ascii=False, indent=2))
+    print(
+        json.dumps(
+            build(
+                args.predictions,
+                args.crop,
+                args.statistics,
+                args.impact,
+                args.summary,
+                args.crop_name,
+                args.station_code,
+            ),
+            ensure_ascii=False,
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

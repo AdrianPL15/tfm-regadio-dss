@@ -1,0 +1,26 @@
+{
+  "test_year": 2025,
+  "paired_days_et0": 293,
+  "bootstrap": {
+    "method": "bootstrap pareado por bloques temporales circulares",
+    "replicates": 5000,
+    "block_days": 7,
+    "seed": 42,
+    "ridge_vs_persistence_mae_difference_mm_day": 0.13,
+    "ci_95_mm_day": [
+      0.075,
+      0.185
+    ],
+    "probability_difference_positive": 1.0
+  },
+  "irrigation_impact": {
+    "crop": "Maíz",
+    "station": "Z06",
+    "paired_days": 183,
+    "persistence_net_need_mae_mm_day": 0.6136590163934426,
+    "ridge_net_need_mae_mm_day": 0.47097169264391264,
+    "relative_mae_improvement_pct": 23.251890697886704,
+    "note": "Evaluación retrospectiva con Pe observada; no valida todavía la previsión AEMET."
+  },
+  "integration_decision": "pending_geographical_validation_and_operational_design"
+}

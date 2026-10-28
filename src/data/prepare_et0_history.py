@@ -72,7 +72,7 @@ def _read_siar_csv(path: Path) -> pd.DataFrame:
     return data
 
 
-def prepare_history(input_root: Path = DEFAULT_INPUT) -> pd.DataFrame:
+def prepare_history(input_root: Path = DEFAULT_INPUT, station_code: str = "AL01") -> pd.DataFrame:
     files = sorted(input_root.glob("*.csv"))
     if not files:
         raise FileNotFoundError(f"No hay CSV históricos en {input_root}")
@@ -83,7 +83,7 @@ def prepare_history(input_root: Path = DEFAULT_INPUT) -> pd.DataFrame:
         if (conflicts > 1).any():
             raise ValueError("Hay fechas duplicadas con valores ET0 incompatibles.")
         data = data.drop_duplicates("date", keep="last")
-    data["station_code"] = "AL01"
+    data["station_code"] = station_code.upper()
     columns = ["date", "station_code"] + [
         column for column in data.columns if column not in {"date", "station_code"}
     ]
@@ -98,7 +98,11 @@ def quality_by_year(data: pd.DataFrame) -> pd.DataFrame:
         missing_dates = expected.difference(observed)
         rows.append(
             {
-                "station_code": "AL01",
+                "station_code": (
+                    str(group["station_code"].iloc[0])
+                    if "station_code" in group.columns
+                    else "UNKNOWN"
+                ),
                 "year": int(year),
                 "expected_days": int(len(expected)),
                 "observed_days": int(observed.nunique()),
@@ -122,19 +126,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--input-root", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--quality", type=Path, default=DEFAULT_QUALITY)
+    parser.add_argument("--station-code", default="AL01")
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
-    data = prepare_history(args.input_root)
+    data = prepare_history(args.input_root, args.station_code)
     quality = quality_by_year(data)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.quality.parent.mkdir(parents=True, exist_ok=True)
     data.to_csv(args.output, index=False, encoding="utf-8")
     quality.to_csv(args.quality, index=False, encoding="utf-8")
     print(
-        f"Histórico AL01: {len(data)} filas, {data['date'].min().date()} a "
+        f"Histórico {args.station_code.upper()}: {len(data)} filas, {data['date'].min().date()} a "
         f"{data['date'].max().date()}, ET0 ausente={int(data['et0_mm'].isna().sum())}."
     )
 
