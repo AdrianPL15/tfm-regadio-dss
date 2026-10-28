@@ -228,7 +228,7 @@ def build_summary(dataset: pd.DataFrame) -> dict[str, Any]:
             "columns_with_missing_values": int((dataset.isna().sum() > 0).sum()),
         },
         "target": {
-            "unit": "mm/dia",
+            "unit": "mm/día",
             "mean": round(float(target.mean()), 4),
             "median": round(float(target.median()), 4),
             "minimum": round(float(target.min()), 4),

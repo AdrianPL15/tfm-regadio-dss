@@ -90,9 +90,12 @@ las entradas del piloto para reproducirlo sin tokens. Se versionan además
 código, esquemas, metadatos, muestras ligeras, métricas y figuras
 reproducibles.
 
-El conjunto actual permite validar el recorrido técnico, pero no demostrar una
-optimización agronómica generalizable. Solo contiene una estación, un cultivo y
-una campaña; la referencia SiAR es calculada; y no se dispone todavía de riego
+El piloto detallado de pimiento permite validar el recorrido técnico, pero no
+demostrar una optimización agronómica generalizable. Se complementa con seis
+combinaciones cultivo-estación para el modelado y con una comprobación diaria
+en tres cultivos activos de 2026, aunque estos casos adicionales siguen
+aportando una cobertura temporal limitada. La referencia SiAR es calculada y
+no se dispone todavía de riego
 real, humedad del suelo, eficiencia de la instalación ni respuesta productiva.
 Estas limitaciones condicionan la evaluación del capítulo 4 y el alcance de las
 recomendaciones posteriores.

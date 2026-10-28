@@ -18,8 +18,8 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 | Escenarios técnicos del DSS | 13 de 13 superados |
 | MAE diario del DSS en la prueba del piloto | 0,09 mm/día |
 | Error semanal relativo del piloto | 4,8 % |
-| Transferencia temporal adicional | 3 de 3 casos por encima de persistencia |
-| MAE agregado de la validación multicaso | 0,613 frente a 0,733 mm/día |
+| Comprobación cronológica adicional | 3 de 3 casos con menor MAE que persistencia |
+| MAE agregado de la validación multicaso | 0,627 frente a 0,791 mm/día |
 
 Las métricas evalúan la reproducción de la referencia calculada por SiAR, no el riego óptimo aplicado en una parcela. Por tanto, no demuestran todavía ahorro de agua ni validación agronómica en campo.
 
@@ -34,11 +34,11 @@ El prototipo combina datos SiAR, previsión AEMET, estimaciones físicas, modelo
 | Orden | Qué abrir | Qué permite comprobar |
 |---|---|---|
 | 1 | [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía breve del prototipo](docs/entrega/DEMO_TFM.md) | Selección de caso, consulta SiAR/AEMET, dosis, explicaciones y CSV descargable. |
-| 2 | [Memoria definitiva en PDF](docs/memoria/TFM_definitivo_2026-10-25.pdf) ([Word editable](docs/memoria/TFM_definitivo_2026-10-25.docx)) | Planteamiento, método, resultados y límites. |
+| 2 | [Memoria definitiva en PDF](docs/memoria/TFM_definitivo_2026-10-27.pdf) ([Word editable](docs/memoria/TFM_definitivo_2026-10-27.docx)) | Planteamiento, método, resultados y límites. |
 | 3 | [Código de la interfaz](src/dss/app_streamlit.py), [motor de recomendación](src/dss/engine.py) y [actualización SiAR](src/data/refresh_siar_crop_needs.py) | Implementación que utiliza la aplicación pública. |
 | 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json), [análisis XAI](docs/data_samples/xai_analysis_4_3.json), [validación del piloto](docs/data_samples/dss_validation_5_3.json) y [validación multicaso](docs/data_samples/dss_validation_multicaso_5_3.json) | Entradas, limpieza, explicabilidad y resultados verificables sin ejecutar el proyecto. |
 
-La [guía de entrega](docs/entrega/ENTREGA_FINAL_2026-10-25.md) reúne el recorrido para el evaluador, los archivos principales y los límites científicos que deben explicarse.
+La [guía de entrega](docs/entrega/ENTREGA_FINAL_2026-10-28.md) reúne el recorrido para el evaluador, los archivos principales y los límites científicos que deben explicarse.
 
 La reutilización académica se documenta mediante la [ficha de los datos](docs/tecnica/DATASET_CARD.md), los [principios FAIR y la citación](docs/tecnica/FAIR_Y_CITACION.md), el [plan de MLOps y monitorización](docs/tecnica/MLOPS_MONITORIZACION.md), `CITATION.cff` y las [condiciones de los datos](DATA_LICENSE.md).
 

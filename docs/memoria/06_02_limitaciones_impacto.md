@@ -17,12 +17,20 @@ que la dosis sea la adecuada para una parcela concreta, cuyo suelo, cubierta,
 marco de plantación y estado del cultivo pueden diferir de los supuestos de la
 estación.
 
+Existe además una dependencia estructural entre el estimador y la referencia:
+SiAR calcula la necesidad a partir de ET0, Kc y precipitación efectiva, mientras
+que la vía física del DSS combina ET0 reciente y el mismo calendario de Kc.
+La comparación no es circular en sentido estricto, porque la ET0 del día
+objetivo no entra en la estimación, pero ambos métodos comparten formulación
+agronómica. Por ello, una buena concordancia mide fidelidad a la referencia
+oficial y no constituye una validación independiente de la dosis agronómica.
+
 La segunda es de validez externa. La evaluación detallada se concentra en
 pimiento AL01 durante 2025, aunque se ha añadido una comprobación temporal con
 coliflor AL01, alfalfa Z06 y alcachofa BA08 en 2026. El DSS supera a la
 persistencia en los tres tramos finales reservados, pero cada cultivo adicional
 aporta una sola campaña y no existe una prueba dejando fuera un año completo.
-Por tanto, la ampliación muestra transferencia a tres calendarios y regiones,
+Por tanto, la ampliación comprueba el comportamiento cronológico en tres calendarios y regiones,
 pero no demuestra generalización nacional ni estabilidad interanual.
 
 La tercera afecta a la capacidad predictiva. El sistema no dispone de una ET0
@@ -60,6 +68,7 @@ demuestra el flujo de datos y de decisión, no una plataforma desplegable.
 |---|---|---|
 | Referencia calculada por SiAR, sin riego aplicado ni respuesta del cultivo | Que las dosis sean óptimas para una parcela ni que reduzcan el consumo de agua | Validación en campo (6.3.3) |
 | Tres casos adicionales, pero una sola campaña por cultivo | Que los resultados se generalicen a todo el territorio o a otros años | Ampliación de la evidencia (6.3.1) |
+| Dependencia estructural entre la referencia SiAR y la vía física | Que el bajo error equivalga a una validación agronómica independiente | Riego observado, sensores y validación de campo (6.3.2 y 6.3.3) |
 | Sin ET0 prevista ni histórico de predicciones | Que el sistema anticipe cambios de tiempo en los horizontes largos | ET0 prevista (6.3.2) |
 | Sin balance hídrico del suelo | Que el sistema determine el momento adecuado del riego | Balance hídrico y riego deficitario (6.3.2) |
 | Restricción hídrica introducida como dotación del usuario | Que la recomendación refleje la disponibilidad oficial de agua | Indicadores hidrológicos (6.3.4) |

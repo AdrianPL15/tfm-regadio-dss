@@ -17,39 +17,49 @@
         "max_abs_difference_mm": 0.028
       },
       "comparable_days": 146,
-      "development_days": 116,
-      "test_days": 30,
-      "test_start": "2026-09-26",
+      "development_days": 124,
+      "test_days": 22,
+      "test_start": "2026-10-04",
       "period_metrics": {
         "desarrollo": {
           "dss": {
-            "n": 116,
-            "mae_mm_day": 0.198,
-            "rmse_mm_day": 0.346,
-            "bias_mm_day": 0.047
+            "n": 124,
+            "mae_mm_day": 0.229,
+            "rmse_mm_day": 0.399,
+            "bias_mm_day": 0.045
           },
           "persistence": {
-            "n": 116,
-            "mae_mm_day": 0.227,
-            "rmse_mm_day": 0.47,
-            "bias_mm_day": -0.022
+            "n": 124,
+            "mae_mm_day": 0.267,
+            "rmse_mm_day": 0.537,
+            "bias_mm_day": -0.032
           },
-          "mae_improvement_vs_persistence_pct": 12.8
+          "mae_improvement_vs_persistence_pct": 14.2
         },
         "prueba": {
           "dss": {
-            "n": 30,
-            "mae_mm_day": 0.689,
-            "rmse_mm_day": 1.02,
-            "bias_mm_day": 0.302
+            "n": 22,
+            "mae_mm_day": 0.694,
+            "rmse_mm_day": 1.073,
+            "bias_mm_day": 0.405
           },
           "persistence": {
-            "n": 30,
-            "mae_mm_day": 0.787,
-            "rmse_mm_day": 1.05,
-            "bias_mm_day": 0.016
+            "n": 22,
+            "mae_mm_day": 0.765,
+            "rmse_mm_day": 1.022,
+            "bias_mm_day": 0.087
           },
-          "mae_improvement_vs_persistence_pct": 12.5
+          "mae_improvement_vs_persistence_pct": 9.3,
+          "paired_block_bootstrap": {
+            "estimand": "MAE persistencia - MAE DSS; positivo favorece al DSS",
+            "observed_difference_mm_day": 0.071,
+            "ci_95_lower_mm_day": -0.196,
+            "ci_95_upper_mm_day": 0.322,
+            "probability_difference_positive": 0.711,
+            "replicates": 5000,
+            "block_days": 7,
+            "seed": 20261027
+          }
         }
       },
       "weekly": {
@@ -76,39 +86,49 @@
         "max_abs_difference_mm": 0.027
       },
       "comparable_days": 238,
-      "development_days": 190,
-      "test_days": 48,
-      "test_start": "2026-09-08",
+      "development_days": 202,
+      "test_days": 36,
+      "test_start": "2026-09-20",
       "period_metrics": {
         "desarrollo": {
           "dss": {
-            "n": 190,
-            "mae_mm_day": 0.661,
-            "rmse_mm_day": 0.99,
-            "bias_mm_day": 0.052
+            "n": 202,
+            "mae_mm_day": 0.657,
+            "rmse_mm_day": 0.977,
+            "bias_mm_day": 0.062
           },
           "persistence": {
-            "n": 190,
-            "mae_mm_day": 0.678,
-            "rmse_mm_day": 0.971,
-            "bias_mm_day": -0.014
+            "n": 202,
+            "mae_mm_day": 0.673,
+            "rmse_mm_day": 0.96,
+            "bias_mm_day": -0.006
           },
-          "mae_improvement_vs_persistence_pct": 2.5
+          "mae_improvement_vs_persistence_pct": 2.4
         },
         "prueba": {
           "dss": {
-            "n": 48,
-            "mae_mm_day": 0.646,
-            "rmse_mm_day": 0.977,
-            "bias_mm_day": 0.313
+            "n": 36,
+            "mae_mm_day": 0.666,
+            "rmse_mm_day": 1.045,
+            "bias_mm_day": 0.341
           },
           "persistence": {
-            "n": 48,
-            "mae_mm_day": 0.761,
-            "rmse_mm_day": 1.11,
-            "bias_mm_day": 0.053
+            "n": 36,
+            "mae_mm_day": 0.816,
+            "rmse_mm_day": 1.205,
+            "bias_mm_day": 0.027
           },
-          "mae_improvement_vs_persistence_pct": 15.1
+          "mae_improvement_vs_persistence_pct": 18.4,
+          "paired_block_bootstrap": {
+            "estimand": "MAE persistencia - MAE DSS; positivo favorece al DSS",
+            "observed_difference_mm_day": 0.15,
+            "ci_95_lower_mm_day": -0.028,
+            "ci_95_upper_mm_day": 0.34,
+            "probability_difference_positive": 0.945,
+            "replicates": 5000,
+            "block_days": 7,
+            "seed": 20261027
+          }
         }
       },
       "weekly": {
@@ -134,80 +154,103 @@
         "days_compared": 297,
         "max_abs_difference_mm": 0.009
       },
-      "comparable_days": 296,
-      "development_days": 236,
-      "test_days": 60,
-      "test_start": "2026-08-27",
+      "comparable_days": 175,
+      "development_days": 148,
+      "test_days": 27,
+      "test_start": "2026-09-29",
       "period_metrics": {
         "desarrollo": {
           "dss": {
-            "n": 236,
-            "mae_mm_day": 0.237,
-            "rmse_mm_day": 0.484,
-            "bias_mm_day": 0.069
+            "n": 148,
+            "mae_mm_day": 0.504,
+            "rmse_mm_day": 0.724,
+            "bias_mm_day": 0.153
           },
           "persistence": {
-            "n": 236,
-            "mae_mm_day": 0.226,
-            "rmse_mm_day": 0.542,
-            "bias_mm_day": -0.004
+            "n": 148,
+            "mae_mm_day": 0.471,
+            "rmse_mm_day": 0.759,
+            "bias_mm_day": -0.021
           },
-          "mae_improvement_vs_persistence_pct": -4.9
+          "mae_improvement_vs_persistence_pct": -7.0
         },
         "prueba": {
           "dss": {
-            "n": 60,
-            "mae_mm_day": 0.548,
-            "rmse_mm_day": 0.854,
-            "bias_mm_day": 0.254
+            "n": 27,
+            "mae_mm_day": 0.521,
+            "rmse_mm_day": 0.896,
+            "bias_mm_day": 0.331
           },
           "persistence": {
-            "n": 60,
-            "mae_mm_day": 0.683,
-            "rmse_mm_day": 1.076,
-            "bias_mm_day": -0.014
+            "n": 27,
+            "mae_mm_day": 0.779,
+            "rmse_mm_day": 1.232,
+            "bias_mm_day": -0.084
           },
-          "mae_improvement_vs_persistence_pct": 19.8
+          "mae_improvement_vs_persistence_pct": 33.1,
+          "paired_block_bootstrap": {
+            "estimand": "MAE persistencia - MAE DSS; positivo favorece al DSS",
+            "observed_difference_mm_day": 0.258,
+            "ci_95_lower_mm_day": 0.0,
+            "ci_95_upper_mm_day": 0.555,
+            "probability_difference_positive": 0.975,
+            "replicates": 5000,
+            "block_days": 7,
+            "seed": 20261027
+          }
         }
       },
       "weekly": {
-        "complete_weeks": 41,
-        "mae_mm": 1.268,
+        "complete_weeks": 24,
+        "mae_mm": 2.136,
         "max_abs_error_mm": 8.693
       },
       "methods_used": {
-        "et0_reciente_kc": 296
+        "et0_reciente_kc": 175
       }
     }
   ],
   "aggregate_test": {
     "pooled_dss": {
-      "n": 138,
-      "mae_mm_day": 0.613,
-      "rmse_mm_day": 0.936,
-      "bias_mm_day": 0.285
+      "n": 85,
+      "mae_mm_day": 0.627,
+      "rmse_mm_day": 1.007,
+      "bias_mm_day": 0.354
     },
     "pooled_persistence": {
-      "n": 138,
-      "mae_mm_day": 0.733,
-      "rmse_mm_day": 1.082,
-      "bias_mm_day": 0.016
+      "n": 85,
+      "mae_mm_day": 0.791,
+      "rmse_mm_day": 1.169,
+      "bias_mm_day": 0.007
     },
-    "macro_mae_dss_mm_day": 0.628,
-    "macro_mae_persistence_mm_day": 0.744,
+    "macro_mae_dss_mm_day": 0.627,
+    "macro_mae_persistence_mm_day": 0.787,
     "cases_where_dss_beats_persistence": 3,
-    "total_cases": 3
+    "total_cases": 3,
+    "paired_block_bootstrap": {
+      "estimand": "MAE persistencia - MAE DSS; positivo favorece al DSS",
+      "observed_difference_mm_day": 0.164,
+      "ci_95_lower_mm_day": 0.03,
+      "ci_95_upper_mm_day": 0.305,
+      "probability_difference_positive": 0.992,
+      "replicates": 5000,
+      "block_days": 7,
+      "seed": 20261027
+    }
   },
   "method": {
     "issue_mode": "Recomendación diaria con información disponible hasta t-1",
     "configured_et0_window_days": 7,
-    "split": "80 % cronológico para desarrollo y 20 % final para prueba en cada caso",
-    "selection": "La ventana no se reajusta por caso ni con el tramo de prueba"
+    "split": "85 % cronológico para desarrollo y 15 % final para prueba en cada caso",
+    "selection": "La ventana no se reajusta por caso ni con el tramo de prueba",
+    "active_day_filter": "Solo jornadas con Kc > 0",
+    "uncertainty": "Bootstrap pareado temporal por bloques de siete días"
   },
   "limitations": [
     "La referencia es la necesidad neta calculada por SiAR, no el riego aplicado.",
     "Los tres casos pertenecen a una sola campaña, 2026.",
     "No se incorporan predicciones AEMET históricas archivadas antes de cada fecha.",
-    "La comparación mide transferencia técnica, no ahorro de agua ni respuesta productiva."
+    "La comparación mide consistencia técnica entre casos, no ahorro de agua ni respuesta productiva.",
+    "Los intervalos bootstrap describen incertidumbre muestral interna, no generalización a otras campañas."
   ]
 }

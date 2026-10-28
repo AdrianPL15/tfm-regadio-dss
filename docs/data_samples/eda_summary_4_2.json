@@ -30,7 +30,7 @@
     "columns_with_missing_values": 67
   },
   "target": {
-    "unit": "mm/dia",
+    "unit": "mm/día",
     "mean": 3.5882,
     "median": 3.94,
     "minimum": 0.0,

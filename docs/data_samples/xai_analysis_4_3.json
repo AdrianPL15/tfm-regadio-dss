@@ -12,11 +12,11 @@
   "models": {
     "random_forest": {
       "metrics": {
-        "mae_mm_day": 0.5620453098210163,
-        "rmse_mm_day": 0.5829772329512651,
-        "r2": -20.78024837542737,
-        "bias_mm_day": 0.5620453098210163,
-        "weekly_mae_mm": 3.231760531470843
+        "mae_mm_day": 0.5598191638333503,
+        "rmse_mm_day": 0.5766600085433135,
+        "r2": -20.31077810247973,
+        "bias_mm_day": 0.5598191638333503,
+        "weekly_mae_mm": 3.218960192041765
       },
       "expected_value_mm": 4.038335466666667,
       "top_features": [
@@ -25,129 +25,129 @@
           "rank": 1,
           "feature": "crop_coefficient_kc",
           "feature_label": "Kc",
-          "mean_absolute_shap_mm": 1.8703159578097726,
-          "mean_signed_shap_mm": -1.8703159578097726,
-          "importance_share_pct": 73.40804425251409
+          "mean_absolute_shap_mm": 1.8980693892310574,
+          "mean_signed_shap_mm": -1.8980693892310574,
+          "importance_share_pct": 74.03235789749937
         },
         {
           "model": "random_forest",
           "rank": 2,
           "feature": "net_irrigation_need_mm_lag_1d",
           "feature_label": "Necesidad t-1",
-          "mean_absolute_shap_mm": 0.335132877019305,
-          "mean_signed_shap_mm": -0.335132877019305,
-          "importance_share_pct": 13.153632659753889
+          "mean_absolute_shap_mm": 0.275478959174102,
+          "mean_signed_shap_mm": -0.275478959174102,
+          "importance_share_pct": 10.74478995052434
         },
         {
           "model": "random_forest",
           "rank": 3,
           "feature": "day_of_year_cos",
           "feature_label": "Día del año (coseno)",
-          "mean_absolute_shap_mm": 0.1238146610860131,
-          "mean_signed_shap_mm": -0.1238146610860131,
-          "importance_share_pct": 4.85960250842094
+          "mean_absolute_shap_mm": 0.1105201728635972,
+          "mean_signed_shap_mm": -0.1105201728635972,
+          "importance_share_pct": 4.310732283420909
         },
         {
           "model": "random_forest",
           "rank": 4,
-          "feature": "day_of_year_sin",
-          "feature_label": "Día del año (seno)",
-          "mean_absolute_shap_mm": 0.0627552481945046,
-          "mean_signed_shap_mm": -0.0627552481945046,
-          "importance_share_pct": 2.4630811801094863
+          "feature": "net_irrigation_need_mm_sum_7d",
+          "feature_label": "Suma previa 7 días",
+          "mean_absolute_shap_mm": 0.05501248147063162,
+          "mean_signed_shap_mm": 0.05501248147063162,
+          "importance_share_pct": 2.145708550051102
         },
         {
           "model": "random_forest",
           "rank": 5,
-          "feature": "net_irrigation_need_mm_sum_7d",
-          "feature_label": "Suma previa 7 días",
-          "mean_absolute_shap_mm": 0.05488632677043082,
-          "mean_signed_shap_mm": 0.05488632677043082,
-          "importance_share_pct": 2.1542338274972517
+          "feature": "et0_pm_mm_lag_7d",
+          "feature_label": "ET0 t-7",
+          "mean_absolute_shap_mm": 0.034987444041059315,
+          "mean_signed_shap_mm": -0.032611830712969775,
+          "importance_share_pct": 1.3646513630440946
         }
       ],
       "worst_local_explanation": {
         "model": "random_forest",
         "observed_date": "2025-09-29",
         "actual_mm": 0.89,
-        "prediction_mm": 1.7191466240557687,
-        "absolute_error_mm": 0.8291466240557687,
+        "prediction_mm": 1.7008664997502516,
+        "absolute_error_mm": 0.8108664997502516,
         "base_value_mm": 4.038335466666667,
         "top_positive_feature": "net_irrigation_need_mm_sum_7d",
-        "top_positive_shap_mm": 0.055027944039522436,
+        "top_positive_shap_mm": 0.05480067982477187,
         "top_negative_feature": "crop_coefficient_kc",
-        "top_negative_shap_mm": -1.8620796625227443,
-        "shap_sum_prediction_mm": 1.719146624055767
+        "top_negative_shap_mm": -1.8939618291700262,
+        "shap_sum_prediction_mm": 1.7008664997502523
       }
     },
     "xgboost": {
       "metrics": {
-        "mae_mm_day": 0.7655953850953475,
-        "rmse_mm_day": 0.7815517843249131,
-        "r2": -38.144897190244215,
-        "bias_mm_day": 0.7655953850953475,
-        "weekly_mae_mm": 4.402173464298248
+        "mae_mm_day": 0.7996532458844392,
+        "rmse_mm_day": 0.8136157685218076,
+        "r2": -41.42270459362034,
+        "bias_mm_day": 0.7996532458844392,
+        "weekly_mae_mm": 4.598006163835525
       },
-      "expected_value_mm": 4.024662494659424,
+      "expected_value_mm": 4.026157855987549,
       "top_features": [
         {
           "model": "xgboost",
           "rank": 1,
           "feature": "crop_coefficient_kc",
           "feature_label": "Kc",
-          "mean_absolute_shap_mm": 1.4326243607894233,
-          "mean_signed_shap_mm": -1.4326243607894233,
-          "importance_share_pct": 53.56173968020942
+          "mean_absolute_shap_mm": 1.291682217432105,
+          "mean_signed_shap_mm": -1.291682217432105,
+          "importance_share_pct": 45.24394811442393
         },
         {
           "model": "xgboost",
           "rank": 2,
           "feature": "net_irrigation_need_mm_lag_1d",
           "feature_label": "Necesidad t-1",
-          "mean_absolute_shap_mm": 0.489715488060661,
-          "mean_signed_shap_mm": -0.489715488060661,
-          "importance_share_pct": 18.30906566074182
+          "mean_absolute_shap_mm": 0.45399575259374536,
+          "mean_signed_shap_mm": -0.45399575259374536,
+          "importance_share_pct": 15.902177793664594
         },
         {
           "model": "xgboost",
           "rank": 3,
           "feature": "day_of_year_cos",
           "feature_label": "Día del año (coseno)",
-          "mean_absolute_shap_mm": 0.2985933189806731,
-          "mean_signed_shap_mm": -0.2985933189806731,
-          "importance_share_pct": 11.16355274922156
+          "mean_absolute_shap_mm": 0.25204524851363636,
+          "mean_signed_shap_mm": -0.25204524851363636,
+          "importance_share_pct": 8.828426986405775
         },
         {
           "model": "xgboost",
           "rank": 4,
-          "feature": "net_irrigation_need_mm_sum_7d",
-          "feature_label": "Suma previa 7 días",
-          "mean_absolute_shap_mm": 0.14016940736252329,
-          "mean_signed_shap_mm": 0.14016940736252329,
-          "importance_share_pct": 5.240534444174676
+          "feature": "net_irrigation_need_mm_sum_3d",
+          "feature_label": "Suma previa 3 días",
+          "mean_absolute_shap_mm": 0.1425660174825917,
+          "mean_signed_shap_mm": -0.1425660174825917,
+          "importance_share_pct": 4.993681426292052
         },
         {
           "model": "xgboost",
           "rank": 5,
-          "feature": "day_of_year_sin",
-          "feature_label": "Día del año (seno)",
-          "mean_absolute_shap_mm": 0.11324188858270645,
-          "mean_signed_shap_mm": -0.11324188858270645,
-          "importance_share_pct": 4.233791301594193
+          "feature": "et0_pm_mm_mean_7d",
+          "feature_label": "ET0 media previa 7 días",
+          "mean_absolute_shap_mm": 0.13758770279262378,
+          "mean_signed_shap_mm": 0.13758770279262378,
+          "importance_share_pct": 4.819305245765263
         }
       ],
       "worst_local_explanation": {
         "model": "xgboost",
         "observed_date": "2025-09-29",
         "actual_mm": 0.89,
-        "prediction_mm": 1.9245092868804932,
-        "absolute_error_mm": 1.034509286880493,
-        "base_value_mm": 4.024662494659424,
-        "top_positive_feature": "net_irrigation_need_mm_sum_7d",
-        "top_positive_shap_mm": 0.14068306982517242,
+        "prediction_mm": 1.948967695236206,
+        "absolute_error_mm": 1.058967695236206,
+        "base_value_mm": 4.026157855987549,
+        "top_positive_feature": "et0_pm_mm_mean_7d",
+        "top_positive_shap_mm": 0.13544079661369324,
         "top_negative_feature": "crop_coefficient_kc",
-        "top_negative_shap_mm": -1.427168607711792,
-        "shap_sum_prediction_mm": 1.9245084347203374
+        "top_negative_shap_mm": -1.2729460000991821,
+        "shap_sum_prediction_mm": 1.9489669222384691
       }
     }
   }
