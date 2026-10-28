@@ -48,7 +48,7 @@ primer comando. El programa comprueba que coincidan estación y fechas.
 
 La reproducción desde una copia compuesta solo por archivos versionados se
 comprobó de nuevo el 26/10/2026: se regeneraron ETL, tabla analítica,
-comparación de modelos, análisis XAI y validación, y pasaron 105 pruebas. Las
+comparación de modelos, análisis XAI y validación, y pasaron 108 pruebas. Las
 dos pruebas de interfaz Streamlit necesitaron el entorno Windows normal porque
 el aislamiento local de sockets impide que `AppTest` cargue la aplicación.
 

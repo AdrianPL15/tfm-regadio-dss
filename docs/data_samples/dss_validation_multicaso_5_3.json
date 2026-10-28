@@ -53,12 +53,12 @@
           "paired_block_bootstrap": {
             "estimand": "MAE persistencia - MAE DSS; positivo favorece al DSS",
             "observed_difference_mm_day": 0.071,
-            "ci_95_lower_mm_day": -0.196,
-            "ci_95_upper_mm_day": 0.322,
-            "probability_difference_positive": 0.711,
+            "ci_95_lower_mm_day": -0.194,
+            "ci_95_upper_mm_day": 0.321,
+            "probability_difference_positive": 0.704,
             "replicates": 5000,
             "block_days": 7,
-            "seed": 20261027
+            "seed": 42
           }
         }
       },
@@ -122,12 +122,12 @@
           "paired_block_bootstrap": {
             "estimand": "MAE persistencia - MAE DSS; positivo favorece al DSS",
             "observed_difference_mm_day": 0.15,
-            "ci_95_lower_mm_day": -0.028,
-            "ci_95_upper_mm_day": 0.34,
-            "probability_difference_positive": 0.945,
+            "ci_95_lower_mm_day": -0.036,
+            "ci_95_upper_mm_day": 0.345,
+            "probability_difference_positive": 0.937,
             "replicates": 5000,
             "block_days": 7,
-            "seed": 20261027
+            "seed": 42
           }
         }
       },
@@ -192,11 +192,11 @@
             "estimand": "MAE persistencia - MAE DSS; positivo favorece al DSS",
             "observed_difference_mm_day": 0.258,
             "ci_95_lower_mm_day": 0.0,
-            "ci_95_upper_mm_day": 0.555,
+            "ci_95_upper_mm_day": 0.54,
             "probability_difference_positive": 0.975,
             "replicates": 5000,
             "block_days": 7,
-            "seed": 20261027
+            "seed": 42
           }
         }
       },
@@ -230,12 +230,12 @@
     "paired_block_bootstrap": {
       "estimand": "MAE persistencia - MAE DSS; positivo favorece al DSS",
       "observed_difference_mm_day": 0.164,
-      "ci_95_lower_mm_day": 0.03,
-      "ci_95_upper_mm_day": 0.305,
-      "probability_difference_positive": 0.992,
+      "ci_95_lower_mm_day": 0.026,
+      "ci_95_upper_mm_day": 0.303,
+      "probability_difference_positive": 0.991,
       "replicates": 5000,
       "block_days": 7,
-      "seed": 20261027
+      "seed": 42
     }
   },
   "method": {

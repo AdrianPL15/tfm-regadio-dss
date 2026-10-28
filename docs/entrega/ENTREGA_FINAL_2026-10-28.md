@@ -4,7 +4,7 @@ Fecha de última comprobación técnica: 28 de octubre de 2026.
 
 ## Archivos que se presentan
 
-1. [Memoria definitiva en PDF](../memoria/TFM_definitivo_2026-10-27.pdf) y [Word editable](../memoria/TFM_definitivo_2026-10-27.docx). Incluye portada, resumen, índices, capítulos 1 a 6, referencias y anexo de reproducción. El equipo debe leer el PDF antes de enviarlo a la universidad.
+1. [Memoria definitiva en PDF](../memoria/TFM_definitivo_2026-10-28.pdf) y [Word editable](../memoria/TFM_definitivo_2026-10-28.docx). Incluye portada, resumen, Abstract y Keywords en inglés, índices, capítulos 1 a 6, referencias y anexo de reproducción. El equipo debe leer el PDF antes de enviarlo a la universidad.
 2. [Aplicación pública Streamlit](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [recorrido de demostración](DEMO_TFM.md). El evaluador puede escoger entre los casos SiAR verificados, actualizar SiAR y AEMET, consultar una dosis y descargar el CSV.
 3. [Repositorio de entrega](https://github.com/AdrianPL15/tfm-regadio-dss). El [README](../../README.md) lleva directamente a la memoria, la app, el código y las evidencias.
 
@@ -21,7 +21,7 @@ Fecha de última comprobación técnica: 28 de octubre de 2026.
 | Interfaz desplegada | [Código Streamlit](../../src/dss/app_streamlit.py) |
 | Reutilización académica y operación | [Ficha del conjunto](../tecnica/DATASET_CARD.md), [principios FAIR](../tecnica/FAIR_Y_CITACION.md) y [plan MLOps](../tecnica/MLOPS_MONITORIZACION.md) |
 
-El 26/10/2026 se ejecutaron **105 pruebas correctas**, incluidas la comprobación de ausencia de fuga temporal, la comprobación XAI y las dos pruebas `AppTest` de Streamlit. En el aislamiento local de sockets de Windows, `AppTest` se detiene antes de cargar la app; ejecutada en el entorno Windows normal, la suite terminó correctamente. La consulta pública de coliflor AL01 para hoy recibió datos SiAR y AEMET y mostró una dosis y un CSV descargable. El resultado de una consulta futura puede variar con los datos recibidos y la hora.
+El 28/10/2026 se ejecutaron **108 pruebas correctas**, incluidas la comprobación de ausencia de fuga temporal, las tres comprobaciones del protocolo multicaso, la comprobación XAI y las dos pruebas `AppTest` de Streamlit. En el aislamiento local de sockets de Windows, `AppTest` se detiene antes de cargar la app; ejecutada en el entorno Windows normal, la suite terminó correctamente. La consulta pública de coliflor AL01 para hoy recibió datos SiAR y AEMET y mostró una dosis y un CSV descargable. El resultado de una consulta futura puede variar con los datos recibidos y la hora.
 
 ## Alcance que debe explicarse
 

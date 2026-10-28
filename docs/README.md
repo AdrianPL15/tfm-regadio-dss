@@ -4,7 +4,7 @@ Esta carpeta está organizada para que la entrega pueda revisarse sin recorrer a
 
 ## Recorrido de evaluación
 
-1. [Memoria definitiva en PDF](memoria/TFM_definitivo_2026-10-27.pdf).
+1. [Memoria definitiva en PDF](memoria/TFM_definitivo_2026-10-28.pdf).
 2. [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/).
 3. [Guía breve del prototipo](entrega/DEMO_TFM.md).
 4. [Guía de entrega y límites](entrega/ENTREGA_FINAL_2026-10-28.md).

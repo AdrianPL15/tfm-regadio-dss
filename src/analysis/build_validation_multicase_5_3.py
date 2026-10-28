@@ -38,7 +38,7 @@ ACTIVE_CASE_NAMES = ("Coliflor", "Alfalfa", "Alcachofa")
 TEST_FRACTION = 0.15
 BOOTSTRAP_REPLICATES = 5_000
 BOOTSTRAP_BLOCK_DAYS = 7
-BOOTSTRAP_SEED = 20261027
+BOOTSTRAP_SEED = 42
 
 
 def _metrics(error: pd.Series) -> dict[str, float | int]:
