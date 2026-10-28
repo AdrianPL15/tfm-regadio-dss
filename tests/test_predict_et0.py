@@ -13,6 +13,7 @@ from src.dss.predict_et0 import (
     history_from_siar_records,
     predict_et0_with_fallback,
     predict_live_et0,
+    to_etc_model_estimate,
 )
 from src.models.train_et0_multiyear import WEATHER_CURRENT
 
@@ -98,8 +99,50 @@ class PredictEt0Tests(unittest.TestCase):
                 "AL01", history, date(2025, 1, 21),
                 manifest_path=manifest, model_dir=root,
             )
-            self.assertEqual(result["method"], "ridge_et0_multiyear")
+            self.assertEqual(result["method"], "ridge_et0_multiyear_h1")
+            self.assertEqual(result["horizon_days"], 1)
             self.assertAlmostEqual(result["et0_mm"], 2.5)
+
+    def test_two_day_horizon_is_selected_from_last_observation(self):
+        with TemporaryDirectory(dir=".test_tmp") as folder:
+            root = Path(folder)
+            history = self._history().iloc[:-1].copy()
+            from src.models.train_et0_multiyear import build_feature_table
+
+            table, features = build_feature_table(history, horizon_days=2)
+            model = DummyRegressor(strategy="constant", constant=2.7)
+            model.fit(table.iloc[:-2][features], table.iloc[:-2]["target_et0_mm"])
+            artifact = root / "model_h2.joblib"
+            joblib.dump(model, artifact)
+            import hashlib
+
+            digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+            manifest = root / "manifest.json"
+            manifest.write_text(
+                json.dumps({"stations": {"AL01": {"horizons": {"2": {
+                    "artifact": artifact.name,
+                    "sha256": digest,
+                    "feature_columns": features,
+                    "horizon_days": 2,
+                }}}}}),
+                encoding="utf-8",
+            )
+            result = predict_et0_with_fallback(
+                "AL01", history, date(2025, 1, 21),
+                manifest_path=manifest, model_dir=root,
+            )
+            self.assertEqual(result["method"], "ridge_et0_multiyear_h2")
+            self.assertEqual(result["horizon_days"], 2)
+            self.assertAlmostEqual(result["et0_mm"], 2.7)
+
+    def test_more_than_two_days_uses_fallback(self):
+        result = predict_et0_with_fallback(
+            "AL01",
+            self._history().iloc[:-2],
+            date(2025, 1, 21),
+        )
+        self.assertEqual(result["method"], "persistence_fallback")
+        self.assertIn("no soportado", result["fallback_reason"])
 
     def test_siar_adapter_produces_training_schema(self):
         record = {
@@ -125,6 +168,29 @@ class PredictEt0Tests(unittest.TestCase):
         )
         self.assertEqual(result["method"], "persistence_fallback")
         self.assertIn("fallo del extractor", result["fallback_reason"])
+
+    def test_et0_is_converted_to_etc_once_with_kc(self):
+        estimate = to_etc_model_estimate(
+            {
+                "et0_mm": 3.0,
+                "method": "ridge_et0_multiyear_h2",
+                "horizon_days": 2,
+                "station_code": "AL01",
+                "model_trained_through": "2025-12-31",
+                "external_test_ridge_mae_mm_day": 0.4,
+                "external_test_mean_7d_mae_mm_day": 0.5,
+            },
+            0.8,
+        )
+        self.assertAlmostEqual(estimate["etc_mm"], 2.4)
+        self.assertEqual(estimate["metric_target"], "ET0")
+        self.assertTrue(estimate["deploy_model_for_dose"])
+
+    def test_fallback_cannot_be_converted_to_etc_model(self):
+        with self.assertRaises(ValueError):
+            to_etc_model_estimate(
+                {"et0_mm": 3.0, "method": "persistence_fallback"}, 0.8
+            )
 
 
 if __name__ == "__main__":

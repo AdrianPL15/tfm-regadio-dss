@@ -1,0 +1,85 @@
+{
+  "experiment": "ET0 multianual: prueba operativa h=1/h=2",
+  "issued_at": "2026-10-29",
+  "target_date": "2026-10-29",
+  "results": [
+    {
+      "station_code": "AL01",
+      "query_start": "2026-09-29",
+      "query_end": "2026-10-28",
+      "records": 29,
+      "last_observation_date": "2026-10-27",
+      "prediction": {
+        "et0_mm": 2.314298777581291,
+        "method": "ridge_et0_multiyear_h2",
+        "horizon_days": 2,
+        "station_code": "AL01",
+        "target_date": "2026-10-29",
+        "artifact": "ridge_et0_AL01_h2.joblib",
+        "artifact_sha256": "107a973e4e8119835cbb61b9d9f2c2dbd419f29b5c4b9e4ed002a703520ebcfb",
+        "model_trained_through": "2025-12-31",
+        "external_test_ridge_mae_mm_day": 0.4334815272258021,
+        "external_test_persistence_mae_mm_day": 0.580561797752809,
+        "external_test_mean_7d_mae_mm_day": 0.5174382691278758,
+        "missing_feature_columns_imputed": [],
+        "missing_feature_values_imputed": [],
+        "fallback_reason": null
+      },
+      "provisional_snapshot": "data/raw/siar/provisional_et0/issued=2026-10-29/station=AL01.csv",
+      "validated_comparison_status": "pending_future_requery"
+    },
+    {
+      "station_code": "Z06",
+      "query_start": "2026-09-29",
+      "query_end": "2026-10-28",
+      "records": 12,
+      "last_observation_date": "2026-10-27",
+      "prediction": {
+        "et0_mm": 2.1212493648233246,
+        "method": "ridge_et0_multiyear_h2",
+        "horizon_days": 2,
+        "station_code": "Z06",
+        "target_date": "2026-10-29",
+        "artifact": "ridge_et0_Z06_h2.joblib",
+        "artifact_sha256": "bcc0ff3ceef112ad6b6c3ee4795a706ea71f59b2e629e63f48d73f0f64b0bd86",
+        "model_trained_through": "2025-10-20",
+        "external_test_ridge_mae_mm_day": 0.6056927794235379,
+        "external_test_persistence_mae_mm_day": 0.7667235494880547,
+        "external_test_mean_7d_mae_mm_day": 0.6730862993661628,
+        "missing_feature_columns_imputed": [],
+        "missing_feature_values_imputed": [
+          "et0_lag_14d"
+        ],
+        "fallback_reason": null
+      },
+      "provisional_snapshot": "data/raw/siar/provisional_et0/issued=2026-10-29/station=Z06.csv",
+      "validated_comparison_status": "pending_future_requery"
+    },
+    {
+      "station_code": "BA08",
+      "query_start": "2026-09-29",
+      "query_end": "2026-10-28",
+      "records": 29,
+      "last_observation_date": "2026-10-27",
+      "prediction": {
+        "et0_mm": 2.2685035228716908,
+        "method": "ridge_et0_multiyear_h2",
+        "horizon_days": 2,
+        "station_code": "BA08",
+        "target_date": "2026-10-29",
+        "artifact": "ridge_et0_BA08_h2.joblib",
+        "artifact_sha256": "74f53007c452edef3f486fc64548b5106d50bd2791030c3b2038afb2626702f2",
+        "model_trained_through": "2025-12-31",
+        "external_test_ridge_mae_mm_day": 0.4611028913411372,
+        "external_test_persistence_mae_mm_day": 0.580054794520548,
+        "external_test_mean_7d_mae_mm_day": 0.5436594911937377,
+        "missing_feature_columns_imputed": [],
+        "missing_feature_values_imputed": [],
+        "fallback_reason": null
+      },
+      "provisional_snapshot": "data/raw/siar/provisional_et0/issued=2026-10-29/station=BA08.csv",
+      "validated_comparison_status": "pending_future_requery"
+    }
+  ],
+  "provisional_vs_validated": "Los valores quedan archivados como snapshot provisional. La comparación solo podrá cerrarse al volver a consultar esas mismas fechas después de su validación por SiAR."
+}

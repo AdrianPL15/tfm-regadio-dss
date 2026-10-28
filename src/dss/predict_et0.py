@@ -50,24 +50,36 @@ def predict_et0_with_fallback(
     manifest_path: Path = MANIFEST,
     model_dir: Path = MODEL_DIR,
 ) -> dict:
-    """Predice ET0 para mañana o devuelve persistencia con causa trazable."""
+    """Predice ET0 a uno o dos días o devuelve persistencia trazable."""
 
     station_code = station_code.upper()
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        entry = manifest["stations"][station_code]
+        station_entry = manifest["stations"][station_code]
+        data = history.copy()
+        data["date"] = pd.to_datetime(data["date"], errors="raise")
+        data = data.loc[data["date"].dt.date < target_day].sort_values("date")
+        if data.empty:
+            raise ValueError("no existen observaciones anteriores a la fecha objetivo")
+        horizon_days = (target_day - data["date"].max().date()).days
+        if horizon_days not in (1, 2):
+            raise ValueError(
+                f"horizonte operativo no soportado: {horizon_days} días desde el último dato"
+            )
+        horizons = station_entry.get("horizons")
+        if horizons is None:
+            if horizon_days != 1:
+                raise ValueError("el manifiesto legado solo contiene el horizonte de un día")
+            entry = station_entry
+        else:
+            entry = horizons[str(horizon_days)]
         artifact = model_dir / entry["artifact"]
         if artifact.parent.resolve() != model_dir.resolve() or not artifact.is_file():
             raise ValueError("artefacto ausente o ruta no válida")
         if _sha256(artifact) != entry["sha256"]:
             raise ValueError("la huella del artefacto no coincide")
 
-        data = history.copy()
-        data["date"] = pd.to_datetime(data["date"], errors="raise")
-        data = data.loc[data["date"].dt.date < target_day].sort_values("date")
-        if data.empty or data["date"].max().date() != target_day - timedelta(days=1):
-            raise ValueError("no existe observación del día inmediatamente anterior")
-        table, available_features = build_feature_table(data)
+        table, available_features = build_feature_table(data, horizon_days=horizon_days)
         row = table.loc[table["prediction_date"].dt.date.eq(target_day)]
         if len(row) != 1:
             raise ValueError("no se pudo construir una única fila de inferencia")
@@ -81,18 +93,31 @@ def predict_et0_with_fallback(
             raise ValueError(
                 "faltan columnas operativas completas: " + ", ".join(missing_columns)
             )
+        imputed_values = feature_frame.columns[feature_frame.isna().iloc[0]].tolist()
         model = joblib.load(artifact)
         prediction = float(model.predict(feature_frame)[0])
         if not np.isfinite(prediction) or prediction < 0:
             raise ValueError("predicción no válida")
         return {
             "et0_mm": prediction,
-            "method": "ridge_et0_multiyear",
+            "method": f"ridge_et0_multiyear_h{horizon_days}",
+            "horizon_days": horizon_days,
             "station_code": station_code,
             "target_date": target_day.isoformat(),
             "artifact": entry["artifact"],
             "artifact_sha256": entry["sha256"],
+            "model_trained_through": entry.get("trained_through"),
+            "external_test_ridge_mae_mm_day": entry.get(
+                "external_test_ridge_mae_mm_day"
+            ),
+            "external_test_persistence_mae_mm_day": entry.get(
+                "external_test_persistence_mae_mm_day"
+            ),
+            "external_test_mean_7d_mae_mm_day": entry.get(
+                "external_test_mean_7d_mae_mm_day"
+            ),
             "missing_feature_columns_imputed": [],
+            "missing_feature_values_imputed": imputed_values,
             "fallback_reason": None,
         }
     except (FileNotFoundError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
@@ -129,6 +154,31 @@ def history_from_siar_records(records: list[dict], station_code: str) -> pd.Data
     return renamed[columns].sort_values("date").reset_index(drop=True)
 
 
+def to_etc_model_estimate(prediction: dict, kc: float) -> dict:
+    """Convierte una ET0 Ridge válida en el contrato ETc que consume el DSS."""
+
+    method = str(prediction.get("method", ""))
+    if not method.startswith("ridge_et0_multiyear_h"):
+        raise ValueError("La predicción ET0 no procede de un artefacto Ridge válido.")
+    et0_mm = float(prediction["et0_mm"])
+    kc = float(kc)
+    if not np.isfinite(et0_mm) or et0_mm < 0 or not np.isfinite(kc) or kc <= 0:
+        raise ValueError("ET0 o Kc no válidos para calcular ETc.")
+    return {
+        "etc_mm": et0_mm * kc,
+        "model": f"Ridge ET0 h={prediction['horizon_days']} × Kc",
+        "case": prediction.get("station_code"),
+        "trained_through": prediction.get("model_trained_through", "2025"),
+        "test_mae_mm_day": prediction.get("external_test_ridge_mae_mm_day"),
+        "physical_baseline_test_mae_mm_day": prediction.get(
+            "external_test_mean_7d_mae_mm_day"
+        ),
+        "steps_ahead": int(prediction["horizon_days"]),
+        "deploy_model_for_dose": True,
+        "metric_target": "ET0",
+    }
+
+
 def predict_live_et0(
     station_code: str,
     target_day: date,
@@ -139,7 +189,7 @@ def predict_live_et0(
     manifest_path: Path = MANIFEST,
     model_dir: Path = MODEL_DIR,
 ) -> dict:
-    """Consulta observaciones SiAR hasta t-1 y ejecuta Ridge con respaldo."""
+    """Consulta SiAR hasta t-1 y elige h=1 o h=2 según el último dato."""
 
     if lookback_days < 14:
         raise ValueError("El periodo operativo debe cubrir al menos 14 días.")

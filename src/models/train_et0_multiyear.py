@@ -52,6 +52,9 @@ def build_feature_table(
     data = history.copy()
     data["date"] = pd.to_datetime(data["date"], errors="raise")
     data = data.sort_values("date").drop_duplicates("date").reset_index(drop=True)
+    if not data.empty:
+        calendar = pd.date_range(data["date"].min(), data["date"].max(), freq="D")
+        data = data.set_index("date").reindex(calendar).rename_axis("date").reset_index()
     data["prediction_date"] = data["date"] + pd.Timedelta(days=horizon_days)
     data["target_et0_mm"] = data["et0_mm"].shift(-horizon_days)
 

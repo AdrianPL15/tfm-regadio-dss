@@ -31,10 +31,12 @@ from src.dss.config import (  # noqa: E402
 from src.dss.data_access import load_case, load_crop_needs_bytes  # noqa: E402
 from src.dss.aemet_forecast import fetch_live_forecast, prepare_live_forecast  # noqa: E402
 from src.data.aemet_client import AEMETClient, AEMETError  # noqa: E402
+from src.data import siar_client as siar_api  # noqa: E402
 from src.data.refresh_siar_crop_needs import SiARRefreshError, fetch_validated_case  # noqa: E402
 from src.dss.engine import METHOD_LABELS, fmt_es, recommend  # noqa: E402
 from src.dss.live_calendar import extend_recent_kc  # noqa: E402
 from src.dss.predict_etc import ModelUnavailable, predict_tomorrow_etc  # noqa: E402
+from src.dss import predict_et0 as et0_model  # noqa: E402
 
 
 st.set_page_config(page_title="DSS de riego", layout="wide")
@@ -116,11 +118,13 @@ with st.sidebar:
     snapshot_key = f"siar_{case.station_code}_{case.crop}_{case.campaign_year}"
     aemet_key = f"aemet_{case.station_code}"
     aemet_time_key = f"aemet_consulta_{case.station_code}"
+    et0_key = f"et0_{case.station_code}_{case.campaign_year}"
     generate = st.button("Actualizar fuentes y generar recomendación", type="primary")
     if generate:
         st.session_state.pop(snapshot_key, None)
         st.session_state.pop(aemet_key, None)
         st.session_state.pop(aemet_time_key, None)
+        st.session_state.pop(et0_key, None)
 
     history, metadata = _load(
         str(_absolute(case.source_file)), str(_absolute(case.metadata_file))
@@ -209,6 +213,35 @@ with st.sidebar:
         mode == "planificacion" and live_case and issue in {today, tomorrow}
         and issue.month in metadata.get("active_months", [])
     )
+    if generate and operational_view:
+        try:
+            with st.spinner("Calculando ET0 con observaciones recientes de SiAR…"):
+                try:
+                    cloud_siar_token = st.secrets.get("SIAR_API_TOKEN")
+                except (FileNotFoundError, KeyError):
+                    cloud_siar_token = None
+                siar_provider = siar_api.SiARClient(
+                    token=cloud_siar_token or os.getenv("SIAR_API_TOKEN")
+                )
+                et0_result = et0_model.predict_live_et0(
+                    case.station_code,
+                    issue,
+                    client=siar_provider,
+                    fallback_history=history,
+                )
+                st.session_state[et0_key] = et0_result
+            if et0_result["method"].startswith("ridge_et0_multiyear_h"):
+                st.success(
+                    "ET0 estimada con el modelo multianual a "
+                    f"{et0_result['horizon_days']} día(s)."
+                )
+            else:
+                st.info(
+                    "El modelo multianual no pudo aplicarse; se mantiene el método "
+                    f"físico de respaldo ({et0_result.get('fallback_reason', 'sin detalle')})."
+                )
+        except (siar_api.SiARError, ValueError, OSError) as error:
+            st.warning(f"La predicción ET0 no está disponible; se usa el respaldo: {error}")
     horizon = st.slider(
         "Horizonte orientativo (días)", 1, MAX_HORIZON_DAYS,
         MAX_HORIZON_DAYS if live_case else 7,
@@ -318,10 +351,25 @@ try:
     )
     model_estimate = None
     if operational_view:
-        try:
-            model_estimate = predict_tomorrow_etc(case, calculation_history, issue)
-        except (ModelUnavailable, OSError, ImportError) as error:
-            st.warning(f"Modelo no disponible; se usa el cálculo físico SiAR: {error}")
+        et0_prediction = st.session_state.get(et0_key)
+        target_row = calculation_history.loc[
+            calculation_history["date"].eq(pd.Timestamp(issue))
+        ]
+        if (
+            et0_prediction
+            and et0_prediction.get("target_date") == issue.isoformat()
+            and str(et0_prediction.get("method", "")).startswith("ridge_et0_multiyear_h")
+            and len(target_row) == 1
+            and pd.notna(target_row["kc"].iat[0])
+        ):
+            model_estimate = et0_model.to_etc_model_estimate(
+                et0_prediction, float(target_row["kc"].iat[0])
+            )
+        else:
+            try:
+                model_estimate = predict_tomorrow_etc(case, calculation_history, issue)
+            except (ModelUnavailable, OSError, ImportError) as error:
+                st.warning(f"Modelo no disponible; se usa el cálculo físico SiAR: {error}")
     result = recommend(
         request, history=calculation_history, metadata=metadata,
         forecast=forecast_input,
@@ -480,11 +528,13 @@ with st.expander("¿De dónde sale esta recomendación?"):
             "solo cuando hay cantidad horaria utilizable y según la fracción supuesta."
         )
     if model_estimate is not None:
+        metric_target = model_estimate.get("metric_target", "ETc")
         st.markdown(
-            f"**Comparación ETc:** modelo {fmt_es(model_estimate['etc_mm'])} mm; "
+            f"**Demanda estimada antes de lluvia:** "
+            f"{fmt_es(model_estimate['etc_mm'])} mm de ETc; "
             f"método usado {fmt_es(first['base_need_before_rain_mm'])} mm. "
-            f"MAE de prueba: modelo {fmt_es(model_estimate['test_mae_mm_day'], 2)} "
-            "mm/día; físico "
+            f"MAE histórico de {metric_target}: modelo "
+            f"{fmt_es(model_estimate['test_mae_mm_day'], 2)} mm/día; referencia física "
             f"{fmt_es(model_estimate['physical_baseline_test_mae_mm_day'], 2)} mm/día."
         )
         st.caption(
@@ -492,7 +542,7 @@ with st.expander("¿De dónde sale esta recomendación?"):
             "calidad; esas métricas no son una evaluación independiente del sistema "
             "completo desplegado."
         )
-        if model_estimate["steps_ahead"] > 1:
+        if model_estimate["steps_ahead"] > 2:
             st.warning(
                 f"La predicción comparativa avanzó {model_estimate['steps_ahead']} "
                 "días desde la última ETc observada. Esta extrapolación no se "

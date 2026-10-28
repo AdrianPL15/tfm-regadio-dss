@@ -3,9 +3,10 @@
 ## Alcance y separación de la entrega
 
 Este trabajo se desarrolla en `codex/experimento-et0-multianual` y no modifica
-la versión estable del TFM, la memoria ni la aplicación Streamlit. Su objetivo
-es comprobar si una predicción de ET0 del día siguiente mejora la referencia de
-persistencia antes de decidir si merece incorporarse al DSS.
+la versión estable del TFM ni la memoria. Su objetivo es comprobar si una
+predicción de ET0 a uno o dos días mejora las referencias físicas antes de
+decidir si merece incorporarse al DSS. La integración con Streamlit existe
+únicamente en esta rama experimental; `main` permanece sin cambios.
 
 La ET0 es una variable meteorológica asociada a la estación, no al cultivo. La
 transformación agronómica se realiza después mediante `ETc = ET0 × Kc`. En el
@@ -164,8 +165,9 @@ y 2025 confirmó además que Ridge completo superó a la media de siete días en
 las nueve combinaciones estación-año a horizonte dos. Considerando conjuntamente
 los horizontes uno y dos, ganó las 18 comparaciones frente a esa referencia.
 El horizonte dos queda por tanto validado como candidato experimental para
-resolver el desfase observado, pero todavía no está serializado ni conectado a
-la aplicación estable.
+resolver el desfase observado. Se serializó después para las tres estaciones y
+se conectó únicamente a la versión de Streamlit de esta rama; la aplicación
+estable de `main` no queda modificada hasta aprobar la fusión.
 
 ## Validación geográfica sin reajuste
 
@@ -250,58 +252,61 @@ procede mantenerlo separado de la entrega estable:
    integrar previsiones meteorológicas futuras completas;
 5. la evaluación con precipitación observada aísla el efecto de ET0, pero no
    valida el error real de la API de AEMET;
-6. el horizonte de dos días ya aporta evidencia retrospectiva favorable, pero
-   falta versionar el artefacto, verificarlo con entradas vivas y decidir cómo
-   seleccionar automáticamente el horizonte según la fecha del último dato.
+6. la comparación entre valores provisionales y posteriormente validados de
+   SiAR requiere conservar instantáneas y esperar a que el proveedor consolide
+   esas mismas fechas; no puede cerrarse retrospectivamente con una sola
+   consulta.
 
 La decisión provisional pasa a ser **candidato favorable a integración
-controlada**, no integración automática. El artefacto a un día ya está
-serializado y dispone de respaldo; antes de sustituir la vía estable de media
-reciente en la aplicación debe versionarse también el horizonte dos, resolver
-la selección automática según la fecha del último dato y ejecutar una prueba
-de regresión completa de Streamlit. Hasta entonces, la media reciente de siete
-días continúa siendo la vía física ordinaria y la persistencia su referencia y
-respaldo final.
+controlada**, no integración automática. Los horizontes uno y dos ya están
+serializados y la rama experimental elige uno automáticamente según la fecha
+del último dato. La media reciente de siete días continúa siendo el respaldo
+físico cuando Ridge no es aplicable, y la persistencia permanece como último
+respaldo trazable. La fusión en la aplicación estable se decidirá solo después
+de revisar esta rama y conservar evidencia de funcionamiento operativo.
 
 ## Preparación técnica para una integración controlada
 
-Se ha preparado una capa experimental que todavía no está conectada a
-Streamlit. Tras congelar la evaluación externa de 2025, Ridge se reajusta con
-todo el histórico 2021–2025 de cada estación. Los tres artefactos se conservan
-en `models/experimental_et0_multiyear/` junto a un manifiesto que declara:
+Tras congelar la evaluación externa de 2025, Ridge se reajusta con todo el
+histórico 2021–2025 de cada estación y horizonte. Los seis artefactos —`h=1` y
+`h=2` para AL01, Z06 y BA08— se conservan en
+`models/experimental_et0_multiyear/` junto a un manifiesto que declara:
 
 - estación, periodo y número de filas de entrenamiento;
 - orden exacto de las variables de entrada;
-- MAE de Ridge y persistencia medidos antes del reajuste, sobre 2025;
+- MAE de Ridge, persistencia y media móvil de siete días medidos antes del
+  reajuste, sobre 2025;
 - nombre y huella SHA-256 del artefacto;
+- versiones de Python, NumPy, pandas, scikit-learn y joblib usadas al exportar;
 - estado explícito `experimental_not_deployed`.
 
-La inferencia de `src/dss/predict_et0.py` solo intenta Ridge cuando existe una
-observación del día inmediatamente anterior y al menos tres retardos de ET0
-válidos. Verifica la huella del artefacto y no utiliza registros de la fecha
-objetivo ni posteriores. Ante un modelo ausente, manipulado, una estación no
-registrada, datos desactualizados o histórico insuficiente, devuelve de forma
-trazable la persistencia de la última ET0 observada. Si tampoco existe esa ET0,
-declara el resultado como no disponible.
+La inferencia de `src/dss/predict_et0.py` calcula la distancia entre el último
+dato y la fecha objetivo y selecciona `h=1` o `h=2`. Exige al menos tres
+retardos de ET0 válidos, verifica la huella del artefacto y no utiliza registros
+de la fecha objetivo ni posteriores. También declara los valores concretos que
+el `Pipeline` ha debido imputar. Ante un horizonte superior, un modelo ausente
+o manipulado, una estación no registrada, datos desactualizados o histórico
+insuficiente, devuelve de forma trazable la persistencia de la última ET0
+observada. Si tampoco existe esa ET0, declara el resultado como no disponible.
 
 Una comprobación de inferencia para el 1 de enero de 2026 produjo Ridge en AL01
 y BA08, mientras Z06 activó correctamente el respaldo por falta de suficientes
 retardos recientes. Este comportamiento confirma que el respaldo no es solo
-una especificación documental. La siguiente fase, todavía pendiente, es
-construir una tabla operativa diaria con las mismas variables desde SiAR y
-decidir qué campos futuros de AEMET pueden incorporarse sin cambiar el contrato
-validado.
+una especificación documental. Después se construyó la tabla operativa diaria
+con las mismas variables desde SiAR y se verificó en vivo en las tres
+estaciones. AEMET no se usa para fabricar esas entradas: conserva el papel
+separado de aportar la lluvia prevista que se descuenta tras `ET0 × Kc`.
 
 ## Auditoría de preparación operativa
 
-La auditoría `src/analysis/audit_et0_operational_readiness.py` confirma que la
-entrada actual de Streamlit no satisface aún el contrato de Ridge. Los CSV de
-necesidades hídricas aportan fecha, Kc, ET0, ETc, Pe y necesidad neta, pero no
-incluyen las series completas de temperatura, humedad, viento, radiación y
-precipitación observada que utilizó el experimento. Imputar columnas enteras
-supondría un escenario diferente al evaluado y podría degradar el resultado sin
-que las métricas de 2025 lo reflejasen; por ello la inferencia lo rechaza y
-activa persistencia.
+La primera auditoría `src/analysis/audit_et0_operational_readiness.py` detectó
+que los CSV de necesidades hídricas usados por Streamlit no satisfacían el
+contrato de Ridge. Esos ficheros aportan fecha, Kc, ET0, ETc, Pe y necesidad
+neta, pero no las series completas de temperatura, humedad, viento, radiación
+y precipitación observada del experimento. Por ello no se imputaron columnas
+enteras ni se atribuyeron a ese escenario las métricas de 2025. La brecha se
+resolvió consultando directamente las observaciones diarias de la API SiAR y
+normalizándolas con el adaptador probado de `src/dss/predict_et0.py`.
 
 AEMET tampoco debe rellenar esas columnas: el producto municipal disponible
 aporta lluvia prevista y su probabilidad, no las observaciones SiAR de la
@@ -318,14 +323,30 @@ persistencia en vez de extrapolar fuera de su alcance. La evaluación posterior
 del horizonte dos no altera retroactivamente esa decisión segura.
 
 La auditoría original registró el estado
-`blocked_siar_publication_lag_for_same_day`. La barrera de evaluación se ha
-reducido después al comprobar que Ridge a horizonte dos también mejora las
-referencias en 2023–2025, pero la integración sigue bloqueada hasta versionar
-ese artefacto y validar la selección automática de horizonte con entradas
-vivas. AEMET no publica ET0 y no corrige por sí sola este desfase. El informe
-de preparación se guarda en
+`blocked_siar_publication_lag_for_same_day`. La barrera se resolvió en esta rama
+al validar y versionar `h=2`. La prueba viva final del 29 de octubre recuperó
+datos hasta el día 27 en las tres estaciones y seleccionó automáticamente
+`ridge_et0_multiyear_h2`: 2,314 mm en AL01, 2,121 mm en Z06 y 2,269 mm en BA08
+para el día 29. AL01 y BA08 no necesitaron imputaciones; Z06 imputó únicamente
+el retardo de 14 días porque la API devolvió una serie continua de 12 jornadas.
+AEMET no publica ET0: su lluvia prevista se descuenta después de `ET0 × Kc`.
+El informe de preparación se guarda en
 `docs/data_samples/et0_operational_readiness.json` y la evidencia de la prueba
-real en `docs/data_samples/et0_live_siar_smoke_2026-10-29.json`.
+real en `docs/data_samples/et0_live_siar_smoke_latest.json`.
+
+El botón de la interfaz experimental reúne las tres operaciones sin mezclarlas:
+actualiza el calendario y Kc del cultivo desde SiAR, obtiene ET0 mediante el
+artefacto compatible con la latencia y consulta a AEMET para descontar una sola
+vez la lluvia prevista aprovechable. Si falla cualquiera de las fuentes, el
+motor conserva el respaldo físico y muestra la causa al usuario.
+
+Las instantáneas normalizadas de esta prueba se conservan localmente fuera del
+control de versiones. Una reconsulta realizada el mismo 29 de octubre no
+detectó cambios en ninguna de las once variables comparadas de AL01, Z06 o
+BA08. Este resultado solo verifica el comparador: no acredita que los valores
+sean definitivos. `src/analysis/compare_et0_provisional_snapshot.py` permite
+repetir la comparación más adelante y separa revisiones de valores, fechas
+nuevas y fechas desaparecidas.
 
 ## Artefactos generados
 
@@ -339,6 +360,10 @@ real en `docs/data_samples/et0_live_siar_smoke_2026-10-29.json`.
 - `src/dss/predict_et0.py`: inferencia con verificación y respaldo;
 - `src/analysis/audit_et0_operational_readiness.py`: compatibilidad entre el
   contrato del modelo y las fuentes que alimentan actualmente Streamlit;
+- `src/analysis/run_et0_live_smoke.py`: prueba viva y archivo local de snapshots
+  provisionales para su validación posterior;
+- `src/analysis/compare_et0_provisional_snapshot.py`: comparación reproducible
+  entre la instantánea y una reconsulta posterior;
 - `docs/data_samples/et0_multiyear_metrics.csv`: métricas de modelos;
 - `docs/data_samples/et0_multiyear_predictions_2025.csv`: predicciones de prueba;
 - `docs/data_samples/et0_multiyear_statistical_evidence.csv`: incertidumbre;
@@ -349,7 +374,16 @@ real en `docs/data_samples/et0_live_siar_smoke_2026-10-29.json`.
 - `docs/data_samples/et0_multiyear_*_Z06.*` y `*_BA08.*`: réplica geográfica;
 - `docs/data_samples/et0_multiyear_geographic_validation.csv`: comparación
   consolidada de las tres estaciones.
+- `docs/data_samples/et0_live_siar_smoke_latest.json`: prueba operativa de los
+  tres artefactos `h=2`.
+- `docs/data_samples/et0_provisional_requery_latest.json`: primera comprobación
+  del mecanismo de detección de revisiones.
 
-Las pruebas automatizadas comprueban la construcción de objetivo a un día, la
-ausencia de fuga temporal, la calidad del calendario, la reproducibilidad del
-bootstrap y la aplicación única de Kc y precipitación.
+Las pruebas automatizadas comprueban los objetivos a uno y dos días, el uso de
+retardos de calendario reales, la ausencia de fuga temporal, la calidad del
+calendario, la reproducibilidad del bootstrap, la integridad SHA-256 de los
+artefactos, los respaldos y la aplicación única de Kc y precipitación. La
+verificación final suma 137 pruebas no visuales superadas, compilación correcta
+de la aplicación y una consulta real satisfactoria en las tres estaciones. La
+prueba visual completa de Streamlit y la fusión en `main` se mantienen como
+puertas deliberadas de revisión, no como resultados ya aprobados.

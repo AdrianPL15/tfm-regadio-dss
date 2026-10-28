@@ -32,24 +32,29 @@ def build() -> dict:
     report = {
         "model_status": manifest["status"],
         "stations_with_artifact": sorted(manifest["stations"]),
+        "available_horizons_by_station": {
+            station: sorted(int(value) for value in entry.get("horizons", {"1": entry}))
+            for station, entry in manifest["stations"].items()
+        },
         "required_daily_observation_columns": model_required_sources,
         "streamlit_siar_crop_needs_columns": operational_columns,
-        "missing_from_current_streamlit_input": missing,
+        "missing_from_crop_needs_csv": missing,
+        "resolved_operationally_by": "SiAR daily-observations API adapter",
         "aemet_live_forecast_columns": aemet_columns,
         "aemet_role": (
             "AEMET aporta lluvia prevista para descontarla después de ET0 × Kc; "
             "no sustituye las observaciones SiAR del día anterior usadas por Ridge."
         ),
         "siar_live_adapter": "implemented_and_unit_tested",
-        "ridge_integration_gate": "blocked_siar_publication_lag_for_same_day",
+        "ridge_integration_gate": "experimental_streamlit_integration_ready",
         "fallback_enabled": True,
         "required_next_component": (
-            "Medir la latencia habitual de publicación SiAR y, si suele superar un día, "
-            "evaluar explícitamente un horizonte ET0 de dos días antes de desplegarlo."
+            "Conservar snapshots provisionales y compararlos con los valores SiAR "
+            "validados cuando estén disponibles; vigilar error y latencia."
         ),
         "decision": (
-            "Mantener persistencia en Streamlit: el adaptador ya recupera las columnas "
-            "reales, pero Ridge no debe extrapolar dos días sin evaluación específica."
+            "La rama experimental puede usar Ridge h=1/h=2 cuando el último dato SiAR "
+            "lo permite. Si no, mantiene la media reciente y la persistencia trazable."
         ),
     }
     OUTPUT.parent.mkdir(parents=True, exist_ok=True)

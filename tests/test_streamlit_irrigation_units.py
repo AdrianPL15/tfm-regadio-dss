@@ -35,6 +35,19 @@ class IrrigationUnitsUiTests(unittest.TestCase):
             patch("src.data.refresh_siar_crop_needs.download_csv", return_value=source),
             patch("src.data.aemet_client.AEMETClient"),
             patch("src.dss.aemet_forecast.fetch_live_forecast", side_effect=AEMETError("prueba")),
+            patch("src.data.siar_client.SiARClient"),
+            patch(
+                "src.dss.predict_et0.predict_live_et0",
+                return_value={
+                    "et0_mm": 2.0,
+                    "method": "ridge_et0_multiyear_h2",
+                    "horizon_days": 2,
+                    "target_date": "2026-10-29",
+                    "model_trained_through": "2025-12-31",
+                    "external_test_ridge_mae_mm_day": 0.4,
+                    "external_test_mean_7d_mae_mm_day": 0.5,
+                },
+            ),
         ):
             app.button[0].click().run()
         self.assertEqual(len(app.exception), 0)

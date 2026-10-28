@@ -43,6 +43,18 @@ class TrainEt0MultiyearTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_feature_table(history, horizon_days=0)
 
+    def test_lags_follow_calendar_days_when_history_has_a_gap(self):
+        history = pd.DataFrame(
+            {
+                "date": pd.to_datetime(["2024-01-01", "2024-01-03", "2024-01-04"]),
+                "et0_mm": [1.0, 3.0, 4.0],
+            }
+        )
+        table, _ = build_feature_table(history)
+        row = table.loc[table["date"].eq(pd.Timestamp("2024-01-03"))].iloc[0]
+        self.assertEqual(float(row["et0_lag_1d"]), 3.0)
+        self.assertTrue(pd.isna(row["et0_lag_2d"]))
+
 
 if __name__ == "__main__":
     unittest.main()

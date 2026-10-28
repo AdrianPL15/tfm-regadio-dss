@@ -5,6 +5,20 @@
     "BA08",
     "Z06"
   ],
+  "available_horizons_by_station": {
+    "AL01": [
+      1,
+      2
+    ],
+    "Z06": [
+      1,
+      2
+    ],
+    "BA08": [
+      1,
+      2
+    ]
+  },
   "required_daily_observation_columns": [
     "et0_mm",
     "temperature_mean_c",
@@ -29,7 +43,7 @@
     "record_status",
     "source_file"
   ],
-  "missing_from_current_streamlit_input": [
+  "missing_from_crop_needs_csv": [
     "humidity_max_pct",
     "humidity_mean_pct",
     "humidity_min_pct",
@@ -41,6 +55,7 @@
     "wind_speed_max_ms",
     "wind_speed_mean_ms"
   ],
+  "resolved_operationally_by": "SiAR daily-observations API adapter",
   "aemet_live_forecast_columns": [
     "date",
     "precipitation_probability_pct",
@@ -54,8 +69,8 @@
   ],
   "aemet_role": "AEMET aporta lluvia prevista para descontarla después de ET0 × Kc; no sustituye las observaciones SiAR del día anterior usadas por Ridge.",
   "siar_live_adapter": "implemented_and_unit_tested",
-  "ridge_integration_gate": "blocked_siar_publication_lag_for_same_day",
+  "ridge_integration_gate": "experimental_streamlit_integration_ready",
   "fallback_enabled": true,
-  "required_next_component": "Medir la latencia habitual de publicación SiAR y, si suele superar un día, evaluar explícitamente un horizonte ET0 de dos días antes de desplegarlo.",
-  "decision": "Mantener persistencia en Streamlit: el adaptador ya recupera las columnas reales, pero Ridge no debe extrapolar dos días sin evaluación específica."
+  "required_next_component": "Conservar snapshots provisionales y compararlos con los valores SiAR validados cuando estén disponibles; vigilar error y latencia.",
+  "decision": "La rama experimental puede usar Ridge h=1/h=2 cuando el último dato SiAR lo permite. Si no, mantiene la media reciente y la persistencia trazable."
 }
