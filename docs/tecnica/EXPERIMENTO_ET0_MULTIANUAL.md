@@ -187,6 +187,39 @@ construir una tabla operativa diaria con las mismas variables desde SiAR y
 decidir qué campos futuros de AEMET pueden incorporarse sin cambiar el contrato
 validado.
 
+## Auditoría de preparación operativa
+
+La auditoría `src/analysis/audit_et0_operational_readiness.py` confirma que la
+entrada actual de Streamlit no satisface aún el contrato de Ridge. Los CSV de
+necesidades hídricas aportan fecha, Kc, ET0, ETc, Pe y necesidad neta, pero no
+incluyen las series completas de temperatura, humedad, viento, radiación y
+precipitación observada que utilizó el experimento. Imputar columnas enteras
+supondría un escenario diferente al evaluado y podría degradar el resultado sin
+que las métricas de 2025 lo reflejasen; por ello la inferencia lo rechaza y
+activa persistencia.
+
+AEMET tampoco debe rellenar esas columnas: el producto municipal disponible
+aporta lluvia prevista y su probabilidad, no las observaciones SiAR de la
+estación en `t-1`. Su papel permanece separado y correcto: descontar una sola
+vez la lluvia prevista después de obtener `ETc = ET0 × Kc`.
+
+Se implementó después un adaptador de la API SiAR que normaliza las
+observaciones diarias al esquema del entrenamiento. La prueba real realizada
+el 29 de octubre de 2026 sobre AL01 recuperó 29 registros, todos con ET0 y
+calidad `PASS`, pero la última observación disponible correspondía al 27 de
+octubre. Para recomendar el día 29 habría que proyectar dos pasos y el
+experimento solo ha validado un paso. El sistema activó correctamente
+persistencia en vez de extrapolar fuera de su alcance.
+
+El estado de integración queda como
+`blocked_siar_publication_lag_for_same_day`. La barrera de columnas está
+resuelta, pero debe medirse la latencia habitual de SiAR y, si el desfase de dos
+días es recurrente, evaluar de forma separada un modelo a horizonte dos antes
+de desplegarlo. AEMET no publica ET0 y no corrige por sí sola este desfase. El
+informe de preparación se guarda en
+`docs/data_samples/et0_operational_readiness.json` y la evidencia de la prueba
+real en `docs/data_samples/et0_live_siar_smoke_2026-10-29.json`.
+
 ## Artefactos generados
 
 - `src/analysis/audit_et0_availability.py`: inventario de fuentes disponibles;
@@ -195,6 +228,8 @@ validado.
 - `src/analysis/evaluate_et0_multiyear.py`: bootstrap e impacto agronómico;
 - `src/models/export_et0_multiyear.py`: reajuste y versionado experimental;
 - `src/dss/predict_et0.py`: inferencia con verificación y respaldo;
+- `src/analysis/audit_et0_operational_readiness.py`: compatibilidad entre el
+  contrato del modelo y las fuentes que alimentan actualmente Streamlit;
 - `docs/data_samples/et0_multiyear_metrics.csv`: métricas de modelos;
 - `docs/data_samples/et0_multiyear_predictions_2025.csv`: predicciones de prueba;
 - `docs/data_samples/et0_multiyear_statistical_evidence.csv`: incertidumbre;

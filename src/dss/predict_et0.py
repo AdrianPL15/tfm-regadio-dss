@@ -6,17 +6,24 @@ import hashlib
 import json
 from datetime import date, timedelta
 from pathlib import Path
+from typing import Protocol
 
 import joblib
 import numpy as np
 import pandas as pd
 
 from src.models.train_et0_multiyear import build_feature_table
+from src.data.siar_client import SiARClient, SiARError
+from src.data.transform_interim import normalize_siar_daily
 
 
 ROOT = Path(__file__).resolve().parents[2]
 MODEL_DIR = ROOT / "models/experimental_et0_multiyear"
 MANIFEST = MODEL_DIR / "manifest.json"
+
+
+class SiARDailySource(Protocol):
+    def get_data(self, data_type, scope, identifiers, start_date, end_date, *, calculated=False): ...
 
 
 def _sha256(path: Path) -> str:
@@ -70,6 +77,10 @@ def predict_et0_with_fallback(
         if feature_frame[et0_lags].notna().sum(axis=1).iat[0] < 3:
             raise ValueError("histórico ET0 insuficiente para el modelo")
         missing_columns = sorted(set(features).difference(available_features))
+        if missing_columns:
+            raise ValueError(
+                "faltan columnas operativas completas: " + ", ".join(missing_columns)
+            )
         model = joblib.load(artifact)
         prediction = float(model.predict(feature_frame)[0])
         if not np.isfinite(prediction) or prediction < 0:
@@ -81,10 +92,76 @@ def predict_et0_with_fallback(
             "target_date": target_day.isoformat(),
             "artifact": entry["artifact"],
             "artifact_sha256": entry["sha256"],
-            "missing_feature_columns_imputed": missing_columns,
+            "missing_feature_columns_imputed": [],
             "fallback_reason": None,
         }
     except (FileNotFoundError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
         result = _persistence(history, target_day, str(exc))
         result.update({"station_code": station_code, "target_date": target_day.isoformat()})
         return result
+
+
+def history_from_siar_records(records: list[dict], station_code: str) -> pd.DataFrame:
+    """Adapta la respuesta diaria oficial al mismo esquema del entrenamiento."""
+
+    rows = normalize_siar_daily(records, ingested_at="live", source_file="SiAR API")
+    frame = pd.DataFrame(rows)
+    if frame.empty:
+        return pd.DataFrame(columns=["date", "station_code", "et0_mm"])
+    station_values = frame["station_code"].dropna().astype(str).str.upper().unique()
+    if len(station_values) != 1 or station_values[0] != station_code.upper():
+        raise ValueError("La respuesta SiAR no corresponde a la estación solicitada.")
+    renamed = frame.rename(
+        columns={
+            "observed_date": "date",
+            "solar_radiation_raw": "solar_radiation_mj_m2",
+            "et0_pm_mm": "et0_mm",
+        }
+    )
+    columns = [
+        "date", "station_code", "et0_mm", "temperature_mean_c",
+        "temperature_max_c", "temperature_min_c", "humidity_mean_pct",
+        "humidity_max_pct", "humidity_min_pct", "wind_speed_mean_ms",
+        "wind_speed_max_ms", "solar_radiation_mj_m2", "precipitation_mm",
+        "quality_status", "quality_issues",
+    ]
+    renamed["date"] = pd.to_datetime(renamed["date"], errors="raise")
+    return renamed[columns].sort_values("date").reset_index(drop=True)
+
+
+def predict_live_et0(
+    station_code: str,
+    target_day: date,
+    *,
+    client: SiARDailySource | None = None,
+    lookback_days: int = 30,
+    fallback_history: pd.DataFrame | None = None,
+    manifest_path: Path = MANIFEST,
+    model_dir: Path = MODEL_DIR,
+) -> dict:
+    """Consulta observaciones SiAR hasta t-1 y ejecuta Ridge con respaldo."""
+
+    if lookback_days < 14:
+        raise ValueError("El periodo operativo debe cubrir al menos 14 días.")
+    source = client or SiARClient()
+    start = target_day - timedelta(days=lookback_days)
+    end = target_day - timedelta(days=1)
+    try:
+        records = source.get_data(
+            "Diarios", "ESTACION", station_code.upper(), start, end, calculated=True
+        )
+        history = history_from_siar_records(records, station_code)
+    except (SiARError, ValueError, KeyError, TypeError) as exc:
+        fallback = fallback_history if fallback_history is not None else pd.DataFrame(
+            columns=["date", "et0_mm"]
+        )
+        result = _persistence(fallback, target_day, f"fallo del extractor SiAR: {exc}")
+        result.update({"station_code": station_code.upper(), "target_date": target_day.isoformat()})
+        return result
+    return predict_et0_with_fallback(
+        station_code,
+        history,
+        target_day,
+        manifest_path=manifest_path,
+        model_dir=model_dir,
+    )

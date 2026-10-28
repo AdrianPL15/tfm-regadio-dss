@@ -1,0 +1,61 @@
+{
+  "model_status": "experimental_not_deployed",
+  "stations_with_artifact": [
+    "AL01",
+    "BA08",
+    "Z06"
+  ],
+  "required_daily_observation_columns": [
+    "et0_mm",
+    "temperature_mean_c",
+    "temperature_max_c",
+    "temperature_min_c",
+    "humidity_mean_pct",
+    "humidity_max_pct",
+    "humidity_min_pct",
+    "wind_speed_mean_ms",
+    "wind_speed_max_ms",
+    "solar_radiation_mj_m2",
+    "precipitation_mm"
+  ],
+  "streamlit_siar_crop_needs_columns": [
+    "date",
+    "et0_mm",
+    "etc_mm",
+    "kc",
+    "kc_imputed",
+    "net_need_mm",
+    "pe_mm",
+    "record_status",
+    "source_file"
+  ],
+  "missing_from_current_streamlit_input": [
+    "humidity_max_pct",
+    "humidity_mean_pct",
+    "humidity_min_pct",
+    "precipitation_mm",
+    "solar_radiation_mj_m2",
+    "temperature_max_c",
+    "temperature_mean_c",
+    "temperature_min_c",
+    "wind_speed_max_ms",
+    "wind_speed_mean_ms"
+  ],
+  "aemet_live_forecast_columns": [
+    "date",
+    "precipitation_probability_pct",
+    "precipitation_mm",
+    "precipitation_hours_covered",
+    "precipitation_amount_status",
+    "issued_at",
+    "hourly_issued_at",
+    "municipality_code",
+    "source"
+  ],
+  "aemet_role": "AEMET aporta lluvia prevista para descontarla después de ET0 × Kc; no sustituye las observaciones SiAR del día anterior usadas por Ridge.",
+  "siar_live_adapter": "implemented_and_unit_tested",
+  "ridge_integration_gate": "blocked_siar_publication_lag_for_same_day",
+  "fallback_enabled": true,
+  "required_next_component": "Medir la latencia habitual de publicación SiAR y, si suele superar un día, evaluar explícitamente un horizonte ET0 de dos días antes de desplegarlo.",
+  "decision": "Mantener persistencia en Streamlit: el adaptador ya recupera las columnas reales, pero Ridge no debe extrapolar dos días sin evaluación específica."
+}
