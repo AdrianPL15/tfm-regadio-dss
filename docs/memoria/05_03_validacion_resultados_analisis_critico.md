@@ -105,6 +105,14 @@ experimentos parten de la misma referencia. En desarrollo los valores no son
 directamente comparables con los de la Tabla 4.13, porque aquí se evalúan todas
 las emisiones del periodo y no tres cortes de validación.
 
+La diferencia pareada `MAE(persistencia) - MAE(DSS)` es de 0,032 mm/día en
+desarrollo, con IC 95 % [-0,055; 0,122], y de 0,029 mm/día en prueba, con IC
+95 % [0,002; 0,067]. Los intervalos se obtuvieron mediante 5.000 remuestreos
+por bloques temporales de siete días y semilla 42 (Künsch, 1989). El resultado de desarrollo
+no permite afirmar una mejora concluyente; el de prueba favorece al DSS dentro
+del tramo reutilizado de septiembre, sin acreditar transferencia a otra
+campaña.
+
 ![Figura 5.3. Recomendaciones emitidas cada día con la información del día anterior y error frente a la referencia SiAR.](../images/dss_campana_5_3.png)
 
 El sesgo del sistema es ligeramente positivo, de 0,04 a 0,05 mm al día. Tiende
@@ -169,6 +177,14 @@ descenso continuo, de modo que ninguna de las dos vías dispone de información
 sobre esa tendencia. El sistema mantiene la ventaja hasta el quinto día, la
 reduce en el sexto y pierde frente a la persistencia en el séptimo, con 0,134
 frente a 0,126 mm.
+
+Los intervalos pareados de la diferencia de MAE muestran una evidencia menos
+uniforme que los valores puntuales. En desarrollo, los días 2 a 7 presentan
+intervalos positivos, mientras que el día 1 incluye el cero. En prueba, solo
+los días 1 y 3 tienen un límite inferior positivo: 0,029 [0,001; 0,067] y
+0,046 [0,010; 0,084] mm/día. Los días 2, 4, 5 y 6 incluyen el cero, y el día 7
+arroja -0,007 [-0,026; 0,011] mm/día. Por tanto, no se atribuye una mejora
+concluyente a todos los horizontes.
 
 Estos resultados permiten ofrecer horizontes de hasta siete días como
 planificación orientativa, aunque el séptimo día de la prueba pierde frente al
@@ -328,6 +344,12 @@ prueba, el mismo criterio del capítulo 4. Solo se evaluaron jornadas activas
 con Kc mayor que cero, para impedir que los días fuera del ciclo mejorasen
 artificialmente las métricas. La ventana de siete días seleccionada con el piloto se mantuvo fija:
 no se reajustó por cultivo ni después de observar el tramo de prueba.
+
+Los recuentos son un día inferiores a los del experimento predictivo de la
+Tabla 4.15 porque esta comparación exige, además de `Kc > 0` y una referencia
+válida, disponer de la persistencia del día anterior. En consecuencia, el
+primer día activo de cada campaña no es comparable y se excluye antes de
+realizar la partición cronológica del 85 % y el 15 %.
 
 **Tabla 5.8. Validación temporal multicaso a un día frente a la referencia SiAR.**
 

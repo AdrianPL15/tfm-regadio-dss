@@ -11,7 +11,7 @@ OUTPUT = Path("docs/images/evaluation_scope_map_1_1.png")
 
 def build(output: Path = OUTPUT) -> Path:
     output.parent.mkdir(parents=True, exist_ok=True)
-    fig, axis = plt.subplots(figsize=(11.2, 6.2), dpi=180)
+    fig, axis = plt.subplots(figsize=(11.2, 8.4), dpi=200)
     axis.set_xlim(0, 12)
     axis.set_ylim(0, 7)
     axis.axis("off")
@@ -58,19 +58,19 @@ def build(output: Path = OUTPUT) -> Path:
             linewidth=1.1, edgecolor="#52606D", facecolor=color,
         )
         axis.add_patch(box)
-        axis.text(x + 0.25, y + 2.02, title, fontsize=12, fontweight="bold", color="#172B4D")
-        axis.text(x + 0.25, y + 1.50, body, fontsize=9.4, va="top", linespacing=1.35, color="#243B53")
+        axis.text(x + 0.25, y + 2.02, title, fontsize=13.2, fontweight="bold", color="#172B4D")
+        axis.text(x + 0.25, y + 1.50, body, fontsize=10.4, va="top", linespacing=1.30, color="#243B53")
         axis.plot([x + 0.25, x + 5.15], [y + 0.58, y + 0.58], color="#9FB3C8", linewidth=0.8)
-        axis.text(x + 0.25, y + 0.42, conclusion, fontsize=8.7, va="top", color="#334E68")
+        axis.text(x + 0.25, y + 0.42, conclusion, fontsize=9.5, va="top", color="#334E68")
 
     axis.text(
         6, 6.62, "Qué se evalúa en cada fase del proyecto",
-        ha="center", fontsize=15, fontweight="bold", color="#102A43",
+        ha="center", fontsize=16.5, fontweight="bold", color="#102A43",
     )
     axis.text(
         6, 6.28,
         "Los cuatro bloques comparten fuentes, pero responden a preguntas distintas y no constituyen pruebas independientes entre sí.",
-        ha="center", fontsize=9.5, color="#486581",
+        ha="center", fontsize=10.4, color="#486581",
     )
     fig.tight_layout(pad=0.4)
     fig.savefig(output, bbox_inches="tight", facecolor="white")

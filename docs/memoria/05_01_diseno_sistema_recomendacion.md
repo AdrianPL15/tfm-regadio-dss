@@ -263,3 +263,10 @@ explícita con las advertencias correspondientes. Esta integración se limita al
 primer día; el resto del horizonte conserva el método físico provisional.
 Las cifras y la reproducción se recogen en
 [`INTEGRACION_ETC_AEMET_2026.md`](../tecnica/INTEGRACION_ETC_AEMET_2026.md).
+
+En la versión evaluada, el cálculo físico supera al modelo de ETc en cinco de
+los seis casos. El único caso habilitado para determinar la dosis mediante el
+modelo es algodón BA08, que estaba fuera de ciclo durante la demostración de
+octubre de 2026. Por ello, en los cultivos activos de la aplicación la dosis
+principal procede del cálculo ET0 reciente × Kc; el modelo de ETc se conserva
+como resultado comparativo y trazable, no como motor operativo general.
