@@ -158,12 +158,43 @@ cuando falten variables, comparar su entrada operativa con la disponibilidad
 real de AEMET y ejecutar una prueba de regresión completa de Streamlit. Hasta
 entonces la persistencia continúa siendo el comportamiento estable del DSS.
 
+## Preparación técnica para una integración controlada
+
+Se ha preparado una capa experimental que todavía no está conectada a
+Streamlit. Tras congelar la evaluación externa de 2025, Ridge se reajusta con
+todo el histórico 2021–2025 de cada estación. Los tres artefactos se conservan
+en `models/experimental_et0_multiyear/` junto a un manifiesto que declara:
+
+- estación, periodo y número de filas de entrenamiento;
+- orden exacto de las variables de entrada;
+- MAE de Ridge y persistencia medidos antes del reajuste, sobre 2025;
+- nombre y huella SHA-256 del artefacto;
+- estado explícito `experimental_not_deployed`.
+
+La inferencia de `src/dss/predict_et0.py` solo intenta Ridge cuando existe una
+observación del día inmediatamente anterior y al menos tres retardos de ET0
+válidos. Verifica la huella del artefacto y no utiliza registros de la fecha
+objetivo ni posteriores. Ante un modelo ausente, manipulado, una estación no
+registrada, datos desactualizados o histórico insuficiente, devuelve de forma
+trazable la persistencia de la última ET0 observada. Si tampoco existe esa ET0,
+declara el resultado como no disponible.
+
+Una comprobación de inferencia para el 1 de enero de 2026 produjo Ridge en AL01
+y BA08, mientras Z06 activó correctamente el respaldo por falta de suficientes
+retardos recientes. Este comportamiento confirma que el respaldo no es solo
+una especificación documental. La siguiente fase, todavía pendiente, es
+construir una tabla operativa diaria con las mismas variables desde SiAR y
+decidir qué campos futuros de AEMET pueden incorporarse sin cambiar el contrato
+validado.
+
 ## Artefactos generados
 
 - `src/analysis/audit_et0_availability.py`: inventario de fuentes disponibles;
 - `src/data/prepare_et0_history.py`: normalización y control de calidad;
 - `src/models/train_et0_multiyear.py`: entrenamiento y validación temporal;
 - `src/analysis/evaluate_et0_multiyear.py`: bootstrap e impacto agronómico;
+- `src/models/export_et0_multiyear.py`: reajuste y versionado experimental;
+- `src/dss/predict_et0.py`: inferencia con verificación y respaldo;
 - `docs/data_samples/et0_multiyear_metrics.csv`: métricas de modelos;
 - `docs/data_samples/et0_multiyear_predictions_2025.csv`: predicciones de prueba;
 - `docs/data_samples/et0_multiyear_statistical_evidence.csv`: incertidumbre;

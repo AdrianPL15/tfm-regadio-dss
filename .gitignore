@@ -35,9 +35,11 @@ data/external/*
 # Modelos entrenados (pueden pesar mucho, se gestionan aparte)
 models/*
 !models/deployed_etc_2026/
+!models/experimental_et0_multiyear/
 *.pkl
 *.joblib
 !models/deployed_etc_2026/*.joblib
+!models/experimental_et0_multiyear/*.joblib
 *.h5
 
 # Python
