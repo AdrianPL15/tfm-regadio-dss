@@ -301,32 +301,13 @@ argumento a favor de los sistemas híbridos defendidos en el apartado 2.3, en lo
 que el aprendizaje automático, cuando se disponga de más datos, debería
 corregir una referencia física y no sustituirla.
 
-Los resultados deben leerse, no obstante, con varias cautelas. La primera es
-que la referencia es la propia SiAR. Un error pequeño frente a ella indica que
-el sistema reproduce bien un cálculo oficial, no que la dosis sea la adecuada
-para una parcela concreta, cuyo suelo, marco de plantación, cubierta y estado
-del cultivo pueden diferir de las hipótesis de la estación. La evaluación
-detallada anterior corresponde al piloto principal de una estación, un cultivo y una
-campaña. Su ventaja en horizontes largos depende en parte de los cambios de
-fase del pimiento, y el tramo de prueba de septiembre es atípico: tiene un Kc
-muy bajo, necesidades cercanas a un milímetro y una ET0 en descenso. Para
-comprobar su comportamiento en otros calendarios, el apartado
-5.3.10 añade una comprobación cronológica con tres cultivos y regiones de 2026. Esta
-ampliación reduce, pero no elimina, la limitación de validez externa porque
-sigue faltando repetir campañas completas en años distintos.
-
-La cuarta cautela se refiere a lo que el sistema no hace. No decide cuándo
-regar, porque sin balance hídrico del suelo todas las necesidades se tratan
-como diarias. No integra una ET0 prevista contrastada, por lo que en los
-horizontes largos depende de que el tiempo se mantenga. Y no se ha validado
-con usuarios, de modo que no hay evidencia de que la interfaz y las
-explicaciones resulten comprensibles para quienes tendrían que utilizarlas. Hay
-también situaciones en las que el sistema no debería emitir una recomendación
-sin que alguien la revise. Ocurre con los datos desactualizados durante más de
-dos días, cuando la ET0 queda fuera del intervalo observado, ante una
-previsión de lluvia relevante y siempre que la dotación obliga a recortar la
-dosis. En todos esos casos el sistema emite avisos, pero la decisión sobre qué
-hacer con ellos corresponde al usuario.
+La interpretación queda condicionada por la referencia SiAR, el tamaño del
+piloto y la ausencia de validación de campo. El apartado 5.3.10 comprueba el
+comportamiento cronológico en otros tres calendarios, mientras que el apartado
+6.2 reúne de forma sistemática las limitaciones de validez, predicción,
+funcionalidad y arquitectura. En este capítulo basta señalar que el resultado
+mide fidelidad al cálculo oficial y que los avisos del sistema requieren la
+decisión final del usuario.
 
 Con estas limitaciones, el prototipo cumple lo que se pretendía demostrar en
 este capítulo: que es posible convertir datos agroclimáticos públicos en una
