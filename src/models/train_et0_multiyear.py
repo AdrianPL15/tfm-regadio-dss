@@ -43,12 +43,17 @@ WEATHER_CURRENT = [
 ]
 
 
-def build_feature_table(history: pd.DataFrame) -> tuple[pd.DataFrame, list[str]]:
+def build_feature_table(
+    history: pd.DataFrame,
+    horizon_days: int = 1,
+) -> tuple[pd.DataFrame, list[str]]:
+    if horizon_days < 1:
+        raise ValueError("horizon_days debe ser un entero positivo.")
     data = history.copy()
     data["date"] = pd.to_datetime(data["date"], errors="raise")
     data = data.sort_values("date").drop_duplicates("date").reset_index(drop=True)
-    data["prediction_date"] = data["date"] + pd.Timedelta(days=1)
-    data["target_et0_mm"] = data["et0_mm"].shift(-1)
+    data["prediction_date"] = data["date"] + pd.Timedelta(days=horizon_days)
+    data["target_et0_mm"] = data["et0_mm"].shift(-horizon_days)
 
     feature_names: list[str] = []
     for lag in (1, 2, 3, 7, 14):

@@ -30,6 +30,19 @@ class TrainEt0MultiyearTests(unittest.TestCase):
         after, _ = build_feature_table(changed)
         pd.testing.assert_series_equal(before.loc[10, features], after.loc[10, features])
 
+    def test_two_day_horizon_uses_current_and_past_only(self):
+        dates = pd.date_range("2024-01-01", periods=20, freq="D")
+        history = pd.DataFrame({"date": dates, "et0_mm": np.arange(20, dtype=float)})
+        table, _ = build_feature_table(history, horizon_days=2)
+        self.assertEqual(float(table.iloc[5]["target_et0_mm"]), 7.0)
+        self.assertEqual(float(table.iloc[5]["et0_lag_1d"]), 5.0)
+        self.assertEqual(table.iloc[5]["prediction_date"], pd.Timestamp("2024-01-08"))
+
+    def test_horizon_must_be_positive(self):
+        history = pd.DataFrame({"date": ["2024-01-01"], "et0_mm": [1.0]})
+        with self.assertRaises(ValueError):
+            build_feature_table(history, horizon_days=0)
+
 
 if __name__ == "__main__":
     unittest.main()
