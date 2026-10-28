@@ -16,7 +16,7 @@ concurrency:
 
 jobs:
   tests:
-    name: Python 3.12 · 105 pruebas
+    name: Python 3.12 · 108 pruebas
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
