@@ -1,6 +1,6 @@
 # Guía de la entrega del TFM
 
-Fecha de última comprobación técnica: 29 de octubre de 2026.
+Fecha de última comprobación técnica: 30 de octubre de 2026.
 
 ## Archivos que se presentan
 
@@ -17,13 +17,14 @@ Fecha de última comprobación técnica: 29 de octubre de 2026.
 | Explicabilidad de Random Forest y XGBoost en el tramo temporal reservado | [Informe XAI](../data_samples/xai_analysis_4_3.json), [importancias](../data_samples/xai_feature_importance_4_3.csv) y [figura](../images/model_xai_4_3.png) |
 | Instantánea de evaluación cerrada el 22/10/2026: seis combinaciones, 1776 filas CSV y 1584 jornadas activas válidas | [Reentrenamiento por caso](../data_samples/model_retraining_2026.json) |
 | Selección entre el modelo de ETc y `ET0 reciente × Kc` para la dosis | [Comparación por caso](../data_samples/etc_model_deployment_2026.json) y [código](../../src/models/train_etc_for_dss.py) |
-| Predicción multianual de ET0 para siete fechas operativas (`h=2…8`) y dos horizontes técnicos adicionales | [Documento técnico](../tecnica/EXPERIMENTO_ET0_MULTIANUAL.md), [modelos](../../models/et0_multiyear/) y [evaluación por horizonte](../data_samples/et0_multiyear_horizon_metrics.csv) |
-| Monitorización prospectiva, cobertura operativa y puerta de decisión tras 30 casos | [Inferencia diaria](../../src/analysis/run_daily_et0_prospective.py), [cobertura 2026](../data_samples/et0_operational_coverage_2026.csv) y [MLOps](../tecnica/MLOPS_MONITORIZACION.md) |
+| Predicción multianual de ET0 para siete fechas operativas (`h=2…8`) y dos horizontes técnicos adicionales | [Documento técnico](../tecnica/EXPERIMENTO_ET0_MULTIANUAL.md), [modelos](../../models/experimental_et0_multiyear/) y [evaluación completa](../data_samples/et0_multiyear_robustness.csv) |
+| Monitorización prospectiva, cobertura operativa y puerta de decisión tras 30 casos | [Inferencia diaria](../../src/analysis/run_et0_prospective_daily.py), [cobertura 2026](../data_samples/et0_operational_coverage_2026.csv) y [MLOps](../tecnica/MLOPS_MONITORIZACION.md) |
+| Comprobación pública específica de Z06 con 60 días solicitados | [Resultado vivo](../data_samples/et0_z06_60day_live_check.json): 13 jornadas devueltas; Ridge o respaldo según horizonte e imputaciones |
 | Reglas de riego y validación retrospectiva | [Motor](../../src/dss/engine.py) y [13 escenarios](../data_samples/dss_validation_5_3.json) |
 | Interfaz desplegada | [Código Streamlit](../../src/dss/app_streamlit.py) |
 | Reutilización académica y operación | [Ficha del conjunto](../tecnica/DATASET_CARD.md), [principios FAIR](../tecnica/FAIR_Y_CITACION.md) y [plan MLOps](../tecnica/MLOPS_MONITORIZACION.md) |
 
-El 29/10/2026 se ejecutaron **150 pruebas correctas**, incluidas la ausencia de fuga temporal, el protocolo multicaso, XAI, ET0 h=1…9, monitorización prospectiva y las dos pruebas `AppTest` de Streamlit. La suite terminó correctamente en el entorno Windows normal. La consulta pública depende de los datos SiAR y AEMET disponibles en cada momento.
+El 30/10/2026 se ejecutaron **150 pruebas correctas**, incluidas la ausencia de fuga temporal, el protocolo multicaso, XAI, ET0 h=1…9, monitorización prospectiva y las dos pruebas `AppTest` de Streamlit. La suite terminó correctamente en el entorno Windows normal. La consulta pública depende de los datos SiAR y AEMET disponibles en cada momento.
 
 ## Alcance que debe explicarse
 

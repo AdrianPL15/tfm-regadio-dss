@@ -148,6 +148,11 @@ estructurada se conservan en `src/analysis/validate_et0_robustness.py`,
 `docs/data_samples/et0_multiyear_robustness.csv` y
 `docs/data_samples/et0_multiyear_robustness_summary.json`.
 
+Los promedios por horizonte publicados en la memoria se recalculan desde el
+CSV de robustez y se redondean a tres decimales. Por ello `h=1` aparece como
+0,472 mm/día: su valor exacto vigente es 0,471970. No existe una discrepancia
+entre la Tabla 4.18 y el conjunto de resultados versionado.
+
 ## Horizontes de uno a nueve días ante la latencia de SiAR
 
 La prueba operativa del 29 de octubre mostró que la última observación SiAR
@@ -329,6 +334,16 @@ disponible. Esta es una limitación de cobertura de la fuente/estación, no un
 fallo predictivo oculto. El detalle reproducible se conserva en
 `docs/data_samples/et0_operational_coverage_2026.csv` y su resumen estructurado
 en `et0_operational_coverage_2026_summary.json`.
+
+La consulta pública se repitió el 30 de octubre de 2026 con 60 días solicitados
+y volvió a devolver 13 registros, hasta el 28 de octubre. El selector permitió
+Ridge a un día en la emisión anterior, imputando únicamente `lag_14d`; para el
+objetivo del día 30 activó `mean_7d_fallback`, porque habrían sido necesarias
+dos imputaciones y la política admite como máximo una. Por tanto, el 0 % de la
+simulación con ventanas completas no debe presentarse como indisponibilidad
+absoluta de Ridge: la cobertura efectiva depende del horizonte y del número de
+entradas ausentes. La evidencia viva queda archivada en
+`docs/data_samples/et0_z06_60day_live_check.json`.
 
 ## Limitaciones y decisión provisional
 

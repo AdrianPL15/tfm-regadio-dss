@@ -36,9 +36,16 @@ pero no demuestra generalización nacional ni estabilidad interanual.
 La tercera afecta a la cobertura predictiva. El sistema dispone de ET0 Ridge
 multianual por horizonte y descuenta la lluvia AEMET disponible, pero su
 validación prospectiva acaba de comenzar y aún no contiene 30 casos
-consolidados. Además, la cobertura retrospectiva de 2026 es cercana al 97 % en
-AL01 y BA08, pero nula para Ridge en Z06 porque la fuente solo devolvió 13 días
-continuos. Los intervalos mostrados son cuantiles empíricos de residuo, no una
+consolidados. Además, la simulación retrospectiva con ventanas completas
+alcanza una cobertura cercana al 97 % en AL01 y BA08, pero 0 % para Ridge en
+la consulta operativa de Z06 que solo devolvió 13 jornadas continuas. Ese
+porcentaje no describe el CSV agronómico de alfalfa, que contiene 239
+jornadas, ni implica que Ridge sea siempre imposible: la consulta pública
+repetida el 30 de octubre de 2026 volvió a devolver 13 registros; permitió
+Ridge a un día cuando solo faltaba un retardo, pero activó la media de siete
+días a dos días porque habría requerido dos imputaciones, por encima del
+máximo admitido. Los intervalos mostrados son cuantiles empíricos de residuo,
+no una
 garantía probabilística calibrada para una parcela concreta. Por ello, la
 predicción a siete días es funcional, pero sigue sujeta a cobertura, deriva y
 calidad de las fuentes.
@@ -67,7 +74,7 @@ demuestra el flujo de datos y de decisión, no una plataforma desplegable.
 | Referencia calculada por SiAR, sin riego aplicado ni respuesta del cultivo | Que las dosis sean óptimas para una parcela ni que reduzcan el consumo de agua | Validación en campo (6.3.3) |
 | Tres casos adicionales, pero una sola campaña por cultivo | Que los resultados se generalicen a todo el territorio o a otros años | Ampliación de la evidencia (6.3.1) |
 | Dependencia estructural entre la referencia SiAR y la vía física | Que el bajo error equivalga a una validación agronómica independiente | Riego observado, sensores y validación de campo (6.3.2 y 6.3.3) |
-| ET0 prevista sin evidencia prospectiva suficiente y cobertura nula de Ridge en Z06 | Que la mejora retrospectiva se mantenga operativamente en todas las estaciones | Monitorización diaria, consolidación y ampliación de cobertura (6.3.2) |
+| ET0 prevista sin evidencia prospectiva suficiente; la consulta pública de Z06 devuelve 13 jornadas y alterna Ridge o respaldo según el horizonte y las imputaciones necesarias | Que la mejora retrospectiva se mantenga operativamente en todas las estaciones y horizontes | Monitorización diaria, consolidación y ampliación de cobertura (6.3.2) |
 | Sin balance hídrico del suelo | Que el sistema determine el momento adecuado del riego | Balance hídrico y riego deficitario (6.3.2) |
 | Restricción hídrica introducida como dotación del usuario | Que la recomendación refleje la disponibilidad oficial de agua | Indicadores hidrológicos (6.3.4) |
 | Interfaz sin evaluación con usuarios | Que las recomendaciones se comprendan y se adopten | Evaluación con usuarios (6.3.3) |

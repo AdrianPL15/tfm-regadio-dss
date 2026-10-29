@@ -381,7 +381,11 @@ En síntesis, el diseño con origen rodante evita mezclar futuro y entrenamiento
 Las tres estaciones, nueve horizontes y 81 ventanas permiten cubrir siete
 fechas pese a la latencia SiAR. Frente a media 7 días, 63 intervalos favorecen
 a Ridge y 18 son no concluyentes; ninguno favorece la referencia. Frente a
-persistencia estacional, los 81 intervalos favorecen a Ridge.
+persistencia estacional, los 81 intervalos favorecen a Ridge. Esta referencia
+no repite simplemente el último valor: suma a la ET0 observada en el origen el
+cambio climatológico medio entre el día del año de origen y el día objetivo,
+calculado exclusivamente con los años de entrenamiento. Formalmente,
+`ET0(t+h) = ET0(t) + climatología(día t+h) − climatología(día t)`.
 
 La ablación no demuestra una ganancia estable de las variables auxiliares: 74
 intervalos son no concluyentes, dos favorecen al modelo completo y cinco al
@@ -432,7 +436,10 @@ la integridad de los artefactos y la activación del respaldo.
 | h=9 | 0,570 | 0,708 | 19,5 % | 9 favorables; 0 no concluyentes |
 
 Los MAE son medias de nueve ventanas (tres estaciones por tres años de
-prueba). La aplicación usa `h=2…8` cuando recomienda desde hoy y `h=3…9`
+prueba), calculadas directamente desde `et0_multiyear_robustness.csv` y
+redondeadas a tres decimales; por ejemplo, el valor exacto de `h=1` es
+0,471970 mm/día y se muestra como 0,472. La aplicación usa `h=2…8` cuando
+recomienda desde hoy y `h=3…9`
 cuando comienza mañana. Los resultados proceden de
 `et0_multiyear_robustness.csv` y
 `et0_multiyear_uncertainty_by_horizon.csv`. La evaluación extremo a extremo de
