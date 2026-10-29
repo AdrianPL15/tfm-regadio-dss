@@ -1,8 +1,8 @@
 # Memoria del TFM para entrega
 
 La versión de entrega es el
-[PDF definitivo](TFM_definitivo_2026-10-28.pdf) y su
-[Word editable](TFM_definitivo_2026-10-28.docx).
+[PDF definitivo](TFM_entrega_final_2026-10-29.pdf) y su
+[Word editable](TFM_entrega_final_2026-10-29.docx).
 El PDF y el Word contienen la misma revisión. El equipo debe hacer su lectura
 final antes de enviar el archivo a la universidad.
 

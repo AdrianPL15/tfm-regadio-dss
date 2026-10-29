@@ -377,16 +377,17 @@ favorecieron al completo, 74 cruzaron cero y cinco favorecieron al reducido.
 El desglose completo queda versionado en
 `docs/data_samples/et0_multiyear_uncertainty_by_horizon.csv`.
 
-**Tabla 4.18. Síntesis del experimento multianual de ET0 y su decisión de uso.**
+En síntesis, el diseño con origen rodante evita mezclar futuro y entrenamiento.
+Las tres estaciones, nueve horizontes y 81 ventanas permiten cubrir siete
+fechas pese a la latencia SiAR. Frente a media 7 días, 63 intervalos favorecen
+a Ridge y 18 son no concluyentes; ninguno favorece la referencia. Frente a
+persistencia estacional, los 81 intervalos favorecen a Ridge.
 
-| Elemento | Evidencia | Decisión |
-|---|---|---|
-| Diseño temporal | Origen rodante 2023–2025, entrenando solo con años anteriores | Evita mezclar futuro y entrenamiento |
-| Alcance | Tres estaciones, nueve horizontes y 81 ventanas estación-año-horizonte | Permite cubrir siete fechas pese a la latencia SiAR |
-| Ridge frente a media 7 días | 63 intervalos favorables y 18 no concluyentes; ninguno favorece la referencia | Integración controlada con respaldo físico |
-| Ridge frente a persistencia estacional | 81 intervalos favorables | Confirma mejora frente a una segunda referencia temporal |
-| Aporte de variables auxiliares | 74 intervalos no concluyentes, 2 favorables al modelo completo y 5 al reducido | No se atribuye una mejora estable a esas variables |
-| Control operativo | 30 casos pareados, ventana móvil de 60 y mejora mínima del 5 % | Retorno automático a media 7 días si se degrada |
+La ablación no demuestra una ganancia estable de las variables auxiliares: 74
+intervalos son no concluyentes, dos favorecen al modelo completo y cinco al
+reducido. Por ello Ridge se integra de forma controlada, con media 7 días como
+respaldo y una puerta prospectiva de 30 casos pareados, ventana móvil máxima de
+60 y mejora mínima del 5 %.
 
 La cobertura retrospectiva de 2026 fue aproximadamente 97 % con Ridge en AL01
 y BA08. En Z06, SiAR solo devolvió 13 jornadas para enero–octubre y Ridge tuvo

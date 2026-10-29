@@ -34,11 +34,11 @@ El prototipo combina observaciones SiAR, previsión de lluvia AEMET, un modelo R
 | Orden | Qué abrir | Qué permite comprobar |
 |---|---|---|
 | 1 | [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía breve del prototipo](docs/entrega/DEMO_TFM.md) | Selección de caso, consulta SiAR/AEMET, dosis, explicaciones y CSV descargable. |
-| 2 | [Memoria definitiva en PDF](docs/memoria/TFM_definitivo_2026-10-28.pdf) ([Word editable](docs/memoria/TFM_definitivo_2026-10-28.docx)) | Planteamiento, método, resultados y límites. |
+| 2 | [Memoria definitiva en PDF](docs/memoria/TFM_entrega_final_2026-10-29.pdf) ([Word editable](docs/memoria/TFM_entrega_final_2026-10-29.docx)) | Planteamiento, método, resultados y límites. |
 | 3 | [Código de la interfaz](src/dss/app_streamlit.py), [motor de recomendación](src/dss/engine.py) y [actualización SiAR](src/data/refresh_siar_crop_needs.py) | Implementación que utiliza la aplicación pública. |
 | 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json), [experimento ET0 multianual](docs/tecnica/SINTESIS_ET0_PARA_MEMORIA.md), [análisis XAI](docs/data_samples/xai_analysis_4_3.json) y [validación multicaso](docs/data_samples/dss_validation_multicaso_5_3.json) | Entradas, limpieza, predicción ET0, explicabilidad y resultados verificables sin ejecutar el proyecto. |
 
-La [guía de entrega](docs/entrega/ENTREGA_FINAL_2026-10-28.md) reúne el recorrido para el evaluador, los archivos principales y los límites científicos que deben explicarse.
+La [guía de entrega](docs/entrega/ENTREGA_FINAL_2026-10-29.md) reúne el recorrido para el evaluador, los archivos principales y los límites científicos que deben explicarse.
 
 La reutilización académica se documenta mediante la [ficha de los datos](docs/tecnica/DATASET_CARD.md), los [principios FAIR y la citación](docs/tecnica/FAIR_Y_CITACION.md), el [plan de MLOps y monitorización](docs/tecnica/MLOPS_MONITORIZACION.md), `CITATION.cff` y las [condiciones de los datos](DATA_LICENSE.md).
 
