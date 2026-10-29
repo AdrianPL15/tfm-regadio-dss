@@ -1,0 +1,26 @@
+{
+  "test_year": 2025,
+  "paired_days_et0": 357,
+  "bootstrap": {
+    "method": "bootstrap pareado por bloques temporales circulares",
+    "replicates": 5000,
+    "block_days": 7,
+    "seed": 42,
+    "ridge_vs_persistence_mae_difference_mm_day": 0.074,
+    "ci_95_mm_day": [
+      0.049,
+      0.103
+    ],
+    "probability_difference_positive": 1.0
+  },
+  "irrigation_impact": {
+    "crop": "Pimiento",
+    "station": "AL01",
+    "paired_days": 145,
+    "persistence_net_need_mae_mm_day": 0.32155172413793104,
+    "ridge_net_need_mae_mm_day": 0.2616320649681856,
+    "relative_mae_improvement_pct": 18.634532074237192,
+    "note": "Evaluación retrospectiva con Pe observada; no valida todavía la previsión AEMET."
+  },
+  "integration_decision": "pending_geographical_validation_and_operational_design"
+}

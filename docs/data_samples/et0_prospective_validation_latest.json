@@ -1,0 +1,14 @@
+{
+  "status": "collecting",
+  "records": 18,
+  "provisional": 0,
+  "consolidated": 0,
+  "pending": 18,
+  "revisions_detected": 0,
+  "consolidation_days": 7,
+  "minimum_validation_days": 30,
+  "recommended_validation_days": 60,
+  "interpretation": "Registro prospectivo; no sustituye la evaluación rolling-origin hasta alcanzar una ventana temporal suficiente.",
+  "deployment_gate": "experimental_ridge_collecting_evidence",
+  "gate_rule": "Con al menos 30 predicciones consolidadas, usar Ridge solo si su MAE prospectivo es menor que el de la media física de 7 días."
+}

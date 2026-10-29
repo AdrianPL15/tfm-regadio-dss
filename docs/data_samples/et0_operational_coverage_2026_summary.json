@@ -1,0 +1,811 @@
+{
+  "year": 2026,
+  "forecast_days": 7,
+  "publication_lag_scenarios_days": [
+    1,
+    2
+  ],
+  "note": "Simulación retrospectiva con disponibilidad final de SiAR y un retraso fijo supuesto; no reconstruye las horas reales de publicación.",
+  "rows": [
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 1,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 1,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 2,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 2,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 3,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 3,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 4,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 4,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 5,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 5,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 6,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 6,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 7,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 7,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 7,
+      "method_group": "unavailable",
+      "days": 1,
+      "coverage_pct": 0.34
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 1,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 1,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 2,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 2,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 3,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 3,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 4,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 4,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 5,
+      "method_group": "mean_7d",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 5,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 6,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 6,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 6,
+      "method_group": "unavailable",
+      "days": 1,
+      "coverage_pct": 0.34
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 7,
+      "method_group": "ridge",
+      "days": 286,
+      "coverage_pct": 96.95
+    },
+    {
+      "station_code": "AL01",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 7,
+      "method_group": "unavailable",
+      "days": 9,
+      "coverage_pct": 3.05
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 1,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 1,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 2,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 2,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 3,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 3,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 4,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 4,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 5,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 5,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 6,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 6,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 7,
+      "method_group": "mean_7d",
+      "days": 7,
+      "coverage_pct": 2.37
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 7,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 7,
+      "method_group": "unavailable",
+      "days": 1,
+      "coverage_pct": 0.34
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 1,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 1,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 2,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 2,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 3,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 3,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 4,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 4,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 5,
+      "method_group": "mean_7d",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 5,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 6,
+      "method_group": "mean_7d",
+      "days": 7,
+      "coverage_pct": 2.37
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 6,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 6,
+      "method_group": "unavailable",
+      "days": 1,
+      "coverage_pct": 0.34
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 7,
+      "method_group": "ridge",
+      "days": 287,
+      "coverage_pct": 97.29
+    },
+    {
+      "station_code": "BA08",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 7,
+      "method_group": "unavailable",
+      "days": 8,
+      "coverage_pct": 2.71
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 1,
+      "method_group": "mean_7d",
+      "days": 4,
+      "coverage_pct": 1.36
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 1,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 1,
+      "method_group": "unavailable",
+      "days": 289,
+      "coverage_pct": 97.97
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 2,
+      "method_group": "mean_7d",
+      "days": 4,
+      "coverage_pct": 1.36
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 2,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 2,
+      "method_group": "unavailable",
+      "days": 289,
+      "coverage_pct": 97.97
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 3,
+      "method_group": "mean_7d",
+      "days": 4,
+      "coverage_pct": 1.36
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 3,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 3,
+      "method_group": "unavailable",
+      "days": 289,
+      "coverage_pct": 97.97
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 4,
+      "method_group": "mean_7d",
+      "days": 4,
+      "coverage_pct": 1.36
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 4,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 4,
+      "method_group": "unavailable",
+      "days": 289,
+      "coverage_pct": 97.97
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 5,
+      "method_group": "mean_7d",
+      "days": 4,
+      "coverage_pct": 1.36
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 5,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 5,
+      "method_group": "unavailable",
+      "days": 289,
+      "coverage_pct": 97.97
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 6,
+      "method_group": "mean_7d",
+      "days": 4,
+      "coverage_pct": 1.36
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 6,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 6,
+      "method_group": "unavailable",
+      "days": 289,
+      "coverage_pct": 97.97
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 7,
+      "method_group": "mean_7d",
+      "days": 4,
+      "coverage_pct": 1.36
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 7,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 1,
+      "forecast_day": 7,
+      "method_group": "unavailable",
+      "days": 289,
+      "coverage_pct": 97.97
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 1,
+      "method_group": "mean_7d",
+      "days": 3,
+      "coverage_pct": 1.02
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 1,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 1,
+      "method_group": "unavailable",
+      "days": 290,
+      "coverage_pct": 98.31
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 2,
+      "method_group": "mean_7d",
+      "days": 3,
+      "coverage_pct": 1.02
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 2,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 2,
+      "method_group": "unavailable",
+      "days": 290,
+      "coverage_pct": 98.31
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 3,
+      "method_group": "mean_7d",
+      "days": 3,
+      "coverage_pct": 1.02
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 3,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 3,
+      "method_group": "unavailable",
+      "days": 290,
+      "coverage_pct": 98.31
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 4,
+      "method_group": "mean_7d",
+      "days": 3,
+      "coverage_pct": 1.02
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 4,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 4,
+      "method_group": "unavailable",
+      "days": 290,
+      "coverage_pct": 98.31
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 5,
+      "method_group": "mean_7d",
+      "days": 3,
+      "coverage_pct": 1.02
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 5,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 5,
+      "method_group": "unavailable",
+      "days": 290,
+      "coverage_pct": 98.31
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 6,
+      "method_group": "mean_7d",
+      "days": 3,
+      "coverage_pct": 1.02
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 6,
+      "method_group": "persistence",
+      "days": 2,
+      "coverage_pct": 0.68
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 6,
+      "method_group": "unavailable",
+      "days": 290,
+      "coverage_pct": 98.31
+    },
+    {
+      "station_code": "Z06",
+      "assumed_publication_lag_days": 2,
+      "forecast_day": 7,
+      "method_group": "unavailable",
+      "days": 295,
+      "coverage_pct": 100.0
+    }
+  ]
+}

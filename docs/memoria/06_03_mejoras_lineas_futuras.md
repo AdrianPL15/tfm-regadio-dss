@@ -56,9 +56,16 @@ resolución disponible deberían tratarse como fuentes de ausencia e
 incertidumbre, de modo que el sistema mantuviera la vía agronómica cuando la
 imagen no fuese representativa.
 
-La segunda prioridad es anticipar cambios de tiempo mediante una ET0 prevista,
-especialmente en los días 4 a 7 del horizonte. El motor ya admite esta entrada,
-de modo que el trabajo pendiente es de datos y de evaluación.
+La segunda prioridad ya no es construir una primera ET0 prevista, sino validar
+prospectivamente la predicción Ridge `h=1…9`, ampliar la cobertura de Z06 y
+vigilar su deriva. Una tarea diaria debe archivar cada emisión y contrastarla
+después con el primer valor SiAR disponible y con su posible revisión. El
+umbral de despliegue exige al menos 30 casos consolidados y un MAE inferior al
+respaldo de media de siete días; si deja de cumplirse, el sistema vuelve a ese
+respaldo. El reentrenamiento se programa una vez al año y solo sustituye al
+artefacto vigente si supera el mismo control temporal.
+
+Como evolución adicional,
 La predicción municipal de AEMET OpenData describe los días
 posteriores a cada emisión y el proyecto no dispone de emisiones pasadas, por
 lo que el histórico debe construirse archivando de forma programada cada
@@ -72,8 +79,8 @@ horizonte del DSS. Además, si se usa como entrada, su
 comparación con la referencia SiAR debe declararse como contraste entre
 productos relacionados, no como validación independiente. Cualquiera de estas
 vías debe evaluarse con la misma disciplina temporal que el resto del trabajo,
-utilizando solo predicciones emitidas antes de cada fecha objetivo, y sustituir
-a la vía actual únicamente si mejora el error por horizonte de la Tabla 5.5.
+utilizando solo predicciones emitidas antes de cada fecha objetivo, y añadirse
+a la vía actual únicamente si mejora el error por horizonte.
 El mismo archivo permitirá evaluar si conviene descontar la lluvia prevista
 en lugar de limitarse a avisar.
 También permitiría modelizar el error local de AEMET mediante dos tareas

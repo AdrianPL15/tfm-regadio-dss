@@ -114,13 +114,12 @@ valor de junio. El ejemplo muestra el motivo por el que se separaron la ET0 y
 el Kc en el diseño: la subida de la demanda al cambiar de fase se anticipa
 desde el primer día, aunque la ET0 se suponga constante.
 
-El ejemplo también deja ver las limitaciones. Los días 28 a 30 de junio el
-sistema sobrestima, porque la semana anterior tuvo una demanda evaporativa mayor que la
-siguiente, y el 3 y el 4 de julio infraestima por la razón contraria. Una
-media de siete días no puede anticipar un cambio de tiempo; para ello haría
-falta una ET0 prevista. La interfaz lo refleja asignando confianza media a los
-tres primeros días y baja a los cuatro siguientes, e indicando en las reglas el
-error medio esperado para cada día del horizonte.
+El ejemplo histórico también deja ver la limitación de la media de siete días:
+sobrestima cuando la demanda evaporativa desciende e infraestima cuando aumenta.
+La consulta operativa actual aborda ese problema con una ET0 Ridge distinta
+para cada horizonte. La interfaz identifica si cada fecha usa el modelo o el
+respaldo físico, muestra un rango residual central del 80 % y advierte cuando
+la cobertura es insuficiente.
 
 ## 5.2.4. Uso desde la línea de comandos
 
@@ -155,8 +154,8 @@ en memoria al pulsar el botón. La previsión AEMET requiere una clave privada y
 puede llegar con una emisión no vigente o sin una cantidad de lluvia utilizable;
 en esos casos no se descuenta precipitación. La campaña histórica de 2025 solo
 admite un escenario manual de lluvia, identificado como hipotético. La vía de
-ET0 prevista está implementada en el motor, pero no se calcula automáticamente
-con la temperatura de AEMET. La consulta de los días posteriores al primero
+ET0 prevista se calcula automáticamente con el modelo multianual de la estación;
+AEMET aporta la lluvia prevista, no la ET0. La consulta de los días del horizonte
 prolonga temporalmente el último Kc dentro del mismo mes y necesita recalcularse
 con nuevas observaciones. Faltan datos de suelo, riego aplicado y validación de
 la lluvia efectiva para presentar la dosis como consejo agronómico operativo.

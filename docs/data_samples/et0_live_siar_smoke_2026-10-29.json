@@ -1,0 +1,14 @@
+{
+  "consulted_on": "2026-10-29",
+  "station_code": "AL01",
+  "requested_period": ["2026-09-29", "2026-10-28"],
+  "records_received": 29,
+  "first_observation": "2026-09-29",
+  "last_observation": "2026-10-27",
+  "et0_non_null": 29,
+  "quality_pass_records": 29,
+  "requested_target": "2026-10-29",
+  "result_method": "persistence_fallback",
+  "reason": "La última observación disponible estaba a dos días de la fecha objetivo; Ridge solo se ha validado a un día.",
+  "secrets_persisted": false
+}

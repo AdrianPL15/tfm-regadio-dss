@@ -1,0 +1,22 @@
+scope,comparison,n,estimand,observed_difference_mm_day,ci_95_lower_mm_day,ci_95_upper_mm_day,probability_difference_positive,replicates,block_days,seed
+dss_un_dia_desarrollo,Persistencia frente a DSS ET0 reciente × Kc,124,MAE referencia - MAE candidato; positivo favorece al candidato,0.032,-0.055,0.122,0.751,5000,7,42
+dss_un_dia_prueba,Persistencia frente a DSS ET0 reciente × Kc,23,MAE referencia - MAE candidato; positivo favorece al candidato,0.029,0.002,0.067,0.983,5000,7,42
+dss_horizonte_desarrollo_d1,Persistencia extendida frente a DSS ET0 reciente × Kc,110,MAE referencia - MAE candidato; positivo favorece al candidato,0.032,-0.063,0.135,0.727,5000,7,42
+dss_horizonte_desarrollo_d2,Persistencia extendida frente a DSS ET0 reciente × Kc,110,MAE referencia - MAE candidato; positivo favorece al candidato,0.145,0.025,0.287,0.995,5000,7,42
+dss_horizonte_desarrollo_d3,Persistencia extendida frente a DSS ET0 reciente × Kc,110,MAE referencia - MAE candidato; positivo favorece al candidato,0.176,0.034,0.371,0.996,5000,7,42
+dss_horizonte_desarrollo_d4,Persistencia extendida frente a DSS ET0 reciente × Kc,110,MAE referencia - MAE candidato; positivo favorece al candidato,0.225,0.033,0.482,0.993,5000,7,42
+dss_horizonte_desarrollo_d5,Persistencia extendida frente a DSS ET0 reciente × Kc,110,MAE referencia - MAE candidato; positivo favorece al candidato,0.273,0.06,0.561,0.998,5000,7,42
+dss_horizonte_desarrollo_d6,Persistencia extendida frente a DSS ET0 reciente × Kc,110,MAE referencia - MAE candidato; positivo favorece al candidato,0.331,0.095,0.642,0.999,5000,7,42
+dss_horizonte_desarrollo_d7,Persistencia extendida frente a DSS ET0 reciente × Kc,110,MAE referencia - MAE candidato; positivo favorece al candidato,0.394,0.151,0.727,1.0,5000,7,42
+dss_horizonte_prueba_d1,Persistencia extendida frente a DSS ET0 reciente × Kc,23,MAE referencia - MAE candidato; positivo favorece al candidato,0.029,0.001,0.067,0.983,5000,7,42
+dss_horizonte_prueba_d2,Persistencia extendida frente a DSS ET0 reciente × Kc,22,MAE referencia - MAE candidato; positivo favorece al candidato,0.023,-0.005,0.048,0.952,5000,7,42
+dss_horizonte_prueba_d3,Persistencia extendida frente a DSS ET0 reciente × Kc,21,MAE referencia - MAE candidato; positivo favorece al candidato,0.046,0.01,0.084,0.995,5000,7,42
+dss_horizonte_prueba_d4,Persistencia extendida frente a DSS ET0 reciente × Kc,20,MAE referencia - MAE candidato; positivo favorece al candidato,0.03,-0.01,0.078,0.914,5000,7,42
+dss_horizonte_prueba_d5,Persistencia extendida frente a DSS ET0 reciente × Kc,19,MAE referencia - MAE candidato; positivo favorece al candidato,0.031,-0.003,0.065,0.962,5000,7,42
+dss_horizonte_prueba_d6,Persistencia extendida frente a DSS ET0 reciente × Kc,18,MAE referencia - MAE candidato; positivo favorece al candidato,0.018,-0.015,0.056,0.811,5000,7,42
+dss_horizonte_prueba_d7,Persistencia extendida frente a DSS ET0 reciente × Kc,17,MAE referencia - MAE candidato; positivo favorece al candidato,-0.007,-0.026,0.011,0.218,5000,7,42
+modelos_prueba_2025,Persistencia frente a ridge,23,MAE referencia - MAE candidato; positivo favorece al candidato,-0.081,-0.135,-0.038,0.0,5000,7,42
+modelos_prueba_2025,Persistencia frente a random_forest,23,MAE referencia - MAE candidato; positivo favorece al candidato,-0.44,-0.516,-0.349,0.0,5000,7,42
+modelos_prueba_2025,Persistencia frente a knn,23,MAE referencia - MAE candidato; positivo favorece al candidato,-0.523,-0.603,-0.431,0.0,5000,7,42
+modelos_prueba_2025,Persistencia frente a svr,23,MAE referencia - MAE candidato; positivo favorece al candidato,-1.771,-2.011,-1.53,0.0,5000,7,42
+modelos_prueba_2025,Persistencia frente a xgboost,23,MAE referencia - MAE candidato; positivo favorece al candidato,-0.68,-0.753,-0.585,0.0,5000,7,42

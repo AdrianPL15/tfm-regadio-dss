@@ -1,0 +1,208 @@
+{
+  "snapshot_issued_at": "2026-10-29",
+  "requeried_at": "2026-10-29",
+  "interpretation": "La reconsulta detecta revisiones, pero SiAR no expone aquí una marca que certifique por sí sola que el valor ya sea definitivo.",
+  "results": [
+    {
+      "station_code": "AL01",
+      "status": "compared",
+      "snapshot_rows": 29,
+      "requery_rows": 29,
+      "common_dates": 29,
+      "only_snapshot_dates": 0,
+      "only_requery_dates": 0,
+      "changed_cells": 0,
+      "columns": {
+        "et0_mm": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "temperature_mean_c": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "temperature_max_c": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "temperature_min_c": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "humidity_mean_pct": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "humidity_max_pct": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "humidity_min_pct": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "wind_speed_mean_ms": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "wind_speed_max_ms": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "solar_radiation_mj_m2": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "precipitation_mm": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        }
+      }
+    },
+    {
+      "station_code": "Z06",
+      "status": "compared",
+      "snapshot_rows": 12,
+      "requery_rows": 12,
+      "common_dates": 12,
+      "only_snapshot_dates": 0,
+      "only_requery_dates": 0,
+      "changed_cells": 0,
+      "columns": {
+        "et0_mm": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "temperature_mean_c": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "temperature_max_c": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "temperature_min_c": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "humidity_mean_pct": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "humidity_max_pct": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "humidity_min_pct": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "wind_speed_mean_ms": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "wind_speed_max_ms": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "solar_radiation_mj_m2": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "precipitation_mm": {
+          "comparable_values": 12,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        }
+      }
+    },
+    {
+      "station_code": "BA08",
+      "status": "compared",
+      "snapshot_rows": 29,
+      "requery_rows": 29,
+      "common_dates": 29,
+      "only_snapshot_dates": 0,
+      "only_requery_dates": 0,
+      "changed_cells": 0,
+      "columns": {
+        "et0_mm": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "temperature_mean_c": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "temperature_max_c": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "temperature_min_c": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "humidity_mean_pct": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "humidity_max_pct": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "humidity_min_pct": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "wind_speed_mean_ms": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "wind_speed_max_ms": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "solar_radiation_mj_m2": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        },
+        "precipitation_mm": {
+          "comparable_values": 29,
+          "changed_values": 0,
+          "max_absolute_change": 0.0
+        }
+      }
+    }
+  ]
+}

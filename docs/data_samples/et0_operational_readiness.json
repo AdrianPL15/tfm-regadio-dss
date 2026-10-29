@@ -1,0 +1,97 @@
+{
+  "model_status": "experimental_not_deployed",
+  "stations_with_artifact": [
+    "AL01",
+    "BA08",
+    "Z06"
+  ],
+  "available_horizons_by_station": {
+    "AL01": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "Z06": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "BA08": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ]
+  },
+  "required_daily_observation_columns": [
+    "et0_mm",
+    "temperature_mean_c",
+    "temperature_max_c",
+    "temperature_min_c",
+    "humidity_mean_pct",
+    "humidity_max_pct",
+    "humidity_min_pct",
+    "wind_speed_mean_ms",
+    "wind_speed_max_ms",
+    "solar_radiation_mj_m2",
+    "precipitation_mm"
+  ],
+  "streamlit_siar_crop_needs_columns": [
+    "date",
+    "et0_mm",
+    "etc_mm",
+    "kc",
+    "kc_imputed",
+    "net_need_mm",
+    "pe_mm",
+    "record_status",
+    "source_file"
+  ],
+  "missing_from_crop_needs_csv": [
+    "humidity_max_pct",
+    "humidity_mean_pct",
+    "humidity_min_pct",
+    "precipitation_mm",
+    "solar_radiation_mj_m2",
+    "temperature_max_c",
+    "temperature_mean_c",
+    "temperature_min_c",
+    "wind_speed_max_ms",
+    "wind_speed_mean_ms"
+  ],
+  "resolved_operationally_by": "SiAR daily-observations API adapter",
+  "aemet_live_forecast_columns": [
+    "date",
+    "precipitation_probability_pct",
+    "precipitation_mm",
+    "precipitation_hours_covered",
+    "precipitation_amount_status",
+    "issued_at",
+    "hourly_issued_at",
+    "municipality_code",
+    "source"
+  ],
+  "aemet_role": "AEMET aporta lluvia prevista para descontarla después de ET0 × Kc; no sustituye las observaciones SiAR del día anterior usadas por Ridge.",
+  "siar_live_adapter": "implemented_and_unit_tested",
+  "ridge_integration_gate": "experimental_streamlit_integration_ready",
+  "fallback_enabled": true,
+  "required_next_component": "Conservar snapshots provisionales y compararlos con los valores SiAR validados cuando estén disponibles; vigilar error y latencia.",
+  "decision": "La rama experimental puede usar Ridge h=1…9 cuando el último dato SiAR lo permite. Si no, mantiene la media reciente y, en último término, la persistencia trazable."
+}

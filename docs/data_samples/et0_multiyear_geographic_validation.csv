@@ -1,0 +1,4 @@
+station_code,crop,test_days,ridge_mae_mm_day,persistence_mae_mm_day,et0_relative_improvement_pct,bootstrap_difference_mm_day,bootstrap_ci95_lower_mm_day,bootstrap_ci95_upper_mm_day,irrigation_paired_days,irrigation_relative_mae_improvement_pct
+AL01,Pimiento,357,0.3885263326545521,0.4629971988795518,16.084517661277086,0.074,0.049,0.103,145,18.634532074237192
+Z06,Maíz,293,0.5580841019237991,0.6879522184300342,18.87749076565306,0.13,0.075,0.185,183,23.251890697886704
+BA08,Algodón,365,0.4026961540345424,0.4664931506849315,13.675869957944458,0.064,0.036,0.092,183,18.22150003840972

@@ -14,7 +14,7 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 | Observaciones activas y completas | 1.584 |
 | Combinaciones cultivo-estación evaluadas | 6 |
 | Enfoques comparados por caso | 6 |
-| Pruebas automáticas | 108 superadas |
+| Pruebas automáticas | 150 superadas |
 | Escenarios técnicos del DSS | 13 de 13 superados |
 | MAE diario del DSS en la prueba del piloto | 0,09 mm/día |
 | Error semanal relativo del piloto | 4,8 % |
@@ -27,7 +27,7 @@ Las métricas evalúan la reproducción de la referencia calculada por SiAR, no 
 
 ![Flujo del motor de recomendación: usuario y datos, estimación diaria, reglas y salidas](docs/images/dss_flujo_5_1.png)
 
-El prototipo combina datos SiAR, previsión AEMET, estimaciones físicas, modelos de contraste y reglas explícitas. La salida prioriza la dosis del primer día y presenta el resto del horizonte como orientación sujeta a actualización.
+El prototipo combina observaciones SiAR, previsión de lluvia AEMET, un modelo Ridge multianual de ET0 por estación y horizonte, respaldos físicos y reglas explícitas. Cada una de las siete fechas recibe su propia ET0 prevista; la salida prioriza la dosis inmediata y conserva el método, el rango residual y las advertencias de cada día.
 
 ## Recorrido para revisar el TFM
 
@@ -36,7 +36,7 @@ El prototipo combina datos SiAR, previsión AEMET, estimaciones físicas, modelo
 | 1 | [Aplicación pública](https://tfm-regadio-dss-adrianpl15.streamlit.app/) y [guía breve del prototipo](docs/entrega/DEMO_TFM.md) | Selección de caso, consulta SiAR/AEMET, dosis, explicaciones y CSV descargable. |
 | 2 | [Memoria definitiva en PDF](docs/memoria/TFM_definitivo_2026-10-28.pdf) ([Word editable](docs/memoria/TFM_definitivo_2026-10-28.docx)) | Planteamiento, método, resultados y límites. |
 | 3 | [Código de la interfaz](src/dss/app_streamlit.py), [motor de recomendación](src/dss/engine.py) y [actualización SiAR](src/data/refresh_siar_crop_needs.py) | Implementación que utiliza la aplicación pública. |
-| 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json), [análisis XAI](docs/data_samples/xai_analysis_4_3.json), [validación del piloto](docs/data_samples/dss_validation_5_3.json) y [validación multicaso](docs/data_samples/dss_validation_multicaso_5_3.json) | Entradas, limpieza, explicabilidad y resultados verificables sin ejecutar el proyecto. |
+| 4 | [Volúmenes de la ETL](docs/data_samples/etl_volume_summary_4_1.csv), [evaluación de modelos](docs/data_samples/model_retraining_2026.json), [experimento ET0 multianual](docs/tecnica/SINTESIS_ET0_PARA_MEMORIA.md), [análisis XAI](docs/data_samples/xai_analysis_4_3.json) y [validación multicaso](docs/data_samples/dss_validation_multicaso_5_3.json) | Entradas, limpieza, predicción ET0, explicabilidad y resultados verificables sin ejecutar el proyecto. |
 
 La [guía de entrega](docs/entrega/ENTREGA_FINAL_2026-10-28.md) reúne el recorrido para el evaluador, los archivos principales y los límites científicos que deben explicarse.
 
@@ -48,7 +48,7 @@ La aplicación abre en **Recomendación (hoy o mañana)** y propone hoy por defe
 
 La visión del producto permite que el usuario elija ubicación, cultivo y periodo para determinar las fuentes y los datos necesarios. El prototipo actual integra SiAR y AEMET mediante una ETL en Python con almacenamiento local por capas. La aplicación de demostración conserva tres combinaciones de 2025 y ofrece seis CSV oficiales de 2026: pimiento y coliflor en `AL01` La Mojonera (Almería), maíz y alfalfa en `Z06` Ejea de los Caballeros (Zaragoza), algodón y alcachofa en `BA08` Don Benito (Badajoz). **No** hay aún selección automática para cualquier estación/cultivo de España. La instantánea versionada el 26/10/2026 contiene observaciones SiAR hasta el 25/10; coliflor, alfalfa y alcachofa mantenían Kc positivo y permitían una estimación orientativa con Kc proyectado y previsión AEMET. La vigencia se verifica de nuevo en cada consulta y la interfaz avisa cuando no procede una predicción actual. Los otros cultivos permanecen como casos históricos. Se han reentrenado y evaluado seis modelos predictivos independientes por cultivo y estación con una instantánea de evaluación cerrada el 22/10/2026; las jornadas operativas posteriores no modifican retrospectivamente esas métricas. [El informe](docs/memoria/04_03_desarrollo_evaluacion_modelo_predictivo.md) distingue esos modelos del motor de reglas que usa Streamlit. No existe un modelo común ni se ha demostrado una mejora general de precisión. Para el piloto se asume pimiento al aire libre; el CSV de SiAR identifica «Pimiento» sin precisar el sistema productivo. La incorporación del Boletín Hidrológico del MITECO y la persistencia operativa permanecen como líneas futuras; la evolución de datos prioriza ingesta ligera, almacenamiento de objetos y Parquet, con una base relacional reservada para usuarios, parcelas y recomendaciones. El sistema está pensado para apoyar, y no sustituir, el criterio agronómico del usuario final.
 
-La app consulta además [modelos de ETc reentrenados](docs/tecnica/INTEGRACION_ETC_AEMET_2026.md), distintos de los modelos de necesidad neta del experimento original. Compara su estimación previa a lluvia con `ET0 reciente × Kc`; utiliza para la dosis el método que tuvo menor MAE de prueba en cada caso y después aplica la lluvia cuantitativa AEMET, si está disponible. En los tres cultivos activos el método físico fue mejor en esa prueba, por lo que el modelo se muestra como contraste. Esta elección requiere validación prospectiva antes de afirmar que mejora la recomendación.
+La app usa 27 artefactos Ridge de ET0 —tres estaciones y horizontes `h=1…9`— y después aplica Kc y la lluvia cuantitativa AEMET. La validación con origen rodante de 2023–2025 compara cada horizonte con media de siete días y persistencia estacional. Una monitorización prospectiva diaria conserva las emisiones, revisa valores provisionales de SiAR y puede devolver automáticamente el sistema al respaldo físico. Los [modelos directos de ETc](docs/tecnica/INTEGRACION_ETC_AEMET_2026.md) se mantienen solo como evidencia comparativa.
 
 La aplicación pública se volvió a comprobar el 25/10/2026 sin iniciar sesión, incluida una consulta SiAR/AEMET, un escenario hipotético de lluvia y la descarga del CSV. Los [datos de 2026 y su alcance](docs/tecnica/CAMPANAS_SIAR_2026.md) complementan los [casos retrospectivos de 2025](docs/tecnica/DEMO_CASOS_SIAR_2025.md). La aplicación separa la dosis del primer día del panorama provisional de hasta siete días y traduce los mm de riego a L/m², m³/ha y m³ para la parcela. El botón **Actualizar fuentes y generar recomendación** consulta el caso vigente en SiAR y la predicción municipal AEMET, validando la descarga antes de calcular; los CSV versionados siguen siendo instantáneas separadas que requieren su propia actualización.
 
@@ -69,7 +69,8 @@ El uso de ChatGPT/Codex y Claude como herramientas de apoyo se declara en [`docs
 │   ├── data_samples/        Tablas, métricas y muestras verificables
 │   ├── images/              Figuras reproducibles de la memoria
 │   └── historico/           Material previo conservado fuera del recorrido principal
-├── models/deployed_etc_2026/ Modelos serializados que consulta la aplicación
+├── models/experimental_et0_multiyear/ Modelos Ridge ET0 por estación y horizonte
+├── models/deployed_etc_2026/ Modelos ETc conservados como comparación
 ├── src/                    ETL, variables, modelos, DSS y visualización
 ├── tests/                  Pruebas automáticas
 ├── .github/workflows/      Comprobaciones y revisión de datos SiAR

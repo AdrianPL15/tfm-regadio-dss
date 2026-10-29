@@ -31,10 +31,16 @@ from src.dss.config import (  # noqa: E402
 from src.dss.data_access import load_case, load_crop_needs_bytes  # noqa: E402
 from src.dss.aemet_forecast import fetch_live_forecast, prepare_live_forecast  # noqa: E402
 from src.data.aemet_client import AEMETClient, AEMETError  # noqa: E402
+from src.data import siar_client as siar_api  # noqa: E402
 from src.data.refresh_siar_crop_needs import SiARRefreshError, fetch_validated_case  # noqa: E402
 from src.dss.engine import METHOD_LABELS, fmt_es, recommend  # noqa: E402
-from src.dss.live_calendar import extend_recent_kc  # noqa: E402
+from src.dss.live_calendar import (  # noqa: E402
+    MAX_KC_STALENESS_DAYS,
+    extend_recent_kc,
+)
 from src.dss.predict_etc import ModelUnavailable, predict_tomorrow_etc  # noqa: E402
+from src.dss import predict_et0 as et0_model  # noqa: E402
+from src.dss.et0_prospective import record_prediction  # noqa: E402
 
 
 st.set_page_config(page_title="DSS de riego", layout="wide")
@@ -116,11 +122,13 @@ with st.sidebar:
     snapshot_key = f"siar_{case.station_code}_{case.crop}_{case.campaign_year}"
     aemet_key = f"aemet_{case.station_code}"
     aemet_time_key = f"aemet_consulta_{case.station_code}"
+    et0_key = f"et0_{case.station_code}_{case.campaign_year}"
     generate = st.button("Actualizar fuentes y generar recomendación", type="primary")
     if generate:
         st.session_state.pop(snapshot_key, None)
         st.session_state.pop(aemet_key, None)
         st.session_state.pop(aemet_time_key, None)
+        st.session_state.pop(et0_key, None)
 
     history, metadata = _load(
         str(_absolute(case.source_file)), str(_absolute(case.metadata_file))
@@ -152,7 +160,7 @@ with st.sidebar:
     live_case = (
         case.campaign_year == today.year
         and today.month in metadata.get("active_months", [])
-        and 0 <= (today - last_day).days <= 2
+        and 0 <= (today - last_day).days <= MAX_KC_STALENESS_DAYS
         and history["record_status"].iloc[-1] == "completo"
         and float(history["kc"].iloc[-1]) > 0
     )
@@ -210,15 +218,62 @@ with st.sidebar:
         and issue.month in metadata.get("active_months", [])
     )
     horizon = st.slider(
-        "Horizonte orientativo (días)", 1, MAX_HORIZON_DAYS,
+        "Horizonte predictivo (días)", 1, MAX_HORIZON_DAYS,
         MAX_HORIZON_DAYS if live_case else 7,
+        help=(
+            "Cada día dispone de su propia predicción ET0. El horizonte del modelo "
+            "se cuenta desde la última observación SiAR, no desde hoy."
+        ),
     )
+    if generate and operational_view:
+        try:
+            with st.spinner("Calculando ET0 con observaciones recientes de SiAR…"):
+                try:
+                    cloud_siar_token = st.secrets.get("SIAR_API_TOKEN")
+                except (FileNotFoundError, KeyError):
+                    cloud_siar_token = None
+                siar_provider = siar_api.SiARClient(
+                    token=cloud_siar_token or os.getenv("SIAR_API_TOKEN")
+                )
+                et0_results = et0_model.predict_live_et0_horizon(
+                    case.station_code,
+                    issue,
+                    horizon,
+                    client=siar_provider,
+                    fallback_history=history,
+                )
+                for et0_result in et0_results.values():
+                    try:
+                        record_prediction(et0_result)
+                    except (OSError, KeyError, TypeError, ValueError):
+                        pass
+                st.session_state[et0_key] = et0_results
+            ridge_days = sum(
+                str(item.get("method", "")).startswith("ridge_et0_multiyear_h")
+                for item in et0_results.values()
+            )
+            if ridge_days:
+                st.success(
+                    f"ET0 predictiva disponible en {ridge_days} de {horizon} días."
+                )
+            else:
+                st.info(
+                    "El modelo multianual no pudo aplicarse; se mantiene el método "
+                    "físico de respaldo para todo el horizonte."
+                )
+        except (siar_api.SiARError, ValueError, OSError) as error:
+            st.warning(f"La predicción ET0 no está disponible; se usa el respaldo: {error}")
     if operational_view:
         st.caption(
             "El primer día es la recomendación principal para la fecha elegida. "
             "Los siguientes son una "
             "previsión provisional, que conviene recalcular con nuevos datos SiAR y AEMET."
         )
+        if last_day < issue:
+            st.caption(
+                f"Kc prolongado desde el último dato SiAR publicado ({last_day:%d/%m/%Y}); "
+                "no se prolongan ET0, lluvia ni necesidad observadas."
+            )
     if case.campaign_year == today.year and not live_case:
         if today.month not in metadata.get("active_months", []) or float(history["kc"].iloc[-1]) <= 0:
             st.warning(
@@ -318,16 +373,37 @@ try:
     )
     model_estimate = None
     if operational_view:
-        try:
-            model_estimate = predict_tomorrow_etc(case, calculation_history, issue)
-        except (ModelUnavailable, OSError, ImportError) as error:
-            st.warning(f"Modelo no disponible; se usa el cálculo físico SiAR: {error}")
+        et0_predictions = st.session_state.get(et0_key, {})
+        model_estimates = {}
+        for target_date in [issue + timedelta(days=offset) for offset in range(horizon)]:
+            prediction = et0_predictions.get(target_date.isoformat())
+            target_row = calculation_history.loc[
+                calculation_history["date"].eq(pd.Timestamp(target_date))
+            ]
+            if (
+                prediction
+                and str(prediction.get("method", "")).startswith("ridge_et0_multiyear_h")
+                and len(target_row) == 1
+                and pd.notna(target_row["kc"].iat[0])
+            ):
+                model_estimates[target_date.isoformat()] = et0_model.to_etc_model_estimate(
+                    prediction, float(target_row["kc"].iat[0])
+                )
+        model_estimate = model_estimates.get(issue.isoformat())
+        if model_estimate is None:
+            try:
+                model_estimate = predict_tomorrow_etc(case, calculation_history, issue)
+            except (ModelUnavailable, OSError, ImportError) as error:
+                st.warning(f"Modelo no disponible; se usa el cálculo físico SiAR: {error}")
     result = recommend(
         request, history=calculation_history, metadata=metadata,
         forecast=forecast_input,
         model_estimate=(
             model_estimate if model_estimate and model_estimate["deploy_model_for_dose"]
             else None
+        ),
+        model_estimates=(
+            model_estimates if operational_view and model_estimates else None
         ),
     )
 except ValueError as error:
@@ -432,11 +508,10 @@ if horizon > 1:
     )
     if operational_view:
         st.warning(
-            "Los días posteriores al primero son orientativos: se mantiene temporalmente "
-            "el último Kc SiAR dentro del mismo mes, la ET0 se estima con observaciones "
-            "recientes y la lluvia solo se descuenta cuando AEMET aporta mm horarios "
-            "utilizables. Una lluvia sin cantidad disponible no significa lluvia cero. "
-            "Recalcula antes de regar cada día."
+            "Cada día usa su horizonte Ridge correspondiente cuando cumple el contrato "
+            "de datos; si no, aparece el respaldo físico. Se mantiene temporalmente el "
+            "último Kc SiAR dentro del mismo mes y la lluvia solo se descuenta cuando "
+            "AEMET aporta mm utilizables. Recalcula antes de regar cada día."
         )
     if summary["days_with_recommendation"] < summary["days_requested"]:
         st.warning(
@@ -467,24 +542,37 @@ with st.expander("¿De dónde sale esta recomendación?"):
         f"({metadata.get('record_count', len(history))} registros)."
     )
     method = first["method"]
-    st.markdown(f"**Método del primer día:** {METHOD_LABELS.get(method, 'sin método')}")
+    method_label = METHOD_LABELS.get(method, "sin método")
+    if method == "modelo_etc" and model_estimate is not None:
+        method_label = f"{model_estimate['model']} + previsión AEMET"
+    st.markdown(f"**Método del primer día:** {method_label}")
     if summary["main_method"] != method:
         st.markdown(
             f"**Método principal del periodo:** "
             f"{METHOD_LABELS.get(summary['main_method'], 'sin método')}"
         )
     if method == "modelo_etc":
-        st.caption(
-            f"Modelo entrenado con SiAR hasta {first['model_trained_through']}; "
-            "predice ETc para el primer día. La lluvia AEMET se descuenta después, "
-            "solo cuando hay cantidad horaria utilizable y según la fracción supuesta."
-        )
+        if model_estimate is not None and model_estimate.get("metric_target") == "ET0":
+            st.caption(
+                f"Modelo entrenado con SiAR hasta {first['model_trained_through']}; "
+                "predice ET0 y la convierte en ETc mediante el Kc del cultivo. "
+                "La lluvia AEMET se descuenta después, solo cuando hay cantidad "
+                "horaria utilizable y según la fracción supuesta."
+            )
+        else:
+            st.caption(
+                f"Modelo entrenado con SiAR hasta {first['model_trained_through']}; "
+                "predice ETc para el primer día. La lluvia AEMET se descuenta después, "
+                "solo cuando hay cantidad horaria utilizable y según la fracción supuesta."
+            )
     if model_estimate is not None:
+        metric_target = model_estimate.get("metric_target", "ETc")
         st.markdown(
-            f"**Comparación ETc:** modelo {fmt_es(model_estimate['etc_mm'])} mm; "
+            f"**Demanda estimada antes de lluvia:** "
+            f"{fmt_es(model_estimate['etc_mm'])} mm de ETc; "
             f"método usado {fmt_es(first['base_need_before_rain_mm'])} mm. "
-            f"MAE de prueba: modelo {fmt_es(model_estimate['test_mae_mm_day'], 2)} "
-            "mm/día; físico "
+            f"MAE histórico de {metric_target}: modelo "
+            f"{fmt_es(model_estimate['test_mae_mm_day'], 2)} mm/día; referencia física "
             f"{fmt_es(model_estimate['physical_baseline_test_mae_mm_day'], 2)} mm/día."
         )
         st.caption(
@@ -492,11 +580,13 @@ with st.expander("¿De dónde sale esta recomendación?"):
             "calidad; esas métricas no son una evaluación independiente del sistema "
             "completo desplegado."
         )
-        if model_estimate["steps_ahead"] > 1:
-            st.warning(
-                f"La predicción comparativa avanzó {model_estimate['steps_ahead']} "
-                "días desde la última ETc observada. Esta extrapolación no se "
-                "evaluó y nunca modifica la dosis principal."
+        lower = model_estimate.get("etc_interval_80_lower_mm")
+        upper = model_estimate.get("etc_interval_80_upper_mm")
+        if lower is not None and upper is not None:
+            st.caption(
+                f"Rango empírico central del 80 % para ETc: "
+                f"{fmt_es(lower, 2)}–{fmt_es(upper, 2)} mm. Se obtiene de residuos "
+                "temporales de 2025 y no es una garantía meteorológica."
             )
     st.markdown(f"**Eficiencia aplicada:** {fmt_es(summary['efficiency'] * 100, 0)} %")
     if summary["allocation_factor"] < 1:
@@ -521,7 +611,7 @@ with st.expander("¿De dónde sale esta recomendación?"):
     st.caption(
         "Para cultivos activos, el botón consulta SiAR y AEMET. SiAR se usa en memoria "
         "y no altera el CSV de GitHub. La previsión AEMET corresponde al municipio, "
-        "no a la parcela, y solo se aplica al día seleccionado si es utilizable."
+        "no a la parcela, y se aplica a cada día del horizonte si es utilizable."
     )
 
 if live_forecast is not None:
@@ -543,7 +633,7 @@ table = pd.DataFrame(
     {
         "Fecha": daily["date"].dt.strftime("%d/%m/%Y"),
         "Kc": daily["kc"].map(lambda v: fmt_es(v, 2)),
-        "Modelo del primer día": daily["predictive_model"].fillna("cálculo físico"),
+        "Modelo o respaldo": daily["predictive_model"].fillna("cálculo físico"),
         "ET0 usada (mm)": daily["et0_used_mm"].map(lambda v: fmt_es(v, 2)),
         "Necesidad neta (mm)": daily["net_need_mm"].map(lambda v: fmt_es(v, 2)),
         "Necesidad sin lluvia hipotética (mm)": daily["base_need_before_rain_mm"].map(lambda v: fmt_es(v, 2)),
@@ -557,6 +647,16 @@ table = pd.DataFrame(
         "Avisos": daily["warnings"],
     }
 )
+table["Rango ETc 80 % (mm)"] = [
+    (
+        f"{fmt_es(lower, 2)}–{fmt_es(upper, 2)}"
+        if pd.notna(lower) and pd.notna(upper) else "sin rango"
+    )
+    for lower, upper in zip(
+        daily["model_etc_interval_80_lower_mm"],
+        daily["model_etc_interval_80_upper_mm"],
+    )
+]
 with st.expander("Ver tabla detallada y reglas de cálculo"):
     st.dataframe(table, hide_index=True, width="stretch")
     for _, row in daily.iterrows():

@@ -105,6 +105,14 @@ experimentos parten de la misma referencia. En desarrollo los valores no son
 directamente comparables con los de la Tabla 4.13, porque aquí se evalúan todas
 las emisiones del periodo y no tres cortes de validación.
 
+La diferencia pareada `MAE(persistencia) - MAE(DSS)` es de 0,032 mm/día en
+desarrollo, con IC 95 % [-0,055; 0,122], y de 0,029 mm/día en prueba, con IC
+95 % [0,002; 0,067]. Los intervalos se obtuvieron mediante 5.000 remuestreos
+por bloques temporales de siete días y semilla 42 (Künsch, 1989). El resultado de desarrollo
+no permite afirmar una mejora concluyente; el de prueba favorece al DSS dentro
+del tramo reutilizado de septiembre, sin acreditar transferencia a otra
+campaña.
+
 ![Figura 5.3. Recomendaciones emitidas cada día con la información del día anterior y error frente a la referencia SiAR.](../images/dss_campana_5_3.png)
 
 El sesgo del sistema es ligeramente positivo, de 0,04 a 0,05 mm al día. Tiende
@@ -170,6 +178,14 @@ sobre esa tendencia. El sistema mantiene la ventaja hasta el quinto día, la
 reduce en el sexto y pierde frente a la persistencia en el séptimo, con 0,134
 frente a 0,126 mm.
 
+Los intervalos pareados de la diferencia de MAE muestran una evidencia menos
+uniforme que los valores puntuales. En desarrollo, los días 2 a 7 presentan
+intervalos positivos, mientras que el día 1 incluye el cero. En prueba, solo
+los días 1 y 3 tienen un límite inferior positivo: 0,029 [0,001; 0,067] y
+0,046 [0,010; 0,084] mm/día. Los días 2, 4, 5 y 6 incluyen el cero, y el día 7
+arroja -0,007 [-0,026; 0,011] mm/día. Por tanto, no se atribuye una mejora
+concluyente a todos los horizontes.
+
 Estos resultados permiten ofrecer horizontes de hasta siete días como
 planificación orientativa, aunque el séptimo día de la prueba pierde frente al
 baseline. La confianza baja desde el cuarto día es una regla prudencial de
@@ -178,9 +194,10 @@ acierto: reconoce que, sin pronóstico de ET0 validado, aumenta la exposición a
 cambios meteorológicos no observados. La regla R9 muestra el MAE histórico por
 día del horizonte, que no debe interpretarse como un intervalo de predicción
 individual ni como garantía para un nuevo cultivo o campaña. Así se evita presentar una
-semana entera con la misma apariencia de certeza. Una mejora real en los
-horizontes largos requiere una ET0 prevista, cuya vía ya está preparada en el
-motor.
+semana entera con la misma apariencia de certeza. Esta evaluación retrospectiva
+del motor físico se conserva separada del experimento multianual de ET0 del
+apartado 4.3.13; la aplicación operativa sí utiliza una ET0 Ridge diferente por
+horizonte, sujeta a cobertura y monitorización prospectiva.
 
 ## 5.3.5. Coherencia semanal
 
@@ -272,7 +289,7 @@ apartado 2.3, de que la incertidumbre debe formar parte de la salida.
 Las comprobaciones de la Tabla 5.7 se complementan con veinte pruebas
 definidas en `tests/test_dss_engine.py`. Tras añadir controles de selección
 de archivos, compatibilidad de estación y campaña e integración de la aplicación,
-el repositorio contiene 108 pruebas definidas. Entre otras cosas, verifican que la
+el repositorio contiene 150 pruebas definidas. Entre otras cosas, verifican que la
 planificación no cambia si se alteran los datos posteriores a la fecha de
 emisión, que es la garantía formal de que el sistema no utiliza información
 futura.
@@ -329,6 +346,12 @@ con Kc mayor que cero, para impedir que los días fuera del ciclo mejorasen
 artificialmente las métricas. La ventana de siete días seleccionada con el piloto se mantuvo fija:
 no se reajustó por cultivo ni después de observar el tramo de prueba.
 
+Los recuentos son un día inferiores a los del experimento predictivo de la
+Tabla 4.15 porque esta comparación exige, además de `Kc > 0` y una referencia
+válida, disponer de la persistencia del día anterior. En consecuencia, el
+primer día activo de cada campaña no es comparable y se excluye antes de
+realizar la partición cronológica del 85 % y el 15 %.
+
 **Tabla 5.8. Validación temporal multicaso a un día frente a la referencia SiAR.**
 
 | Cultivo y estación | Días comparables | Días de prueba | MAE DSS (mm/día) | MAE persistencia (mm/día) | Diferencia MAE [IC 95 %] (mm/día) |
@@ -369,6 +392,6 @@ el territorio nacional.
 
 El Anexo A reúne los comandos y las rutas que regeneran las cifras, tablas y
 figuras de este capítulo. La secuencia incluye la validación del piloto, la
-comprobación multicaso, la figura del motor y las 108 pruebas automáticas. Esta
+comprobación multicaso, la figura del motor y las 150 pruebas automáticas. Esta
 separación mantiene en el cuerpo el razonamiento y concentra la reproducción
 técnica en un único lugar.

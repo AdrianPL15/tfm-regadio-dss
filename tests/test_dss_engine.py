@@ -120,6 +120,32 @@ class RecommendTests(unittest.TestCase):
         self.assertAlmostEqual(result.daily["net_need_mm"].iat[0], 5.0 * 0.7)
         self.assertAlmostEqual(result.daily["net_need_mm"].iat[2], 5.0 * 0.9)
 
+    def test_predictive_estimate_is_applied_to_each_horizon_day(self):
+        request = RecommendationRequest(
+            issue_date=date(2025, 6, 20), horizon_days=3
+        )
+        estimates = {
+            f"2025-06-{day}": {
+                "etc_mm": value,
+                "model": f"Ridge h={day - 19}",
+                "trained_through": "2025-12-31",
+            }
+            for day, value in [(20, 2.0), (21, 3.0), (22, 4.0)]
+        }
+        result = recommend(
+            request,
+            history=self.history,
+            metadata={},
+            expected_errors={},
+            model_estimates=estimates,
+        )
+        self.assertEqual(result.daily["method"].tolist(), ["modelo_etc"] * 3)
+        np.testing.assert_allclose(result.daily["net_need_mm"], [2.0, 3.0, 4.0])
+        self.assertEqual(
+            result.daily["predictive_model"].tolist(),
+            ["Ridge h=1", "Ridge h=2", "Ridge h=3"],
+        )
+
     def test_gross_dose_and_volume(self):
         result = run(self.history, issue_date=date(2025, 6, 20), horizon_days=1,
                      efficiency=0.8, area_ha=2.0)

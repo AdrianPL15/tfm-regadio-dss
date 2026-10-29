@@ -1,6 +1,7 @@
 """La demo distingue la dosis diaria de la suma orientativa del horizonte."""
 
 from pathlib import Path
+from datetime import date, timedelta
 import unittest
 from unittest.mock import patch
 
@@ -35,11 +36,32 @@ class IrrigationUnitsUiTests(unittest.TestCase):
             patch("src.data.refresh_siar_crop_needs.download_csv", return_value=source),
             patch("src.data.aemet_client.AEMETClient"),
             patch("src.dss.aemet_forecast.fetch_live_forecast", side_effect=AEMETError("prueba")),
+            patch("src.data.siar_client.SiARClient"),
+            patch(
+                "src.dss.predict_et0.predict_live_et0_horizon",
+                return_value={
+                    (date.today() + timedelta(days=offset)).isoformat(): {
+                        "et0_mm": 2.0 + offset / 10,
+                        "method": f"ridge_et0_multiyear_h{offset + 1}",
+                        "horizon_days": offset + 1,
+                        "target_date": (date.today() + timedelta(days=offset)).isoformat(),
+                        "station_code": "AL01",
+                        "artifact": f"h{offset + 1}.joblib",
+                        "artifact_sha256": f"sha{offset + 1}",
+                        "model_trained_through": "2025-12-31",
+                        "external_test_ridge_mae_mm_day": 0.4,
+                        "external_test_mean_7d_mae_mm_day": 0.5,
+                        "external_test_residual_interval_80_pct_mm_day": [-0.3, 0.3],
+                    }
+                    for offset in range(7)
+                },
+            ),
         ):
             app.button[0].click().run()
         self.assertEqual(len(app.exception), 0)
         self.assertTrue(any("SiAR consultado" in item.value for item in app.success))
         self.assertTrue(any("AEMET no está disponible" in item.value for item in app.warning))
+        self.assertTrue(any("7 de 7" in item.value for item in app.success))
 
 
 if __name__ == "__main__":

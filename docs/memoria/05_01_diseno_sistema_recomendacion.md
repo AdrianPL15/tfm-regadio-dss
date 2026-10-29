@@ -97,15 +97,14 @@ que es el uso operativo, la ET0 y la precipitación efectiva del día que se
 quiere regar todavía no se conocen. Para ese caso se establecieron tres vías
 con un orden de preferencia fijo.
 
-La vía preferente utiliza una ET0 prevista cuando se proporciona como entrada
-explícita; el prototipo no descarga ni calcula automáticamente esta predicción.
-Los productos pronosticados de SiAR y una estimación derivada de AEMET son
-opciones de integración futura que requerirán calibración y validación. La necesidad se obtiene
-multiplicando esa ET0 por el Kc del día. La segunda vía, que es la que se
-emplea por defecto en el piloto porque no se dispone de un histórico de
-predicciones alineado con la campaña, sustituye la ET0 futura por la media de
-la ET0 observada en los siete días anteriores y la combina con el Kc del día
-objetivo. La tercera vía es la persistencia del apartado 4.3: se repite la
+La vía preferente utiliza la ET0 prevista por el modelo Ridge multianual del
+apartado 4.3.13. La aplicación calcula una predicción específica para cada uno
+de los siete días mostrados y la multiplica por el Kc del día. Si faltan las
+ventanas completas o el control prospectivo desactiva Ridge, la segunda vía
+utiliza la media de la ET0 observada en los siete días anteriores. No se
+prolonga indefinidamente: con una observación de más de siete días se declara
+la salida no disponible. La tercera vía es la persistencia del apartado 4.3:
+se repite la
 última necesidad neta conocida. Solo se recurre a ella cuando no hay ninguna
 ET0 reciente, y en todos los casos su valor se guarda junto a la recomendación
 como referencia de comparación.
@@ -216,10 +215,10 @@ fuente y la fecha de descarga. Todo ello se exporta en CSV y JSON, lo que
 permite archivar las recomendaciones emitidas y compararlas más adelante con
 lo que realmente se regó.
 
-La versión 1.1 añade el nombre del modelo predictivo y la última fecha de sus
-datos de entrenamiento cuando participa en el primer día. Si la prueba
-histórica favorece el cálculo físico, la predicción ETc del modelo se muestra
-como comparación, pero no modifica la dosis.
+La versión 1.1 añade, para cada día, el nombre del modelo o respaldo utilizado,
+la última fecha de los datos y el intervalo residual central del 80 %. Así se
+distingue una estimación Ridge de una sustitución física y de una fecha sin
+cobertura suficiente.
 
 La explicación se redacta a partir de los mismos valores que aparecen en la
 tabla. Para el 1 de julio de 2025, por ejemplo, la salida indica que la
@@ -232,34 +231,40 @@ razonamiento sin interpretar una tabla extensa.
 ## 5.1.6. Decisiones descartadas
 
 Durante el diseño se valoraron otras alternativas que finalmente no se
-incorporaron. La primera fue utilizar como motor el modelo Ridge, segundo
-clasificado en el apartado 4.3. Se descartó porque no superó de forma estable a
-la persistencia y porque su comportamiento ante un cambio de fase del cultivo
-resulta menos transparente que una multiplicación por el Kc. La segunda fue
+incorporaron. La primera fue utilizar directamente el Ridge de necesidad neta
+del apartado 4.3. Se descartó porque no superó de forma estable a la
+persistencia y mezclaría en una sola etiqueta demanda y lluvia. Esto no debe
+confundirse con el Ridge multianual de ET0 del apartado 4.3.13, que predice una
+variable meteorológica anterior a Kc y a la precipitación. La segunda fue
 estimar la ET0 futura con la ecuación de Hargreaves a partir de las
 temperaturas previstas por AEMET. Es una opción contemplada en FAO-56 para
 cuando faltan variables (Allen et al., 1998), pero no se dispone de un
 histórico de predicciones de la campaña de 2025 con el que calibrarla, y
 presentar una vía no evaluada como parte del sistema habría contradicho el
 criterio seguido en el resto del trabajo. El motor admite una ET0 prevista como
-entrada para que esa vía pueda incorporarse cuando exista la evidencia. La
+entrada; esa interfaz se utiliza ahora con el modelo multianual validado. La
 tercera alternativa fue un balance hídrico del suelo con agotamiento admisible,
 que permitiría decidir no solo cuánto sino cuándo regar. Requiere capacidad de
 retención, profundidad radicular y riegos previos de la parcela, datos que el
 piloto no tiene, y se plantea como evolución en el capítulo 6.
 
-## 5.1.7. Integración de ETc predictiva y AEMET
+## 5.1.7. Integración predictiva y AEMET
 
-Para la planificación de mañana, el sistema comprueba si existe un modelo de
-ETc entrenado para el cultivo y la estación seleccionados. La ETc predicha es
-una demanda **anterior** a la lluvia. Su uso para la dosis queda condicionado
-a que su MAE en el tramo de prueba sea menor que el del cálculo físico de ET0
-reciente por Kc. En caso contrario, la interfaz presenta ambas estimaciones
-y conserva el cálculo físico como base. La previsión AEMET, si aporta mm
+Para cada fecha del horizonte, el sistema calcula la ET0 con el modelo Ridge de
+la estación y horizonte correspondientes, la transforma en ETc mediante Kc y
+la entrega al motor como demanda **anterior** a la lluvia. La previsión AEMET,
+si aporta mm
 horarios completos, se descuenta después una sola vez usando la fracción
 aprovechable hipotética indicada por el usuario. Si faltan el modelo, los
 datos recientes o la previsión cuantitativa, el motor mantiene una salida
-explícita con las advertencias correspondientes. Esta integración se limita al
-primer día; el resto del horizonte conserva el método físico provisional.
-Las cifras y la reproducción se recogen en
-[`INTEGRACION_ETC_AEMET_2026.md`](../tecnica/INTEGRACION_ETC_AEMET_2026.md).
+explícita con las advertencias correspondientes. La latencia SiAR se traduce
+en horizontes de modelo: con dos días de retraso, hoy usa `h=2` y el séptimo
+día `h=8`; si la consulta comienza mañana utiliza `h=3…9`. La reproducción se
+recoge en [`SINTESIS_ET0_PARA_MEMORIA.md`](../tecnica/SINTESIS_ET0_PARA_MEMORIA.md).
+
+El modelo directo de ETc se conserva únicamente como comparación: el cálculo
+físico lo supera en cinco de los seis casos. La vía operativa es el Ridge de
+ET0 multianual cuando supera su control de cobertura y monitorización; en caso
+contrario se aplica la media reciente o se declara ausencia de cobertura. El
+modelo directo de ETc queda como resultado comparativo y trazable, no como
+motor operativo general.

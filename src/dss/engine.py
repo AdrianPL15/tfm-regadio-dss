@@ -72,6 +72,8 @@ DAILY_COLUMNS = [
     "source_file",
     "predictive_model",
     "model_trained_through",
+    "model_etc_interval_80_lower_mm",
+    "model_etc_interval_80_upper_mm",
 ]
 
 
@@ -362,6 +364,7 @@ def recommend(
     forecast: pd.DataFrame | None = None,
     expected_errors: dict[int, float] | None = None,
     model_estimate: dict[str, Any] | None = None,
+    model_estimates: dict[str, dict[str, Any]] | None = None,
 ) -> Recommendation:
     """Genera la recomendación diaria y el resumen del horizonte solicitado."""
 
@@ -410,13 +413,18 @@ def recommend(
             if forecast_indexed is not None and target_date in forecast_indexed.index
             else None
         )
+        daily_model = None
+        if model_estimates is not None:
+            daily_model = model_estimates.get(target_date.strftime("%Y-%m-%d"))
+        elif offset == 0:
+            daily_model = model_estimate
         use_model = (
-            offset == 0 and request.mode == "planificacion" and not stale_data
-            and model_estimate is not None
+            request.mode == "planificacion" and not stale_data
+            and daily_model is not None
         )
         estimate = estimate_day(
             target=target, known=known, forecast_row=forecast_row, mode=request.mode,
-            model_etc_mm=float(model_estimate["etc_mm"]) if use_model else None,
+            model_etc_mm=float(daily_model["etc_mm"]) if use_model else None,
         )
         rules = list(estimate.pop("rules"))
         warnings = list(estimate.pop("warnings"))
@@ -500,8 +508,14 @@ def recommend(
                 "source_file": history["source_file"].iloc[0]
                 if "source_file" in history
                 else None,
-                "predictive_model": model_estimate["model"] if use_model else None,
-                "model_trained_through": model_estimate["trained_through"] if use_model else None,
+                "predictive_model": daily_model["model"] if use_model else None,
+                "model_trained_through": daily_model["trained_through"] if use_model else None,
+                "model_etc_interval_80_lower_mm": (
+                    daily_model.get("etc_interval_80_lower_mm") if use_model else None
+                ),
+                "model_etc_interval_80_upper_mm": (
+                    daily_model.get("etc_interval_80_upper_mm") if use_model else None
+                ),
             }
         )
 
@@ -577,6 +591,7 @@ def recommend(
         "source_retrieved_at": metadata.get("retrieved_at"),
         "method_labels": METHOD_LABELS,
         "model_estimate": model_estimate,
+        "model_estimates": model_estimates,
     }
     return Recommendation(
         daily=daily, summary=summary, metadata=metadata_out, warnings=general_warnings

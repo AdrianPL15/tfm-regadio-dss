@@ -37,6 +37,7 @@ python -m src.analysis.build_eda_4_2
 python -m src.models.train_evaluate
 python -m src.analysis.build_xai_4_3
 python -m src.analysis.build_validation_5_3
+python -m src.analysis.build_current_statistical_evidence
 python -m unittest discover -s tests -q
 streamlit run src/dss/app_streamlit.py
 ```
@@ -48,7 +49,9 @@ primer comando. El programa comprueba que coincidan estación y fechas.
 
 La reproducción desde una copia compuesta solo por archivos versionados se
 comprobó de nuevo el 26/10/2026: se regeneraron ETL, tabla analítica,
-comparación de modelos, análisis XAI y validación, y pasaron 108 pruebas. Las
+comparación de modelos, análisis XAI, intervalos bootstrap y validación. Los
+resultados de incertidumbre quedan en
+`docs/data_samples/statistical_evidence_current.csv` y su equivalente JSON. Las
 dos pruebas de interfaz Streamlit necesitaron el entorno Windows normal porque
 el aislamiento local de sockets impide que `AppTest` cargue la aplicación.
 

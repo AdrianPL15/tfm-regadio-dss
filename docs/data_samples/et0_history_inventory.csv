@@ -1,0 +1,11 @@
+source_type,station_code,crop,source_file,rows,unique_dates,start_date,end_date,calendar_days,calendar_coverage_pct,years,year_count,et0_valid,et0_missing,multiyear_full_weather_candidate
+crop_calendar,AL01,coliflor,data/external/siar_necesidades_coliflor_AL01_2026.csv,147,147,2026-06-01,2026-10-25,147,100.0,2026,1,147,0,False
+crop_calendar,AL01,pimiento,data/external/siar_necesidades_pimiento_AL01_2025.csv,150,150,2025-05-01,2025-09-30,153,98.04,2025,1,148,2,False
+crop_calendar,AL01,pimiento,data/external/siar_necesidades_pimiento_AL01_2026.csv,178,178,2026-05-01,2026-10-25,178,100.0,2026,1,177,1,False
+crop_calendar,BA08,alcachofa,data/external/siar_necesidades_alcachofa_BA08_2026.csv,298,298,2026-01-01,2026-10-25,298,100.0,2026,1,297,1,False
+crop_calendar,BA08,algodon,data/external/siar_necesidades_algodon_BA08_2025.csv,183,183,2025-04-01,2025-09-30,183,100.0,2025,1,183,0,False
+crop_calendar,BA08,algodon,data/external/siar_necesidades_algodon_BA08_2026.csv,208,208,2026-04-01,2026-10-25,208,100.0,2026,1,207,1,False
+crop_calendar,Z06,alfalfa,data/external/siar_necesidades_alfalfa_Z06_2026.csv,239,239,2026-03-01,2026-10-25,239,100.0,2026,1,239,0,False
+crop_calendar,Z06,maiz,data/external/siar_necesidades_maiz_Z06_2025.csv,183,183,2025-04-01,2025-09-30,183,100.0,2025,1,183,0,False
+crop_calendar,Z06,maiz,data/external/siar_necesidades_maiz_Z06_2026.csv,208,208,2026-04-01,2026-10-25,208,100.0,2026,1,208,0,False
+station_weather,AL01,,data/interim/et0_history_AL01_2021_2025.csv,1826,1826,2021-01-01,2025-12-31,1826,100.0,"2021,2022,2023,2024,2025",5,1792,34,True

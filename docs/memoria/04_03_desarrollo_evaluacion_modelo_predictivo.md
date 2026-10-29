@@ -155,6 +155,16 @@ aproximadamente entre 0,89 y 1,35 mm/día, por lo que el denominador del R² es
 pequeño. La Figura 4.7 muestra las predicciones y el error con signo de los seis
 enfoques.
 
+El bootstrap pareado por bloques temporales de siete días (Künsch, 1989), con 5.000
+remuestreos y semilla 42, confirma que ninguno de los modelos de aprendizaje
+mejora a la persistencia en este tramo. La diferencia
+`MAE(persistencia) - MAE(modelo)` es de -0,081 mm/día para Ridge, con IC 95 %
+[-0,135; -0,038]. Para Random Forest, KNN, SVR y XGBoost las diferencias son,
+respectivamente, -0,440 [-0,516; -0,349], -0,523 [-0,603; -0,431], -1,771
+[-2,011; -1,530] y -0,680 [-0,753; -0,585] mm/día. Todos los intervalos
+favorecen a la persistencia dentro de estos 23 días; no demuestran que esa
+ventaja se transfiera a otras campañas.
+
 ![Figura 4.7. Predicciones y errores diarios de los seis enfoques en el tramo de prueba.](../images/model_predictions_4_3.png)
 
 ## 4.3.7. Decisión e interpretación
@@ -166,6 +176,13 @@ aprendizaje automático para futuras comparaciones. Esto no significa que el
 aprendizaje automático carezca de utilidad, sino que la muestra actual —un
 único ciclo, cultivo y estación— no contiene información suficiente para
 demostrar una mejora estable frente a una serie muy autocorrelacionada.
+
+El tramo de septiembre se reservó antes del ajuste inicial, pero posteriormente
+se reutilizó para interpretar los modelos mediante SHAP, comprobar el motor
+físico y orientar decisiones operativas de la aplicación. Por ello, sus
+resultados son una evaluación retrospectiva reutilizada y no una prueba final
+independiente del sistema completo. Esta limitación no altera las métricas,
+pero restringe el alcance de las conclusiones.
 
 El buen resultado de la persistencia es coherente con el problema evaluado. El
 objetivo cambia gradualmente entre días consecutivos porque el Kc y gran parte
@@ -278,10 +295,10 @@ decisión de uso en Streamlit se documentan en
 [`INTEGRACION_ETC_AEMET_2026.md`](../tecnica/INTEGRACION_ETC_AEMET_2026.md).
 
 El cálculo físico obtuvo menor MAE en cinco de los seis tramos de prueba. Por
-ello, los modelos están conectados a la aplicación como estimación contrastable,
-pero solo el caso de algodón supera el control comparativo para intervenir en
-la dosis principal cuando el cultivo esté activo. Los casos activos en octubre
-de 2026 conservan la estimación física. Tras elegir la base, el motor aplica
+ello, estos modelos directos de ETc se conservan como comparación y no son la
+vía predictiva principal. La ampliación multianual descrita en 4.3.13 predice
+ET0 por estación, la transforma mediante Kc y la contrasta con media de siete
+días antes de intervenir en la dosis. Tras elegir la base, el motor aplica
 una sola vez la fracción supuesta de lluvia AEMET y la eficiencia del riego.
 Esta decisión operativa utiliza resultados del tramo de prueba y no constituye
 una segunda evaluación independiente del sistema desplegado.
@@ -305,6 +322,8 @@ demuestran causalidad ni bastan por sí solas para explicar el error.
 | XGBoost | Kc | 1,292 mm/día | 45,2 % |
 | XGBoost | Necesidad t-1 | 0,454 mm/día | 15,9 % |
 | XGBoost | Día del año (coseno) | 0,252 mm/día | 8,8 % |
+| Random Forest | ET0 retardada y medias de ET0 (agregado) | 0,115 mm/día | 4,5 % |
+| XGBoost | ET0 retardada y medias de ET0 (agregado) | 0,440 mm/día | 15,4 % |
 
 ![Figura 4.9. Importancia global y explicaciones locales de Random Forest y XGBoost mediante TreeSHAP.](../images/model_xai_4_3.png)
 
@@ -312,9 +331,11 @@ El resultado debe interpretarse junto con la distribución temporal. El periodo
 de desarrollo contiene valores de Kc entre 0,3 y 1,0 y una necesidad media de
 4,041 mm/día, mientras que toda la prueba corresponde a Kc igual a 0,3 y su
 media desciende a 1,130 mm/día. En ambos modelos, Kc y la necesidad del día
-anterior concentran la mayor parte de la contribución. Las variables de ET0
-pasada aportan información adicional, pero los árboles no se ajustan
-completamente al tramo final y mantienen un sesgo positivo.
+anterior concentran la mayor parte de la contribución. Las seis variables de
+ET0 retardada y medias de ET0 suman un 4,5 % de la importancia en Random
+Forest y un 15,4 % en XGBoost. Por tanto, su aportación es secundaria en el
+primer modelo y apreciable en el segundo, pero no evita que ambos árboles se
+ajusten de forma incompleta al tramo final y mantengan un sesgo positivo.
 
 La explicación local del 29 de septiembre, el día de mayor error para ambos
 modelos, muestra ese mismo patrón: frente a una referencia SiAR de 0,89 mm/día,
@@ -327,3 +348,38 @@ decisión de no desplegar los árboles con los datos actuales.
 
 El Anexo A recoge el comando y las rutas que regeneran el informe XAI, las
 importancias globales, las explicaciones locales y la Figura 4.9.
+
+## 4.3.13. Predicción multianual de ET0 a siete días
+
+Para superar la limitación de una única campaña por cultivo se planteó un
+experimento independiente sobre ET0 diaria de estación entre 2021 y 2025. Se
+entrenó Ridge para `h=1…9`: aunque la interfaz muestra siete fechas, con dos
+días de retraso SiAR hoy requiere `h=2` y el séptimo día `h=8`; si se empieza
+mañana se requieren `h=3…9`. Cada horizonte dispone de un artefacto por AL01,
+Z06 y BA08. Las medias de 3, 7 y 14 días exigen ventanas completas y todas las
+entradas pertenecen a `t` o antes.
+
+La validación con origen rodante prueba 2023, 2024 y 2025 entrenando solo con
+años anteriores. Ridge completo obtuvo menor MAE puntual que media 7 días en
+las 81 combinaciones estación-año-horizonte. El bootstrap por bloques produjo
+63 intervalos que excluyeron cero a favor de Ridge y 18 no concluyentes. En la
+ablación frente a Ridge reducido, 74 de 81 intervalos cruzaron cero y cinco
+favorecieron al reducido; por tanto, no se atribuye una ganancia estable a las
+variables meteorológicas auxiliares.
+
+La cobertura retrospectiva de 2026 fue aproximadamente 97 % con Ridge en AL01
+y BA08. En Z06, SiAR solo devolvió 13 jornadas para enero–octubre y Ridge tuvo
+0 % de cobertura tras exigir 14 observaciones completas. El sistema no fabrica
+esa serie: usa media 7 días durante un máximo de siete días y después declara
+la recomendación no disponible.
+
+Streamlit genera una ET0 distinta para cada fecha, aplica `ET0 × Kc`, descuenta
+la lluvia AEMET utilizable y muestra el método y un intervalo residual central
+del 80 %. Una tarea diaria emite `h=1…9` sin depender de aperturas de la app,
+conserva el primer valor SiAR provisional, detecta revisiones y consolida tras
+siete días. Con 30 casos consolidados, Ridge se mantiene solo si su MAE
+prospectivo es menor que el de media 7 días; en caso contrario se activa
+automáticamente el respaldo físico. La documentación completa y las 162
+comparaciones bootstrap se conservan en
+[`SINTESIS_ET0_PARA_MEMORIA.md`](../tecnica/SINTESIS_ET0_PARA_MEMORIA.md) y en
+los ficheros de evidencia del repositorio.

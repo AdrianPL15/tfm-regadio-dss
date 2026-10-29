@@ -1,0 +1,40 @@
+{
+  "station_code": "AL01",
+  "target": "ET0 del día siguiente (mm/día)",
+  "train_period": [
+    "2021-01-02",
+    "2024-12-31"
+  ],
+  "test_period": [
+    "2025-01-01",
+    "2025-12-31"
+  ],
+  "feature_count": 20,
+  "features": [
+    "et0_lag_1d",
+    "et0_lag_2d",
+    "et0_lag_3d",
+    "et0_lag_7d",
+    "et0_lag_14d",
+    "et0_mean_3d",
+    "et0_mean_7d",
+    "et0_mean_14d",
+    "temperature_mean_c_lag_1d",
+    "temperature_max_c_lag_1d",
+    "temperature_min_c_lag_1d",
+    "humidity_mean_pct_lag_1d",
+    "humidity_max_pct_lag_1d",
+    "humidity_min_pct_lag_1d",
+    "wind_speed_mean_ms_lag_1d",
+    "wind_speed_max_ms_lag_1d",
+    "solar_radiation_mj_m2_lag_1d",
+    "precipitation_mm_lag_1d",
+    "target_day_sin",
+    "target_day_cos"
+  ],
+  "selected_by_validation": "Ridge",
+  "best_test_model": "Ridge",
+  "best_test_mae_mm": 0.38852633265455216,
+  "persistence_test_mae_mm": 0.4629971988795518,
+  "integration_decision": "pending_statistical_and_irrigation_impact_evaluation"
+}

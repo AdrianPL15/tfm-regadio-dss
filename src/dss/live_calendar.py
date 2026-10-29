@@ -13,6 +13,9 @@ from typing import Any
 import pandas as pd
 
 
+MAX_KC_STALENESS_DAYS = 7
+
+
 def extend_recent_kc(
     history: pd.DataFrame,
     metadata: dict[str, Any],
@@ -48,8 +51,11 @@ def extend_recent_kc(
 
     last = available_history.sort_values("date").iloc[-1]
     last_day = pd.Timestamp(last["date"]).date()
-    if not as_of - timedelta(days=2) <= last_day <= as_of:
-        raise ValueError("SiAR no dispone de un Kc reciente para esta campaña.")
+    if not as_of - timedelta(days=MAX_KC_STALENESS_DAYS) <= last_day <= as_of:
+        raise ValueError(
+            "SiAR no dispone de un Kc publicado en los últimos "
+            f"{MAX_KC_STALENESS_DAYS} días para esta campaña."
+        )
     if last["record_status"] != "completo" or pd.isna(last["kc"]):
         raise ValueError("El último Kc SiAR no está completo.")
     if float(last["kc"]) <= 0:
