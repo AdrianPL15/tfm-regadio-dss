@@ -8,7 +8,7 @@ import pandas as pd
 from src.dss.config import DEMO_CASES, RecommendationRequest
 from src.dss.data_access import load_case
 from src.dss.engine import recommend
-from src.dss.live_calendar import extend_recent_kc
+from src.dss.live_calendar import MAX_KC_STALENESS_DAYS, extend_recent_kc
 
 
 class Campaign2026Tests(unittest.TestCase):
@@ -70,6 +70,26 @@ class Campaign2026Tests(unittest.TestCase):
         )
         self.assertGreater(result.daily["gross_dose_mm"].iat[0], 0)
         self.assertEqual(result.daily["data_last_observed"].iat[0], "2026-10-22")
+
+    def test_kc_can_bridge_four_day_publication_lag_within_same_active_month(self):
+        case = next(case for case in DEMO_CASES if case.campaign_year == 2026 and case.crop == "Coliflor")
+        history, metadata = load_case(case)
+        history = history.loc[history["date"] <= pd.Timestamp("2026-10-25")].copy()
+        extended = extend_recent_kc(
+            history, metadata, target_day=date(2026, 10, 29),
+            as_of=date(2026, 10, 29),
+        )
+        self.assertEqual(extended.iloc[-1]["date"].date(), date(2026, 10, 29))
+        self.assertEqual(extended.iloc[-1]["record_status"], "kc_proyectado_mes")
+
+    def test_kc_projection_rejects_lag_beyond_declared_limit(self):
+        case = next(case for case in DEMO_CASES if case.campaign_year == 2026 and case.crop == "Coliflor")
+        history, metadata = load_case(case)
+        as_of = date(2026, 10, 29)
+        cutoff = as_of - pd.Timedelta(days=MAX_KC_STALENESS_DAYS + 1)
+        history = history.loc[history["date"] <= pd.Timestamp(cutoff)].copy()
+        with self.assertRaisesRegex(ValueError, "últimos 7 días"):
+            extend_recent_kc(history, metadata, target_day=as_of, as_of=as_of)
 
     def test_future_rows_are_excluded_from_a_retrospective_query(self):
         case = next(case for case in DEMO_CASES if case.campaign_year == 2026 and case.crop == "Coliflor")

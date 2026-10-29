@@ -1,0 +1,49 @@
+{
+  "tested_at": "2026-10-29",
+  "environment": "Streamlit local, rama codex/experimento-et0-multianual",
+  "target_date": "2026-10-29",
+  "verification": "manual_browser_smoke",
+  "results": [
+    {
+      "case": "Coliflor / AL01 / Almería",
+      "siar_new_days": 2,
+      "siar_last_date": "2026-10-27",
+      "et0_method": "ridge_et0_multiyear_h2",
+      "etc_display_mm": 2.3,
+      "aemet_response_received": true,
+      "aemet_remaining_rain_display_mm": 0.0,
+      "gross_dose_display_l_m2": 2.5,
+      "parcel_area_ha": 1.5,
+      "parcel_volume_display_m3": 38
+    },
+    {
+      "case": "Alfalfa / Z06 / Zaragoza",
+      "siar_new_days": 2,
+      "siar_last_date": "2026-10-27",
+      "et0_method": "ridge_et0_multiyear_h2",
+      "etc_display_mm": 1.8,
+      "aemet_response_received": true,
+      "aemet_remaining_rain_display_mm": 0.0,
+      "gross_dose_display_l_m2": 2.0,
+      "parcel_area_ha": 1.5,
+      "parcel_volume_display_m3": 29
+    },
+    {
+      "case": "Alcachofa / BA08 / Badajoz",
+      "siar_new_days": 2,
+      "siar_last_date": "2026-10-27",
+      "et0_method": "ridge_et0_multiyear_h2",
+      "etc_display_mm": 2.2,
+      "aemet_response_received": true,
+      "aemet_remaining_rain_display_mm": 0.0,
+      "gross_dose_display_l_m2": 2.4,
+      "parcel_area_ha": 1.5,
+      "parcel_volume_display_m3": 36
+    }
+  ],
+  "notes": [
+    "Las cantidades son las cifras redondeadas visibles en la interfaz.",
+    "AEMET respondió, pero no aportó lluvia restante positiva en estos tres casos.",
+    "La prueba confirma el flujo SiAR -> Ridge ET0 h=2 -> Kc -> AEMET -> eficiencia."
+  ]
+}

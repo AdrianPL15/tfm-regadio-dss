@@ -34,7 +34,10 @@ from src.data.aemet_client import AEMETClient, AEMETError  # noqa: E402
 from src.data import siar_client as siar_api  # noqa: E402
 from src.data.refresh_siar_crop_needs import SiARRefreshError, fetch_validated_case  # noqa: E402
 from src.dss.engine import METHOD_LABELS, fmt_es, recommend  # noqa: E402
-from src.dss.live_calendar import extend_recent_kc  # noqa: E402
+from src.dss.live_calendar import (  # noqa: E402
+    MAX_KC_STALENESS_DAYS,
+    extend_recent_kc,
+)
 from src.dss.predict_etc import ModelUnavailable, predict_tomorrow_etc  # noqa: E402
 from src.dss import predict_et0 as et0_model  # noqa: E402
 
@@ -156,7 +159,7 @@ with st.sidebar:
     live_case = (
         case.campaign_year == today.year
         and today.month in metadata.get("active_months", [])
-        and 0 <= (today - last_day).days <= 2
+        and 0 <= (today - last_day).days <= MAX_KC_STALENESS_DAYS
         and history["record_status"].iloc[-1] == "completo"
         and float(history["kc"].iloc[-1]) > 0
     )
@@ -252,6 +255,11 @@ with st.sidebar:
             "Los siguientes son una "
             "previsión provisional, que conviene recalcular con nuevos datos SiAR y AEMET."
         )
+        if last_day < issue:
+            st.caption(
+                f"Kc prolongado desde el último dato SiAR publicado ({last_day:%d/%m/%Y}); "
+                "no se prolongan ET0, lluvia ni necesidad observadas."
+            )
     if case.campaign_year == today.year and not live_case:
         if today.month not in metadata.get("active_months", []) or float(history["kc"].iloc[-1]) <= 0:
             st.warning(
@@ -515,18 +523,29 @@ with st.expander("¿De dónde sale esta recomendación?"):
         f"({metadata.get('record_count', len(history))} registros)."
     )
     method = first["method"]
-    st.markdown(f"**Método del primer día:** {METHOD_LABELS.get(method, 'sin método')}")
+    method_label = METHOD_LABELS.get(method, "sin método")
+    if method == "modelo_etc" and model_estimate is not None:
+        method_label = f"{model_estimate['model']} + previsión AEMET"
+    st.markdown(f"**Método del primer día:** {method_label}")
     if summary["main_method"] != method:
         st.markdown(
             f"**Método principal del periodo:** "
             f"{METHOD_LABELS.get(summary['main_method'], 'sin método')}"
         )
     if method == "modelo_etc":
-        st.caption(
-            f"Modelo entrenado con SiAR hasta {first['model_trained_through']}; "
-            "predice ETc para el primer día. La lluvia AEMET se descuenta después, "
-            "solo cuando hay cantidad horaria utilizable y según la fracción supuesta."
-        )
+        if model_estimate is not None and model_estimate.get("metric_target") == "ET0":
+            st.caption(
+                f"Modelo entrenado con SiAR hasta {first['model_trained_through']}; "
+                "predice ET0 y la convierte en ETc mediante el Kc del cultivo. "
+                "La lluvia AEMET se descuenta después, solo cuando hay cantidad "
+                "horaria utilizable y según la fracción supuesta."
+            )
+        else:
+            st.caption(
+                f"Modelo entrenado con SiAR hasta {first['model_trained_through']}; "
+                "predice ETc para el primer día. La lluvia AEMET se descuenta después, "
+                "solo cuando hay cantidad horaria utilizable y según la fracción supuesta."
+            )
     if model_estimate is not None:
         metric_target = model_estimate.get("metric_target", "ETc")
         st.markdown(

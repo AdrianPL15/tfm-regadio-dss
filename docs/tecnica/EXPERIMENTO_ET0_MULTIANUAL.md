@@ -340,6 +340,21 @@ artefacto compatible con la latencia y consulta a AEMET para descontar una sola
 vez la lluvia prevista aprovechable. Si falla cualquiera de las fuentes, el
 motor conserva el respaldo físico y muestra la causa al usuario.
 
+La prueba visual detectó además que el selector de fecha seguía limitado por el
+último día del CSV local. Se corrigió para admitir hoy y mañana cuando el Kc
+publicado tenga como máximo siete días, permanezca dentro del mismo mes activo
+y sea positivo. Solo se prolonga Kc, una magnitud de fase fenológica; ET0,
+lluvia y necesidad observadas no se fabrican. La interfaz declara la fecha desde
+la que se prolonga y rechaza automáticamente una antigüedad mayor.
+
+El recorrido completo se ejecutó el 29 de octubre en los tres casos activos:
+coliflor/AL01, alfalfa/Z06 y alcachofa/BA08. SiAR añadió dos jornadas y quedó en
+el día 27, el selector eligió Ridge `h=2` y AEMET respondió en los tres casos.
+Las dosis visibles fueron respectivamente 2,5, 2,0 y 2,4 L/m². La lluvia
+restante publicada fue 0,0 mm, por lo que no hubo descuento en esta ejecución.
+La evidencia redondeada de la interfaz se conserva en
+`docs/data_samples/et0_streamlit_smoke_latest.json`.
+
 Las instantáneas normalizadas de esta prueba se conservan localmente fuera del
 control de versiones. Una reconsulta realizada el mismo 29 de octubre no
 detectó cambios en ninguna de las once variables comparadas de AL01, Z06 o
@@ -378,12 +393,14 @@ nuevas y fechas desaparecidas.
   tres artefactos `h=2`.
 - `docs/data_samples/et0_provisional_requery_latest.json`: primera comprobación
   del mecanismo de detección de revisiones.
+- `docs/data_samples/et0_streamlit_smoke_latest.json`: prueba visual del flujo
+  completo en los tres casos activos.
 
 Las pruebas automatizadas comprueban los objetivos a uno y dos días, el uso de
 retardos de calendario reales, la ausencia de fuga temporal, la calidad del
 calendario, la reproducibilidad del bootstrap, la integridad SHA-256 de los
 artefactos, los respaldos y la aplicación única de Kc y precipitación. La
-verificación final suma 137 pruebas no visuales superadas, compilación correcta
+verificación final suma 139 pruebas no visuales superadas, compilación correcta
 de la aplicación y una consulta real satisfactoria en las tres estaciones. La
 prueba visual completa de Streamlit y la fusión en `main` se mantienen como
 puertas deliberadas de revisión, no como resultados ya aprobados.
