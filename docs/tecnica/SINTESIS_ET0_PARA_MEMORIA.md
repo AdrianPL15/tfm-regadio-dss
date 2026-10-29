@@ -108,14 +108,15 @@ servicio.
 Una acción diaria emite `h=1…9` para las tres estaciones sin depender de que un
 usuario abra la aplicación. Guarda la primera ET0 publicada como provisional,
 revisa cambios posteriores y consolida el valor tras siete días. Con menos de
-30 predicciones consolidadas, el estado permanece experimental. A partir de 30,
-Ridge continúa solo si su MAE es menor que el de media 7 días; en caso contrario
-la aplicación activa automáticamente el respaldo físico. Se recomiendan 60
-casos antes de adoptar una conclusión estable.
+30 predicciones consolidadas y pareadas, el estado permanece experimental. A
+partir de 30, la puerta utiliza como máximo los 60 casos más recientes y Ridge
+continúa solo si reduce al menos un 5 % el MAE de media 7 días; en caso
+contrario la aplicación activa automáticamente el respaldo físico.
 
 El reentrenamiento se plantea anualmente, después de cerrar y auditar la
-campaña. Un artefacto nuevo no sustituye al anterior si no supera de nuevo la
-referencia física en validación temporal.
+campaña. La frecuencia, el disparador y la regla de promoción quedan registrados
+en el manifiesto. Un artefacto nuevo no sustituye al anterior si no supera de
+nuevo la referencia física en validación temporal y prospectiva.
 
 ## Conclusión y limitaciones
 

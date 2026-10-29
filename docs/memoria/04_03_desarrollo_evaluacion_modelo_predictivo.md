@@ -387,9 +387,11 @@ Streamlit genera una ET0 distinta para cada fecha, aplica `ET0 × Kc`, descuenta
 la lluvia AEMET utilizable y muestra el método y un intervalo residual central
 del 80 %. Una tarea diaria emite `h=1…9` sin depender de aperturas de la app,
 conserva el primer valor SiAR provisional, detecta revisiones y consolida tras
-siete días. Con 30 casos consolidados, Ridge se mantiene solo si su MAE
-prospectivo es menor que el de media 7 días; en caso contrario se activa
-automáticamente el respaldo físico. La documentación completa y las 243
+siete días. Con 30 casos consolidados y pareados, la puerta evalúa como máximo
+los 60 más recientes. Ridge se mantiene solo si reduce al menos un 5 % el MAE
+de media 7 días; en caso contrario se activa automáticamente el respaldo
+físico. El manifiesto fija un reentrenamiento anual tras cerrar y auditar la
+campaña. La documentación completa y las 243
 comparaciones bootstrap se conservan en
 [`SINTESIS_ET0_PARA_MEMORIA.md`](../tecnica/SINTESIS_ET0_PARA_MEMORIA.md) y en
 los ficheros de evidencia del repositorio.

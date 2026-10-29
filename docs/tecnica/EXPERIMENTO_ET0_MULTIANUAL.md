@@ -512,15 +512,18 @@ de evidencia revisable. La primera ET0 observada se marca como provisional; en
 consultas posteriores se conserva el valor más reciente, se cuenta cualquier
 revisión y solo se marca como consolidada tras siete días.
 
-La puerta automática se evalúa al alcanzar 30 predicciones consolidadas. Ridge
-continúa únicamente si su MAE prospectivo es menor que el de la media de siete
+La puerta automática se evalúa al alcanzar 30 predicciones consolidadas y
+pareadas. Después utiliza como máximo los 60 casos más recientes para evitar
+que un histórico antiguo oculte una degradación actual. Ridge continúa
+únicamente si reduce al menos un 5 % el MAE prospectivo de la media de siete
 días; de lo contrario, la inferencia activa `physical_mean_7d`. Antes de 30
-casos el estado es experimental y se muestra como evidencia en recogida. Los
-artefactos se revisarán anualmente al cerrar la campaña, pero solo sustituirán
-la versión anterior si vuelven a superar la referencia física en validación
-temporal. La interfaz muestra además el intervalo empírico central del 80 % de
-ETc por día, derivado de residuos de 2025 y etiquetado como incertidumbre
-histórica, no como garantía.
+casos el estado es experimental y se muestra como evidencia en recogida. El
+manifiesto fija un reentrenamiento anual tras cerrar y auditar la campaña; un
+artefacto nuevo solo sustituirá al anterior si supera la referencia física en
+validación temporal y conserva la puerta prospectiva. La interfaz muestra en
+el bloque principal el intervalo empírico central del 80 % de ETc por día,
+derivado de residuos de 2025 y etiquetado como incertidumbre histórica, no
+como garantía.
 
 ## Artefactos generados
 

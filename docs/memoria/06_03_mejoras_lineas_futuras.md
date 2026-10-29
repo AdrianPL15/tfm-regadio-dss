@@ -60,10 +60,12 @@ La segunda prioridad ya no es construir una primera ET0 prevista, sino validar
 prospectivamente la predicción Ridge `h=1…9`, ampliar la cobertura de Z06 y
 vigilar su deriva. Una tarea diaria debe archivar cada emisión y contrastarla
 después con el primer valor SiAR disponible y con su posible revisión. El
-umbral de despliegue exige al menos 30 casos consolidados y un MAE inferior al
+umbral de despliegue exige al menos 30 casos consolidados y pareados. Sobre una
+ventana móvil máxima de 60 casos, Ridge debe reducir al menos un 5 % el MAE del
 respaldo de media de siete días; si deja de cumplirse, el sistema vuelve a ese
-respaldo. El reentrenamiento se programa una vez al año y solo sustituye al
-artefacto vigente si supera el mismo control temporal.
+respaldo. El reentrenamiento se programa una vez al año, al cerrar y auditar la
+campaña, y solo sustituye al artefacto vigente si supera el mismo control
+temporal y prospectivo.
 
 Como evolución adicional,
 La predicción municipal de AEMET OpenData describe los días

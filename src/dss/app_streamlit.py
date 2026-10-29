@@ -456,6 +456,15 @@ if pd.notna(first["gross_dose_mm"]):
             f"({fmt_es(first['base_need_before_rain_mm'])} mm de ETc). "
             "Después se aplica la lluvia prevista disponible y la eficiencia del riego."
         )
+        if model_estimate is not None:
+            lower = model_estimate.get("etc_interval_80_lower_mm")
+            upper = model_estimate.get("etc_interval_80_upper_mm")
+            if lower is not None and upper is not None:
+                st.info(
+                    f"Rango histórico central del 80 % para la demanda ETc: "
+                    f"{fmt_es(lower, 2)}–{fmt_es(upper, 2)} mm. Es una referencia "
+                    "obtenida de residuos de 2025, no una garantía meteorológica."
+                )
     elif model_estimate is not None:
         st.caption(
             f"Modelo {model_estimate['model']} comprobado: "

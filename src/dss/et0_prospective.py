@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -12,6 +13,10 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_LOG = ROOT / "data/raw/siar/prospective_et0/predictions.csv"
 DEFAULT_SUMMARY = ROOT / "docs/data_samples/et0_prospective_validation_latest.json"
+MINIMUM_GATE_CASES = 30
+GATE_WINDOW_CASES = 60
+RECOMMENDED_VALIDATION_CASES = 60
+MINIMUM_RELATIVE_IMPROVEMENT = 0.05
 
 
 def record_prediction(
@@ -124,21 +129,30 @@ def validate_log(
         valid = log.loc[log["status"].isin(["provisional", "consolidated"])].copy()
         consolidated = log.loc[log["status"].eq("consolidated")].copy()
         summary = {
-            "status": "collecting" if len(consolidated) < 30 else "minimum_window_reached",
+            "status": (
+                "collecting"
+                if len(consolidated) < MINIMUM_GATE_CASES
+                else "minimum_window_reached"
+            ),
             "records": int(len(log)),
             "provisional": int(log["status"].eq("provisional").sum()),
             "consolidated": int(len(consolidated)),
             "pending": int(log["status"].eq("pending").sum()),
             "revisions_detected": int(pd.to_numeric(log["revision_count"]).fillna(0).sum()),
             "consolidation_days": consolidation_days,
-            "minimum_validation_days": 30,
-            "recommended_validation_days": 60,
+            "minimum_validation_cases": MINIMUM_GATE_CASES,
+            "recommended_validation_cases": RECOMMENDED_VALIDATION_CASES,
+            "gate_window_cases": GATE_WINDOW_CASES,
+            "minimum_relative_improvement_pct": (
+                MINIMUM_RELATIVE_IMPROVEMENT * 100.0
+            ),
             "interpretation": (
                 "Registro prospectivo; no sustituye la evaluación rolling-origin hasta "
                 "alcanzar una ventana temporal suficiente."
             ),
         }
         scoring = consolidated if not consolidated.empty else valid
+        scoring = scoring.sort_values(["target_date", "issued_at_utc"])
         if not scoring.empty:
             actual = pd.to_numeric(scoring["actual_et0_latest_mm"])
             for label, column in {
@@ -152,18 +166,63 @@ def validate_log(
                     summary[f"{label}_mae_mm_day"] = float(
                         (candidate[mask] - actual[mask]).abs().mean()
                     )
-        if len(consolidated) < 30:
+        gate_scoring = consolidated.copy()
+        gate_scoring["actual"] = pd.to_numeric(
+            gate_scoring.get("actual_et0_latest_mm"), errors="coerce"
+        )
+        gate_scoring["ridge"] = pd.to_numeric(
+            gate_scoring.get("prediction_et0_mm"), errors="coerce"
+        )
+        gate_scoring["mean_7d"] = pd.to_numeric(
+            gate_scoring.get("baseline_mean_7d_mm"), errors="coerce"
+        )
+        gate_scoring = gate_scoring.dropna(subset=["actual", "ridge", "mean_7d"])
+        gate_scoring = gate_scoring.sort_values(["target_date", "issued_at_utc"]).tail(
+            GATE_WINDOW_CASES
+        )
+        summary["gate_evaluation_cases"] = int(len(gate_scoring))
+        summary["status"] = (
+            "collecting"
+            if len(gate_scoring) < MINIMUM_GATE_CASES
+            else "minimum_window_reached"
+        )
+        if not gate_scoring.empty:
+            ridge_gate_mae = float((gate_scoring["ridge"] - gate_scoring["actual"]).abs().mean())
+            mean_gate_mae = float((gate_scoring["mean_7d"] - gate_scoring["actual"]).abs().mean())
+            relative_improvement = (
+                (mean_gate_mae - ridge_gate_mae) / mean_gate_mae
+                if mean_gate_mae > 0
+                else float("-inf")
+            )
+            summary["gate_ridge_mae_mm_day"] = ridge_gate_mae
+            summary["gate_mean_7d_mae_mm_day"] = mean_gate_mae
+            summary["observed_relative_improvement_pct"] = (
+                relative_improvement * 100.0
+                if math.isfinite(relative_improvement)
+                else None
+            )
+        else:
+            relative_improvement = float("-inf")
+
+        if len(gate_scoring) < MINIMUM_GATE_CASES:
             summary["deployment_gate"] = "experimental_ridge_collecting_evidence"
-        elif (
-            summary.get("ridge_mae_mm_day", float("inf"))
-            < summary.get("mean_7d_mae_mm_day", float("inf"))
-        ):
+            summary["gate_reason"] = (
+                f"faltan casos pareados: {len(gate_scoring)}/{MINIMUM_GATE_CASES}"
+            )
+        elif relative_improvement >= MINIMUM_RELATIVE_IMPROVEMENT:
             summary["deployment_gate"] = "ridge"
+            summary["gate_reason"] = (
+                "Ridge supera el margen mínimo frente a media 7 días en la ventana reciente"
+            )
         else:
             summary["deployment_gate"] = "physical_mean_7d"
+            summary["gate_reason"] = (
+                "Ridge no alcanza una mejora relativa del 5 % frente a media 7 días"
+            )
         summary["gate_rule"] = (
-            "Con al menos 30 predicciones consolidadas, usar Ridge solo si su MAE "
-            "prospectivo es menor que el de la media física de 7 días."
+            "Con al menos 30 casos consolidados y pareados, evaluar los 60 más "
+            "recientes y usar Ridge solo si reduce al menos un 5 % el MAE de la "
+            "media física de 7 días."
         )
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     summary_path.write_text(

@@ -50,6 +50,20 @@ def export_models(
             "reentrenamiento anual tras cerrar y auditar la campaña; no sustituir "
             "artefactos si empeoran frente a media 7 días en rolling-origin"
         ),
+        "retraining_schedule": {
+            "frequency": "annual",
+            "trigger": "official_campaign_closed_and_audited",
+            "promotion_rule": (
+                "superar media 7 días en rolling-origin y conservar la puerta "
+                "prospectiva de 30 casos, ventana 60 y mejora mínima del 5 %"
+            ),
+        },
+        "prospective_gate_policy": {
+            "minimum_paired_consolidated_cases": 30,
+            "recent_window_cases": 60,
+            "minimum_relative_mae_improvement_pct": 5.0,
+            "fallback": "physical_mean_7d",
+        },
         "fallback": "media de ET0 de los últimos 7 días con al menos 3 observaciones; en último término, persistencia",
         "exported_at": date.today().isoformat(),
         "runtime_versions": {

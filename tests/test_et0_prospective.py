@@ -40,6 +40,44 @@ class Et0ProspectiveTests(unittest.TestCase):
             self.assertEqual(result["consolidated"], 1)
             self.assertAlmostEqual(result["ridge_mae_mm_day"], 0.1)
 
+            gate_log = root / "gate_predictions.csv"
+            gate_summary = root / "gate_summary.json"
+            dates = pd.date_range("2026-09-01", periods=30, freq="D")
+            actual_rows = []
+            for target in dates:
+                prediction = self._prediction().copy()
+                prediction.update(
+                    {
+                        "target_date": target.date().isoformat(),
+                        "et0_mm": 2.1,
+                        "baseline_mean_7d_mm": 2.2,
+                    }
+                )
+                record_prediction(prediction, log_path=gate_log, issued_at=stamp)
+                actual_rows.append(
+                    {"date": target, "station_code": "AL01", "et0_mm": 2.0}
+                )
+            gate = validate_log(
+                pd.DataFrame(actual_rows),
+                log_path=gate_log,
+                summary_path=gate_summary,
+                validated_at=datetime(2026, 11, 15, tzinfo=timezone.utc),
+            )
+            self.assertEqual(gate["gate_evaluation_cases"], 30)
+            self.assertEqual(gate["deployment_gate"], "ridge")
+            self.assertGreaterEqual(gate["observed_relative_improvement_pct"], 5.0)
+
+            logged = pd.read_csv(gate_log)
+            logged["prediction_et0_mm"] = 2.195
+            logged.to_csv(gate_log, index=False)
+            fallback_gate = validate_log(
+                pd.DataFrame(actual_rows),
+                log_path=gate_log,
+                summary_path=gate_summary,
+                validated_at=datetime(2026, 11, 15, tzinfo=timezone.utc),
+            )
+            self.assertEqual(fallback_gate["deployment_gate"], "physical_mean_7d")
+
     def test_provisional_value_is_rechecked_and_revision_is_counted(self):
         with TemporaryDirectory() as folder:
             root = Path(folder)
