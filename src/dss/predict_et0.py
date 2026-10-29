@@ -274,10 +274,10 @@ def predict_live_et0(
 
     if lookback_days < 14:
         raise ValueError("El periodo operativo debe cubrir al menos 14 días.")
-    source = client or SiARClient()
     start = target_day - timedelta(days=lookback_days)
     end = target_day - timedelta(days=1)
     try:
+        source = client or SiARClient()
         records = source.get_data(
             "Diarios", "ESTACION", station_code.upper(), start, end, calculated=True
         )
@@ -319,10 +319,10 @@ def predict_live_et0_horizon(
         raise ValueError("El horizonte operativo debe contener entre 1 y 7 días.")
     if lookback_days < 14:
         raise ValueError("El periodo operativo debe cubrir al menos 14 días.")
-    source = client or SiARClient()
     start = first_day - timedelta(days=lookback_days)
     end = first_day - timedelta(days=1)
     try:
+        source = client or SiARClient()
         records = source.get_data(
             "Diarios", "ESTACION", station_code.upper(), start, end, calculated=True
         )

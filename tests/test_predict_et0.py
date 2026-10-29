@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
+from unittest.mock import patch
 
 import joblib
 import numpy as np
@@ -264,6 +265,21 @@ class PredictEt0Tests(unittest.TestCase):
                 "2026-10-29", "2026-10-30", "2026-10-31",
                 "2026-11-01", "2026-11-02", "2026-11-03", "2026-11-04",
             ],
+        )
+
+    def test_horizon_without_api_token_uses_validated_crop_history(self):
+        with patch(
+            "src.dss.predict_et0.SiARClient",
+            side_effect=ValueError("token no configurado"),
+        ):
+            results = predict_live_et0_horizon(
+                "AL01", date(2025, 1, 21), 2,
+                fallback_history=self._history(),
+                manifest_path=Path("does-not-exist.json"),
+            )
+        self.assertEqual(len(results), 2)
+        self.assertTrue(
+            all(item["method"] == "mean_7d_fallback" for item in results.values())
         )
 
     def test_et0_is_converted_to_etc_once_with_kc(self):

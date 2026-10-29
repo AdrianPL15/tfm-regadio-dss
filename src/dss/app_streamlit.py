@@ -232,8 +232,9 @@ with st.sidebar:
                     cloud_siar_token = st.secrets.get("SIAR_API_TOKEN")
                 except (FileNotFoundError, KeyError):
                     cloud_siar_token = None
-                siar_provider = siar_api.SiARClient(
-                    token=cloud_siar_token or os.getenv("SIAR_API_TOKEN")
+                siar_token = cloud_siar_token or os.getenv("SIAR_API_TOKEN")
+                siar_provider = (
+                    siar_api.SiARClient(token=siar_token) if siar_token else None
                 )
                 et0_results = et0_model.predict_live_et0_horizon(
                     case.station_code,
