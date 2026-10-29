@@ -4,7 +4,7 @@
 
 Este trabajo se desarrolla en `codex/experimento-et0-multianual` y no modifica
 la versión estable del TFM ni la memoria. Su objetivo es comprobar si una
-predicción de ET0 entre uno y siete días mejora las referencias físicas antes de
+predicción de ET0 entre uno y nueve días mejora las referencias físicas antes de
 decidir si merece incorporarse al DSS. La integración con Streamlit existe
 únicamente en esta rama experimental; `main` permanece sin cambios.
 
@@ -50,11 +50,13 @@ python -m src.data.prepare_et0_history
 
 ## Diseño experimental
 
-El objetivo es la ET0 del día siguiente en mm/día. Las variables se construyen
-solo con información anterior a la fecha objetivo:
+El objetivo se redefine para cada horizonte: ET0 en `t+h`, con `h=1…9`, en
+mm/día. Se entrena y evalúa un artefacto independiente por horizonte. Las
+variables se construyen solo con información disponible en `t` o antes:
 
 - retardos de ET0 de 1, 2, 3, 7 y 14 días;
-- medias móviles de ET0 de 3, 7 y 14 días;
+- medias móviles completas de ET0 de 3, 7 y 14 días; una ventana de 14 días
+  exige literalmente 14 observaciones y no se calcula con una ventana parcial;
 - temperatura, humedad, radiación, viento y precipitación del día anterior;
 - codificación cíclica del día del año.
 
@@ -144,7 +146,7 @@ estructurada se conservan en `src/analysis/validate_et0_robustness.py`,
 `docs/data_samples/et0_multiyear_robustness.csv` y
 `docs/data_samples/et0_multiyear_robustness_summary.json`.
 
-## Horizontes de uno a siete días ante la latencia de SiAR
+## Horizontes de uno a nueve días ante la latencia de SiAR
 
 La prueba operativa del 29 de octubre mostró que la última observación SiAR
 disponible era del día 27. Se repitió por ello el mismo protocolo para predecir
@@ -161,30 +163,33 @@ En la prueba de 2025 se obtuvieron los siguientes resultados:
 | BA08 | 365 | 0,580 | 0,544 | 0,486 | 0,461 | 15,2 % |
 
 Los valores son MAE en mm/día. Se amplió a continuación el protocolo completo
-a `h=1…7`, siempre construyendo las variables con información disponible en
+a `h=1…9`, siempre construyendo las variables con información disponible en
 `t` o antes. El MAE medio de las nueve ventanas estación-año fue:
 
-| Horizonte | Ridge completo | Media 7 días | Ventanas ganadas |
-|---:|---:|---:|---:|
-| 1 | 0,470 | 0,551 | 9/9 |
-| 2 | 0,522 | 0,587 | 9/9 |
-| 3 | 0,544 | 0,607 | 9/9 |
-| 4 | 0,555 | 0,622 | 9/9 |
-| 5 | 0,563 | 0,636 | 9/9 |
-| 6 | 0,566 | 0,650 | 9/9 |
-| 7 | 0,570 | 0,666 | 9/9 |
+| Horizonte | Ridge completo | Media 7 días | Persistencia estacional | Ventanas ganadas |
+|---:|---:|---:|---:|---:|
+| 1 | 0,472 | 0,551 | 0,663 | 9/9 |
+| 2 | 0,524 | 0,587 | 0,781 | 9/9 |
+| 3 | 0,546 | 0,607 | 0,831 | 9/9 |
+| 4 | 0,557 | 0,622 | 0,865 | 9/9 |
+| 5 | 0,565 | 0,636 | 0,868 | 9/9 |
+| 6 | 0,567 | 0,650 | 0,891 | 9/9 |
+| 7 | 0,571 | 0,666 | 0,900 | 9/9 |
+| 8 | 0,571 | 0,687 | 0,898 | 9/9 |
+| 9 | 0,570 | 0,708 | 0,899 | 9/9 |
 
-Los valores son promedios descriptivos de MAE en mm/día, no siete pruebas
-externas independientes. Ridge ganó por valor puntual las 63 combinaciones.
+Los valores son promedios descriptivos de MAE en mm/día, no nueve pruebas
+externas independientes. Ridge ganó por valor puntual las 81 combinaciones.
 El bootstrap por bloques mostró un intervalo completamente positivo frente a
-la media de siete días en 51 de 63 ventanas: 9/9 en `h=1`, 7/9 en `h=2`, 7/9
-en `h=3`, 7/9 en `h=4`, 5/9 en `h=5`, 8/9 en `h=6` y 8/9 en `h=7`. Por tanto,
+la media de siete días en 63 de 81 ventanas: 9/9 en `h=1`, 6/9 en `h=2`, 6/9
+en `h=3`, 5/9 en `h=4`, 5/9 en `h=5`, 7/9 en `h=6`, 8/9 en `h=7`, 8/9 en
+`h=8` y 9/9 en `h=9`. Por tanto,
 la señal media es favorable, pero la incertidumbre crece y no se afirma
 superioridad estadística en cada estación-año individual.
 
 La regla de exportación queda codificada: un horizonte solo se serializa si
 Ridge completo presenta menor MAE puntual que la media móvil de siete días en
-las nueve ventanas. Los siete horizontes cumplieron esta regla; el manifiesto
+las nueve ventanas. Los nueve horizontes cumplieron esta regla; el manifiesto
 conserva los 9/9 resultados que justifican cada artefacto.
 
 ## Validación geográfica sin reajuste
@@ -220,13 +225,31 @@ La proporción de réplicas positivas fue 1,000 en las tres estaciones. Ningún
 intervalo cruza cero dentro de 2025; la mejora es consistente geográficamente
 en este conjunto, aunque todavía no acredita estabilidad en otros años futuros.
 
-La extensión `h=1…7` repite el mismo procedimiento, con 5.000 réplicas y
+La extensión `h=1…9` repite el mismo procedimiento, con 5.000 réplicas y
 semilla 42, para cada combinación estación-año-horizonte y para dos contrastes:
 Ridge completo frente a media móvil de siete días y frente a Ridge reducido.
-Las 126 comparaciones, incluidas las de `h=2`, se conservan en
+Las 162 comparaciones, incluidas las de `h=2`, se conservan en
 `docs/data_samples/et0_multiyear_robustness_uncertainty.csv`; las predicciones
 diarias pareadas que permiten recomputarlas están en
 `docs/data_samples/et0_multiyear_robustness_predictions.csv`.
+
+Frente a la media móvil, 63 intervalos excluyeron cero a favor de Ridge y 18
+lo cruzaron; ninguno favoreció significativamente a la media. En la ablación
+Ridge completo frente a Ridge reducido, solo 2 intervalos favorecieron al
+completo, 74 cruzaron cero y 5 favorecieron al reducido. Esta evidencia impide
+atribuir una mejora estable a las variables meteorológicas auxiliares: el valor
+principal procede de la historia de ET0 y la estacionalidad.
+
+## Relación entre latencia y siete días de recomendación
+
+El horizonte del modelo se mide desde la última observación SiAR, mientras el
+horizonte de la interfaz se mide desde el primer día solicitado. Con dos días
+de latencia, recomendar hoy exige `h=2` y los siete días visibles utilizan
+`h=2…8`; si el usuario empieza mañana, utilizan `h=3…9`. Por eso se entrenan
+nueve horizontes aunque la interfaz muestre como máximo siete fechas. El motor
+aplica una predicción ET0 distinta a cada día. Cuando un horizonte no cumple el
+contrato, solo ese día vuelve a la media de siete días o queda no disponible;
+no se presenta todo el periodo como si procediera del modelo.
 
 La evaluación se reproduce con:
 
@@ -264,6 +287,33 @@ Esta mejora agronómica no constituye evidencia independiente del modelo: es la
 propagación esperable del error de ET0 a través de las mismas operaciones
 deterministas `ETc = ET0 × Kc` y `necesidad = max(ETc − Pe, 0)`.
 
+## Cobertura operativa retrospectiva en 2026
+
+Se descargó el intervalo 1 de enero–28 de octubre de 2026 por bloques de cuota
+seguros y se simuló una recomendación de siete días para cada fecha de emisión,
+con escenarios de uno y dos días de retraso fijo de publicación. La simulación
+usa los datos finales disponibles y no reconstruye la hora real a la que SiAR
+publicó cada jornada; mide disponibilidad del contrato, no latencia histórica
+exacta.
+
+| Estación | Retraso supuesto | Ridge | Media 7 días | Persistencia | No disponible |
+|---|---:|---:|---:|---:|---:|
+| AL01 | 1 día | 96,95 % | 3,00 % | 0,00 % | 0,05 % |
+| AL01 | 2 días | 96,95 % | 2,57 % | 0,00 % | 0,48 % |
+| BA08 | 1 día | 97,29 % | 2,66 % | 0,00 % | 0,05 % |
+| BA08 | 2 días | 97,29 % | 2,28 % | 0,00 % | 0,44 % |
+| Z06 | 1 día | 0,00 % | 1,36 % | 0,68 % | 97,97 % |
+| Z06 | 2 días | 0,00 % | 0,87 % | 0,58 % | 98,55 % |
+
+SiAR devolvió 301 jornadas en AL01 y BA08, pero solo 13 en Z06 para todo el
+intervalo solicitado. Tras exigir 14 valores completos, Z06 no puede usar
+Ridge en la simulación. El DSS no rellena los meses ausentes: utiliza un
+respaldo solo durante siete días y después declara la recomendación como no
+disponible. Esta es una limitación de cobertura de la fuente/estación, no un
+fallo predictivo oculto. El detalle reproducible se conserva en
+`docs/data_samples/et0_operational_coverage_2026.csv` y su resumen estructurado
+en `et0_operational_coverage_2026_summary.json`.
+
 ## Limitaciones y decisión provisional
 
 El experimento aporta evidencia favorable entre años y zonas, pero todavía
@@ -288,7 +338,7 @@ procede mantenerlo separado de la entrega estable:
    cerrados —preferiblemente 60— antes de apoyar una decisión de despliegue.
 
 La decisión provisional pasa a ser **candidato favorable a integración
-controlada**, no integración automática. Los horizontes de uno a siete días se
+controlada**, no integración automática. Los horizontes de uno a nueve días se
 serializan porque cumplen la regla predefinida de 9/9 victorias puntuales frente
 a la media móvil. La rama experimental selecciona el horizonte según la fecha
 del último dato. La media reciente de siete días, calculada con al menos tres
@@ -300,7 +350,7 @@ prospectiva suficiente.
 ## Preparación técnica para una integración controlada
 
 Tras congelar la evaluación externa de 2025, Ridge se reajusta con todo el
-histórico 2021–2025 de cada estación y horizonte. Los 21 artefactos —`h=1…7`
+histórico 2021–2025 de cada estación y horizonte. Los 27 artefactos —`h=1…9`
 para AL01, Z06 y BA08— se conservan en
 `models/experimental_et0_multiyear/` junto a un manifiesto que declara:
 
@@ -314,7 +364,7 @@ para AL01, Z06 y BA08— se conservan en
 - estado explícito `experimental_not_deployed`.
 
 La inferencia de `src/dss/predict_et0.py` calcula la distancia entre el último
-dato y la fecha objetivo y selecciona `h=1…7`. Exige al menos tres
+dato y la fecha objetivo y selecciona `h=1…9`. Exige al menos tres
 retardos de ET0 válidos, verifica la huella del artefacto y no utiliza registros
 de la fecha objetivo ni posteriores. También declara los valores concretos que
 el `Pipeline` ha debido imputar y rechaza la inferencia si más de un valor de
@@ -333,6 +383,23 @@ estaciones. AEMET no se usa para fabricar esas entradas: conserva el papel
 separado de aportar la lluvia prevista que se descuenta tras `ET0 × Kc`.
 
 ## Auditoría de preparación operativa
+
+### Estado final de esta rama
+
+- se consulta una vez el histórico reciente de cada estación y se generan siete
+  fechas con artefactos `h=1…9`, según la latencia real;
+- las medias móviles requieren ventanas completas y como máximo se permite una
+  entrada imputada por predicción;
+- cada día conserva su método, horizonte, huella del modelo e intervalo
+  empírico central del 80 %;
+- la media de siete días es el respaldo prioritario, con al menos tres valores
+  recientes y una antigüedad máxima de siete días;
+- la persistencia solo actúa como último respaldo y nunca se usa información
+  con más de siete días para emitir una dosis;
+- AEMET mantiene un papel separado: únicamente aporta precipitación prevista
+  para descontarla después de `ET0 × Kc`.
+
+### Bitácora de incidencias ya resueltas
 
 La primera auditoría `src/analysis/audit_et0_operational_readiness.py` detectó
 que los CSV de necesidades hídricas usados por Streamlit no satisfacían el
@@ -359,7 +426,7 @@ del horizonte dos no altera retroactivamente esa decisión segura.
 
 La auditoría original registró el estado
 `blocked_siar_publication_lag_for_same_day`. La barrera se resolvió en esta rama
-al validar y versionar `h=1…7`. La primera prueba viva del 29 de octubre recuperó
+al validar y versionar `h=1…9`. La primera prueba viva del 29 de octubre recuperó
 datos hasta el día 27 en las tres estaciones y seleccionó automáticamente
 `ridge_et0_multiyear_h2`: 2,314 mm en AL01, 2,121 mm en Z06 y 2,269 mm en BA08
 para el día 29. AL01 y BA08 no necesitaron imputaciones; Z06 imputó únicamente
@@ -426,6 +493,23 @@ validados; se recomiendan 60. Hasta entonces no se presentará el rendimiento
 prospectivo como validación del modelo. La primera emisión se registró el 29 de
 octubre de 2026 para AL01, Z06 y BA08 y permanece pendiente de observación consolidada.
 
+La recogida deja de depender de que alguien abra Streamlit. El flujo programado
+`.github/workflows/et0-prospective-daily.yml` consulta diariamente las tres
+estaciones, emite `h=1…9` sin seleccionar días favorables y mantiene una rama
+de evidencia revisable. La primera ET0 observada se marca como provisional; en
+consultas posteriores se conserva el valor más reciente, se cuenta cualquier
+revisión y solo se marca como consolidada tras siete días.
+
+La puerta automática se evalúa al alcanzar 30 predicciones consolidadas. Ridge
+continúa únicamente si su MAE prospectivo es menor que el de la media de siete
+días; de lo contrario, la inferencia activa `physical_mean_7d`. Antes de 30
+casos el estado es experimental y se muestra como evidencia en recogida. Los
+artefactos se revisarán anualmente al cerrar la campaña, pero solo sustituirán
+la versión anterior si vuelven a superar la referencia física en validación
+temporal. La interfaz muestra además el intervalo empírico central del 80 % de
+ETc por día, derivado de residuos de 2025 y etiquetado como incertidumbre
+histórica, no como garantía.
+
 ## Artefactos generados
 
 - `src/analysis/audit_et0_availability.py`: inventario de fuentes disponibles;
@@ -463,9 +547,9 @@ octubre de 2026 para AL01, Z06 y BA08 y permanece pendiente de observación cons
   completo en los tres casos activos.
 - `docs/data_samples/et0_multiyear_robustness_predictions.csv` y
   `et0_multiyear_robustness_uncertainty.csv`: pares diarios e intervalos por
-  bloques para los siete horizontes.
+  bloques para los nueve horizontes.
 
-Las pruebas automatizadas comprueban los objetivos de uno a siete días, el uso de
+Las pruebas automatizadas comprueban los objetivos de uno a nueve días, el uso de
 retardos de calendario reales, la ausencia de fuga temporal, la calidad del
 calendario, la reproducibilidad del bootstrap, la integridad SHA-256 de los
 artefactos, los respaldos y la aplicación única de Kc y precipitación. La

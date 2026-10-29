@@ -21,7 +21,7 @@ Fecha de última comprobación técnica: 28 de octubre de 2026.
 | Interfaz desplegada | [Código Streamlit](../../src/dss/app_streamlit.py) |
 | Reutilización académica y operación | [Ficha del conjunto](../tecnica/DATASET_CARD.md), [principios FAIR](../tecnica/FAIR_Y_CITACION.md) y [plan MLOps](../tecnica/MLOPS_MONITORIZACION.md) |
 
-El 28/10/2026 se ejecutaron **108 pruebas correctas**, incluidas la comprobación de ausencia de fuga temporal, las tres comprobaciones del protocolo multicaso, la comprobación XAI y las dos pruebas `AppTest` de Streamlit. En el aislamiento local de sockets de Windows, `AppTest` se detiene antes de cargar la app; ejecutada en el entorno Windows normal, la suite terminó correctamente. La consulta pública de coliflor AL01 para hoy recibió datos SiAR y AEMET y mostró una dosis y un CSV descargable. El resultado de una consulta futura puede variar con los datos recibidos y la hora.
+El 29/10/2026 se ejecutaron **150 pruebas correctas**, incluidas la ausencia de fuga temporal, el protocolo multicaso, XAI, ET0 h=1…9, monitorización prospectiva y las dos pruebas `AppTest` de Streamlit. La suite terminó correctamente en el entorno Windows normal. La consulta pública depende de los datos SiAR y AEMET disponibles en cada momento.
 
 ## Alcance que debe explicarse
 

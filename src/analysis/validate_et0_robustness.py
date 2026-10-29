@@ -270,7 +270,7 @@ def main() -> None:
     prediction_frames = []
     for station, path in STATIONS.items():
         history = pd.read_csv(path)
-        for horizon_days in range(1, 8):
+        for horizon_days in range(1, 10):
             metrics, predictions = evaluate_station(
                 history, station, horizon_days=horizon_days, return_predictions=True
             )

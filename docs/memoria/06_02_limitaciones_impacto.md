@@ -33,17 +33,15 @@ aporta una sola campaña y no existe una prueba dejando fuera un año completo.
 Por tanto, la ampliación comprueba el comportamiento cronológico en tres calendarios y regiones,
 pero no demuestra generalización nacional ni estabilidad interanual.
 
-La tercera afecta a la capacidad predictiva. El sistema no dispone de una ET0
-prevista contrastada. AEMET está integrado y normalizado, pero sus predicciones
-no coinciden temporalmente con la campaña de 2025, y sin un histórico de
-emisiones no es posible calibrar ni evaluar una ET0 futura sin incurrir en fuga
-de información. En consecuencia, cualquier horizonte futuro depende de que el
-tiempo no cambie demasiado respecto al periodo reciente; el cuarto día se
-utiliza solo como umbral prudencial de aviso en la interfaz. En la prueba el sistema
-llega a perder frente a la persistencia en el séptimo día. Tampoco descuenta la
-lluvia prevista. Es una decisión prudente en un clima con 2,51 mm de
-precipitación efectiva en toda la campaña, pero en zonas más lluviosas
-trasladaría al usuario un número mayor de avisos que resolver.
+La tercera afecta a la cobertura predictiva. El sistema dispone de ET0 Ridge
+multianual por horizonte y descuenta la lluvia AEMET disponible, pero su
+validación prospectiva acaba de comenzar y aún no contiene 30 casos
+consolidados. Además, la cobertura retrospectiva de 2026 es cercana al 97 % en
+AL01 y BA08, pero nula para Ridge en Z06 porque la fuente solo devolvió 13 días
+continuos. Los intervalos mostrados son cuantiles empíricos de residuo, no una
+garantía probabilística calibrada para una parcela concreta. Por ello, la
+predicción a siete días es funcional, pero sigue sujeta a cobertura, deriva y
+calidad de las fuentes.
 
 La cuarta es funcional. El sistema propone una dosis diaria orientativa, pero
 no determina cuándo regar, porque no mantiene un balance hídrico del suelo.
@@ -69,7 +67,7 @@ demuestra el flujo de datos y de decisión, no una plataforma desplegable.
 | Referencia calculada por SiAR, sin riego aplicado ni respuesta del cultivo | Que las dosis sean óptimas para una parcela ni que reduzcan el consumo de agua | Validación en campo (6.3.3) |
 | Tres casos adicionales, pero una sola campaña por cultivo | Que los resultados se generalicen a todo el territorio o a otros años | Ampliación de la evidencia (6.3.1) |
 | Dependencia estructural entre la referencia SiAR y la vía física | Que el bajo error equivalga a una validación agronómica independiente | Riego observado, sensores y validación de campo (6.3.2 y 6.3.3) |
-| Sin ET0 prevista ni histórico de predicciones | Que el sistema anticipe cambios de tiempo en los horizontes largos | ET0 prevista (6.3.2) |
+| ET0 prevista sin evidencia prospectiva suficiente y cobertura nula de Ridge en Z06 | Que la mejora retrospectiva se mantenga operativamente en todas las estaciones | Monitorización diaria, consolidación y ampliación de cobertura (6.3.2) |
 | Sin balance hídrico del suelo | Que el sistema determine el momento adecuado del riego | Balance hídrico y riego deficitario (6.3.2) |
 | Restricción hídrica introducida como dotación del usuario | Que la recomendación refleje la disponibilidad oficial de agua | Indicadores hidrológicos (6.3.4) |
 | Interfaz sin evaluación con usuarios | Que las recomendaciones se comprendan y se adopten | Evaluación con usuarios (6.3.3) |

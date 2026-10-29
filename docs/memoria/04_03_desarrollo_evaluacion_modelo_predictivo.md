@@ -295,12 +295,10 @@ decisión de uso en Streamlit se documentan en
 [`INTEGRACION_ETC_AEMET_2026.md`](../tecnica/INTEGRACION_ETC_AEMET_2026.md).
 
 El cálculo físico obtuvo menor MAE en cinco de los seis tramos de prueba. Por
-ello, los modelos están conectados a la aplicación como estimación contrastable,
-pero solo el caso de algodón supera el control comparativo para intervenir en
-la dosis principal cuando el cultivo esté activo. Los casos activos en octubre
-de 2026 conservan la estimación física. En consecuencia, para los cultivos
-activos mostrados en el prototipo la dosis principal procede de ET0 reciente
-por Kc y de las reglas agronómicas, no del modelo de aprendizaje. Tras elegir la base, el motor aplica
+ello, estos modelos directos de ETc se conservan como comparación y no son la
+vía predictiva principal. La ampliación multianual descrita en 4.3.13 predice
+ET0 por estación, la transforma mediante Kc y la contrasta con media de siete
+días antes de intervenir en la dosis. Tras elegir la base, el motor aplica
 una sola vez la fracción supuesta de lluvia AEMET y la eficiencia del riego.
 Esta decisión operativa utiliza resultados del tramo de prueba y no constituye
 una segunda evaluación independiente del sistema desplegado.
@@ -350,3 +348,38 @@ decisión de no desplegar los árboles con los datos actuales.
 
 El Anexo A recoge el comando y las rutas que regeneran el informe XAI, las
 importancias globales, las explicaciones locales y la Figura 4.9.
+
+## 4.3.13. Predicción multianual de ET0 a siete días
+
+Para superar la limitación de una única campaña por cultivo se planteó un
+experimento independiente sobre ET0 diaria de estación entre 2021 y 2025. Se
+entrenó Ridge para `h=1…9`: aunque la interfaz muestra siete fechas, con dos
+días de retraso SiAR hoy requiere `h=2` y el séptimo día `h=8`; si se empieza
+mañana se requieren `h=3…9`. Cada horizonte dispone de un artefacto por AL01,
+Z06 y BA08. Las medias de 3, 7 y 14 días exigen ventanas completas y todas las
+entradas pertenecen a `t` o antes.
+
+La validación con origen rodante prueba 2023, 2024 y 2025 entrenando solo con
+años anteriores. Ridge completo obtuvo menor MAE puntual que media 7 días en
+las 81 combinaciones estación-año-horizonte. El bootstrap por bloques produjo
+63 intervalos que excluyeron cero a favor de Ridge y 18 no concluyentes. En la
+ablación frente a Ridge reducido, 74 de 81 intervalos cruzaron cero y cinco
+favorecieron al reducido; por tanto, no se atribuye una ganancia estable a las
+variables meteorológicas auxiliares.
+
+La cobertura retrospectiva de 2026 fue aproximadamente 97 % con Ridge en AL01
+y BA08. En Z06, SiAR solo devolvió 13 jornadas para enero–octubre y Ridge tuvo
+0 % de cobertura tras exigir 14 observaciones completas. El sistema no fabrica
+esa serie: usa media 7 días durante un máximo de siete días y después declara
+la recomendación no disponible.
+
+Streamlit genera una ET0 distinta para cada fecha, aplica `ET0 × Kc`, descuenta
+la lluvia AEMET utilizable y muestra el método y un intervalo residual central
+del 80 %. Una tarea diaria emite `h=1…9` sin depender de aperturas de la app,
+conserva el primer valor SiAR provisional, detecta revisiones y consolida tras
+siete días. Con 30 casos consolidados, Ridge se mantiene solo si su MAE
+prospectivo es menor que el de media 7 días; en caso contrario se activa
+automáticamente el respaldo físico. La documentación completa y las 162
+comparaciones bootstrap se conservan en
+[`SINTESIS_ET0_PARA_MEMORIA.md`](../tecnica/SINTESIS_ET0_PARA_MEMORIA.md) y en
+los ficheros de evidencia del repositorio.

@@ -43,6 +43,15 @@ class TrainEt0MultiyearTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             build_feature_table(history, horizon_days=0)
 
+    def test_fourteen_day_mean_requires_complete_window(self):
+        history = pd.DataFrame({
+            "date": pd.date_range("2025-01-01", periods=14, freq="D"),
+            "et0_mm": np.arange(1.0, 15.0),
+        })
+        table, _ = build_feature_table(history)
+        self.assertTrue(table["et0_mean_14d"].iloc[:13].isna().all())
+        self.assertAlmostEqual(table["et0_mean_14d"].iloc[13], 7.5)
+
     def test_lags_follow_calendar_days_when_history_has_a_gap(self):
         history = pd.DataFrame(
             {

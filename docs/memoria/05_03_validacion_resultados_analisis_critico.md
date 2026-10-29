@@ -194,9 +194,10 @@ acierto: reconoce que, sin pronóstico de ET0 validado, aumenta la exposición a
 cambios meteorológicos no observados. La regla R9 muestra el MAE histórico por
 día del horizonte, que no debe interpretarse como un intervalo de predicción
 individual ni como garantía para un nuevo cultivo o campaña. Así se evita presentar una
-semana entera con la misma apariencia de certeza. Una mejora real en los
-horizontes largos requiere una ET0 prevista, cuya vía ya está preparada en el
-motor.
+semana entera con la misma apariencia de certeza. Esta evaluación retrospectiva
+del motor físico se conserva separada del experimento multianual de ET0 del
+apartado 4.3.13; la aplicación operativa sí utiliza una ET0 Ridge diferente por
+horizonte, sujeta a cobertura y monitorización prospectiva.
 
 ## 5.3.5. Coherencia semanal
 
@@ -288,7 +289,7 @@ apartado 2.3, de que la incertidumbre debe formar parte de la salida.
 Las comprobaciones de la Tabla 5.7 se complementan con veinte pruebas
 definidas en `tests/test_dss_engine.py`. Tras añadir controles de selección
 de archivos, compatibilidad de estación y campaña e integración de la aplicación,
-el repositorio contiene 108 pruebas definidas. Entre otras cosas, verifican que la
+el repositorio contiene 150 pruebas definidas. Entre otras cosas, verifican que la
 planificación no cambia si se alteran los datos posteriores a la fecha de
 emisión, que es la garantía formal de que el sistema no utiliza información
 futura.
@@ -391,6 +392,6 @@ el territorio nacional.
 
 El Anexo A reúne los comandos y las rutas que regeneran las cifras, tablas y
 figuras de este capítulo. La secuencia incluye la validación del piloto, la
-comprobación multicaso, la figura del motor y las 108 pruebas automáticas. Esta
+comprobación multicaso, la figura del motor y las 150 pruebas automáticas. Esta
 separación mantiene en el cuerpo el razonamiento y concentra la reproducción
 técnica en un único lugar.

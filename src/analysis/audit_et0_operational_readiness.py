@@ -53,7 +53,7 @@ def build() -> dict:
             "validados cuando estén disponibles; vigilar error y latencia."
         ),
         "decision": (
-            "La rama experimental puede usar Ridge h=1…7 cuando el último dato SiAR "
+            "La rama experimental puede usar Ridge h=1…9 cuando el último dato SiAR "
             "lo permite. Si no, mantiene la media reciente y, en último término, "
             "la persistencia trazable."
         ),

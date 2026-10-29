@@ -44,8 +44,12 @@ def export_models(
     manifest: dict[str, object] = {
         "status": "experimental_not_deployed",
         "model_family": "Ridge",
-        "target": "ET0 de uno a siete días (mm/día)",
+        "target": "ET0 de uno a nueve días (mm/día)",
         "training_policy": "reajuste final con 2021-2025 tras evaluación externa congelada en 2025",
+        "retraining_policy": (
+            "reentrenamiento anual tras cerrar y auditar la campaña; no sustituir "
+            "artefactos si empeoran frente a media 7 días en rolling-origin"
+        ),
         "fallback": "media de ET0 de los últimos 7 días con al menos 3 observaciones; en último término, persistencia",
         "exported_at": date.today().isoformat(),
         "runtime_versions": {
@@ -58,6 +62,9 @@ def export_models(
         "stations": {},
     }
     robustness = pd.read_csv(metrics_root / "et0_multiyear_robustness.csv")
+    prediction_evidence = pd.read_csv(
+        metrics_root / "et0_multiyear_robustness_predictions.csv"
+    )
     comparison = robustness.pivot_table(
         index=["station_code", "test_year", "horizon_days"],
         columns="method",
@@ -108,6 +115,16 @@ def export_models(
             mean_7d_mae = float(
                 robustness_test.loc["Media movil 7 dias", "mae_mm_day"]
             )
+            residual_sample = prediction_evidence[
+                (prediction_evidence["station_code"] == station)
+                & (prediction_evidence["test_year"] == 2025)
+                & (prediction_evidence["horizon_days"] == horizon_days)
+            ].copy()
+            residual = (
+                residual_sample["target_et0_mm"]
+                - residual_sample["ridge_full_prediction_mm"]
+            )
+            residual_q10, residual_q90 = residual.quantile([0.10, 0.90])
             station_horizons[str(horizon_days)] = {
                 "artifact": artifact.name,
                 "sha256": _sha256(artifact),
@@ -120,6 +137,12 @@ def export_models(
                 "external_test_ridge_mae_mm_day": ridge_mae,
                 "external_test_persistence_mae_mm_day": persistence_mae,
                 "external_test_mean_7d_mae_mm_day": mean_7d_mae,
+                "external_test_residual_interval_80_pct_mm_day": [
+                    float(residual_q10), float(residual_q90)
+                ],
+                "external_test_residual_interval_sample_size": int(
+                    residual.notna().sum()
+                ),
             }
         manifest["stations"][station] = {"horizons": station_horizons}
     manifest_path = model_dir / "manifest.json"

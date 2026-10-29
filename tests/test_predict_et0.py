@@ -13,6 +13,7 @@ from src.dss.predict_et0 import (
     history_from_siar_records,
     predict_et0_with_fallback,
     predict_live_et0,
+    predict_live_et0_horizon,
     to_etc_model_estimate,
 )
 from src.models.train_et0_multiyear import WEATHER_CURRENT
@@ -168,6 +169,25 @@ class PredictEt0Tests(unittest.TestCase):
             self.assertEqual(result["method"], "mean_7d_fallback")
             self.assertIn("demasiados valores", result["fallback_reason"])
 
+    def test_monitoring_gate_can_force_physical_fallback(self):
+        with TemporaryDirectory(dir=".test_tmp") as folder:
+            root = Path(folder)
+            monitoring = root / "monitoring.json"
+            monitoring.write_text(
+                json.dumps({"deployment_gate": "physical_mean_7d"}),
+                encoding="utf-8",
+            )
+            manifest = root / "manifest.json"
+            manifest.write_text("{}", encoding="utf-8")
+            result = predict_et0_with_fallback(
+                "AL01", self._history(), date(2025, 1, 21),
+                manifest_path=manifest,
+                monitoring_path=monitoring,
+            )
+            # La ausencia del manifiesto también es segura; el contrato principal
+            # es que nunca se intente devolver Ridge con la puerta física activa.
+            self.assertEqual(result["method"], "mean_7d_fallback")
+
     def test_unversioned_horizon_uses_mean_7d_before_persistence(self):
         with TemporaryDirectory(dir=".test_tmp") as folder:
             root = Path(folder)
@@ -220,6 +240,31 @@ class PredictEt0Tests(unittest.TestCase):
         )
         self.assertEqual(result["method"], "mean_7d_fallback")
         self.assertIn("fallo del extractor", result["fallback_reason"])
+
+    def test_seven_day_horizon_queries_siar_once(self):
+        class Source:
+            def __init__(self):
+                self.calls = 0
+
+            def get_data(self, *args, **kwargs):
+                self.calls += 1
+                return []
+
+        source = Source()
+        results = predict_live_et0_horizon(
+            "AL01", date(2026, 10, 29), 7,
+            client=source, fallback_history=self._history(),
+            manifest_path=Path("does-not-exist.json"),
+        )
+        self.assertEqual(source.calls, 1)
+        self.assertEqual(len(results), 7)
+        self.assertEqual(
+            list(results),
+            [
+                "2026-10-29", "2026-10-30", "2026-10-31",
+                "2026-11-01", "2026-11-02", "2026-11-03", "2026-11-04",
+            ],
+        )
 
     def test_et0_is_converted_to_etc_once_with_kc(self):
         estimate = to_etc_model_estimate(

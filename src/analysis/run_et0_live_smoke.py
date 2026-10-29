@@ -1,4 +1,4 @@
-"""Prueba viva del selector experimental ET0 h=1…7 sin tocar Streamlit."""
+"""Prueba viva del selector experimental ET0 h=1…9 sin tocar Streamlit."""
 
 from __future__ import annotations
 
@@ -69,7 +69,7 @@ def run_live_smoke(
                 }
             )
     report = {
-        "experiment": "ET0 multianual: prueba operativa h=1/h=7",
+        "experiment": "ET0 multianual: prueba operativa h=1/h=9",
         "issued_at": issued_at,
         "target_date": target_day.isoformat(),
         "results": results,

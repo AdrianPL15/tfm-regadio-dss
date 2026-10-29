@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+from functools import lru_cache
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Protocol
@@ -20,7 +21,9 @@ from src.data.transform_interim import normalize_siar_daily
 ROOT = Path(__file__).resolve().parents[2]
 MODEL_DIR = ROOT / "models/experimental_et0_multiyear"
 MANIFEST = MODEL_DIR / "manifest.json"
+MONITORING_SUMMARY = ROOT / "docs/data_samples/et0_prospective_validation_latest.json"
 MAX_IMPUTED_FEATURE_VALUES = 1
+MAX_FALLBACK_AGE_DAYS = 7
 
 
 class SiARDailySource(Protocol):
@@ -29,6 +32,14 @@ class SiARDailySource(Protocol):
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+@lru_cache(maxsize=64)
+def _load_verified_model(path_text: str, expected_sha256: str):
+    path = Path(path_text)
+    if _sha256(path) != expected_sha256:
+        raise ValueError("la huella del artefacto no coincide")
+    return joblib.load(path)
 
 
 def _physical_fallback(history: pd.DataFrame, target_day: date, reason: str) -> dict:
@@ -42,6 +53,12 @@ def _physical_fallback(history: pd.DataFrame, target_day: date, reason: str) -> 
     if values.empty:
         return {"et0_mm": None, "method": "unavailable", "fallback_reason": reason}
     last_day = known["date"].max()
+    if (pd.Timestamp(target_day) - last_day).days > MAX_FALLBACK_AGE_DAYS:
+        return {
+            "et0_mm": None,
+            "method": "unavailable",
+            "fallback_reason": f"{reason}; la última ET0 supera {MAX_FALLBACK_AGE_DAYS} días",
+        }
     recent = known.loc[known["date"].ge(last_day - pd.Timedelta(days=6)), "et0_mm"]
     if len(recent) >= 3:
         return {
@@ -89,12 +106,19 @@ def predict_et0_with_fallback(
     *,
     manifest_path: Path = MANIFEST,
     model_dir: Path = MODEL_DIR,
+    monitoring_path: Path | None = MONITORING_SUMMARY,
 ) -> dict:
     """Predice ET0 para un horizonte versionado o devuelve respaldo trazable."""
 
     station_code = station_code.upper()
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if monitoring_path is not None and monitoring_path.exists():
+            monitoring = json.loads(monitoring_path.read_text(encoding="utf-8"))
+            if monitoring.get("deployment_gate") == "physical_mean_7d":
+                raise ValueError(
+                    "la monitorización prospectiva ha activado la media física de 7 días"
+                )
         station_entry = manifest["stations"][station_code]
         data = history.copy()
         data["date"] = pd.to_datetime(data["date"], errors="raise")
@@ -116,8 +140,6 @@ def predict_et0_with_fallback(
         artifact = model_dir / entry["artifact"]
         if artifact.parent.resolve() != model_dir.resolve() or not artifact.is_file():
             raise ValueError("artefacto ausente o ruta no válida")
-        if _sha256(artifact) != entry["sha256"]:
-            raise ValueError("la huella del artefacto no coincide")
 
         table, available_features = build_feature_table(data, horizon_days=horizon_days)
         row = table.loc[table["prediction_date"].dt.date.eq(target_day)]
@@ -139,7 +161,7 @@ def predict_et0_with_fallback(
                 "demasiados valores de entrada requieren imputación: "
                 f"{len(imputed_values)} > {MAX_IMPUTED_FEATURE_VALUES}"
             )
-        model = joblib.load(artifact)
+        model = _load_verified_model(str(artifact.resolve()), entry["sha256"])
         prediction = float(model.predict(feature_frame)[0])
         if not np.isfinite(prediction) or prediction < 0:
             raise ValueError("predicción no válida")
@@ -160,6 +182,9 @@ def predict_et0_with_fallback(
             ),
             "external_test_mean_7d_mae_mm_day": entry.get(
                 "external_test_mean_7d_mae_mm_day"
+            ),
+            "external_test_residual_interval_80_pct_mm_day": entry.get(
+                "external_test_residual_interval_80_pct_mm_day"
             ),
             "missing_feature_columns_imputed": [],
             "missing_feature_values_imputed": imputed_values,
@@ -212,8 +237,15 @@ def to_etc_model_estimate(prediction: dict, kc: float) -> dict:
     kc = float(kc)
     if not np.isfinite(et0_mm) or et0_mm < 0 or not np.isfinite(kc) or kc <= 0:
         raise ValueError("ET0 o Kc no válidos para calcular ETc.")
+    interval = prediction.get("external_test_residual_interval_80_pct_mm_day")
+    et0_lower = et0_upper = None
+    if isinstance(interval, list) and len(interval) == 2:
+        et0_lower = max(0.0, et0_mm + float(interval[0]))
+        et0_upper = max(et0_lower, et0_mm + float(interval[1]))
     return {
         "etc_mm": et0_mm * kc,
+        "etc_interval_80_lower_mm": None if et0_lower is None else et0_lower * kc,
+        "etc_interval_80_upper_mm": None if et0_upper is None else et0_upper * kc,
         "model": f"Ridge ET0 h={prediction['horizon_days']} × Kc",
         "case": prediction.get("station_code"),
         "trained_through": prediction.get("model_trained_through", "2025"),
@@ -236,8 +268,9 @@ def predict_live_et0(
     fallback_history: pd.DataFrame | None = None,
     manifest_path: Path = MANIFEST,
     model_dir: Path = MODEL_DIR,
+    monitoring_path: Path | None = MONITORING_SUMMARY,
 ) -> dict:
-    """Consulta SiAR hasta t-1 y elige un horizonte validado entre h=1 y h=7."""
+    """Consulta SiAR hasta t-1 y elige un horizonte validado entre h=1 y h=9."""
 
     if lookback_days < 14:
         raise ValueError("El periodo operativo debe cubrir al menos 14 días.")
@@ -264,4 +297,48 @@ def predict_live_et0(
         target_day,
         manifest_path=manifest_path,
         model_dir=model_dir,
+        monitoring_path=monitoring_path,
     )
+
+
+def predict_live_et0_horizon(
+    station_code: str,
+    first_day: date,
+    days: int,
+    *,
+    client: SiARDailySource | None = None,
+    lookback_days: int = 30,
+    fallback_history: pd.DataFrame | None = None,
+    manifest_path: Path = MANIFEST,
+    model_dir: Path = MODEL_DIR,
+    monitoring_path: Path | None = MONITORING_SUMMARY,
+) -> dict[str, dict]:
+    """Consulta SiAR una vez y predice cada fecha de un horizonte de 1–7 días."""
+
+    if not 1 <= int(days) <= 7:
+        raise ValueError("El horizonte operativo debe contener entre 1 y 7 días.")
+    if lookback_days < 14:
+        raise ValueError("El periodo operativo debe cubrir al menos 14 días.")
+    source = client or SiARClient()
+    start = first_day - timedelta(days=lookback_days)
+    end = first_day - timedelta(days=1)
+    try:
+        records = source.get_data(
+            "Diarios", "ESTACION", station_code.upper(), start, end, calculated=True
+        )
+        history = history_from_siar_records(records, station_code)
+    except (SiARError, ValueError, KeyError, TypeError):
+        history = fallback_history if fallback_history is not None else pd.DataFrame(
+            columns=["date", "et0_mm"]
+        )
+    return {
+        target.isoformat(): predict_et0_with_fallback(
+            station_code,
+            history,
+            target,
+            manifest_path=manifest_path,
+            model_dir=model_dir,
+            monitoring_path=monitoring_path,
+        )
+        for target in (first_day + timedelta(days=offset) for offset in range(days))
+    }

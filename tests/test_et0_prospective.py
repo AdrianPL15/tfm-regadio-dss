@@ -33,9 +33,33 @@ class Et0ProspectiveTests(unittest.TestCase):
             actuals = pd.DataFrame({
                 "date": ["2026-10-29"], "station_code": ["AL01"], "et0_mm": [2.4]
             })
-            result = validate_log(actuals, log_path=log, summary_path=summary)
-            self.assertEqual(result["validated"], 1)
+            result = validate_log(
+                actuals, log_path=log, summary_path=summary,
+                validated_at=datetime(2026, 11, 10, tzinfo=timezone.utc),
+            )
+            self.assertEqual(result["consolidated"], 1)
             self.assertAlmostEqual(result["ridge_mae_mm_day"], 0.1)
+
+    def test_provisional_value_is_rechecked_and_revision_is_counted(self):
+        with TemporaryDirectory(dir=".test_tmp") as folder:
+            root = Path(folder)
+            log = root / "predictions.csv"
+            summary = root / "summary.json"
+            record_prediction(self._prediction(), log_path=log)
+            first = pd.DataFrame({
+                "date": ["2026-10-29"], "station_code": ["AL01"], "et0_mm": [2.4]
+            })
+            validate_log(
+                first, log_path=log, summary_path=summary,
+                validated_at=datetime(2026, 10, 30, tzinfo=timezone.utc),
+            )
+            revised = first.assign(et0_mm=2.45)
+            result = validate_log(
+                revised, log_path=log, summary_path=summary,
+                validated_at=datetime(2026, 11, 10, tzinfo=timezone.utc),
+            )
+            self.assertEqual(result["revisions_detected"], 1)
+            self.assertEqual(result["consolidated"], 1)
 
     def test_fallback_is_not_recorded(self):
         with TemporaryDirectory(dir=".test_tmp") as folder:

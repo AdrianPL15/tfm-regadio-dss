@@ -65,7 +65,9 @@ def build_feature_table(
         feature_names.append(name)
     for window in (3, 7, 14):
         name = f"et0_mean_{window}d"
-        data[name] = data["et0_mm"].rolling(window, min_periods=max(2, window // 2)).mean()
+        # La etiqueta de la variable coincide literalmente con su contrato:
+        # una media de N días exige N observaciones consecutivas disponibles.
+        data[name] = data["et0_mm"].rolling(window, min_periods=window).mean()
         feature_names.append(name)
 
     for column in WEATHER_CURRENT:
