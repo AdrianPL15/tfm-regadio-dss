@@ -23,7 +23,7 @@ class Et0ProspectiveTests(unittest.TestCase):
         }
 
     def test_record_is_idempotent_and_validation_closes_it(self):
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             root = Path(folder)
             log = root / "predictions.csv"
             summary = root / "summary.json"
@@ -41,7 +41,7 @@ class Et0ProspectiveTests(unittest.TestCase):
             self.assertAlmostEqual(result["ridge_mae_mm_day"], 0.1)
 
     def test_provisional_value_is_rechecked_and_revision_is_counted(self):
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             root = Path(folder)
             log = root / "predictions.csv"
             summary = root / "summary.json"
@@ -62,7 +62,7 @@ class Et0ProspectiveTests(unittest.TestCase):
             self.assertEqual(result["consolidated"], 1)
 
     def test_fallback_is_not_recorded(self):
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             log = Path(folder) / "predictions.csv"
             self.assertFalse(record_prediction(
                 {"method": "mean_7d_fallback"}, log_path=log

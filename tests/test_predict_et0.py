@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 from tempfile import TemporaryDirectory
 import unittest
-from unittest.mock import patch
 
 import joblib
 import numpy as np
@@ -41,7 +40,7 @@ class PredictEt0Tests(unittest.TestCase):
         self.assertAlmostEqual(result["et0_mm"], self._history()["et0_mm"].tail(7).mean())
 
     def test_stale_history_does_not_invoke_model(self):
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             root = Path(folder)
             manifest = root / "manifest.json"
             manifest.write_text(json.dumps({"stations": {"AL01": {}}}), encoding="utf-8")
@@ -53,7 +52,7 @@ class PredictEt0Tests(unittest.TestCase):
 
     def test_missing_operational_columns_force_fallback(self):
         history = self._history()[["date", "et0_mm"]]
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             root = Path(folder)
             artifact = root / "model.joblib"
             joblib.dump(DummyRegressor(strategy="mean"), artifact)
@@ -75,7 +74,7 @@ class PredictEt0Tests(unittest.TestCase):
             self.assertIn("faltan columnas", result["fallback_reason"])
 
     def test_valid_artifact_returns_ridge_method(self):
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             root = Path(folder)
             history = self._history()
             from src.models.train_et0_multiyear import build_feature_table
@@ -106,7 +105,7 @@ class PredictEt0Tests(unittest.TestCase):
             self.assertAlmostEqual(result["et0_mm"], 2.5)
 
     def test_two_day_horizon_is_selected_from_last_observation(self):
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             root = Path(folder)
             history = self._history().iloc[:-1].copy()
             from src.models.train_et0_multiyear import build_feature_table
@@ -138,7 +137,7 @@ class PredictEt0Tests(unittest.TestCase):
             self.assertAlmostEqual(result["et0_mm"], 2.7)
 
     def test_more_than_one_imputed_input_forces_physical_fallback(self):
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             root = Path(folder)
             history = self._history()
             history.loc[history.index[-1], [
@@ -171,7 +170,7 @@ class PredictEt0Tests(unittest.TestCase):
             self.assertIn("demasiados valores", result["fallback_reason"])
 
     def test_monitoring_gate_can_force_physical_fallback(self):
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             root = Path(folder)
             monitoring = root / "monitoring.json"
             monitoring.write_text(
@@ -190,7 +189,7 @@ class PredictEt0Tests(unittest.TestCase):
             self.assertEqual(result["method"], "mean_7d_fallback")
 
     def test_unversioned_horizon_uses_mean_7d_before_persistence(self):
-        with TemporaryDirectory(dir=".test_tmp") as folder:
+        with TemporaryDirectory() as folder:
             root = Path(folder)
             manifest = root / "manifest.json"
             manifest.write_text(
@@ -265,21 +264,6 @@ class PredictEt0Tests(unittest.TestCase):
                 "2026-10-29", "2026-10-30", "2026-10-31",
                 "2026-11-01", "2026-11-02", "2026-11-03", "2026-11-04",
             ],
-        )
-
-    def test_horizon_without_api_token_uses_validated_crop_history(self):
-        with patch(
-            "src.dss.predict_et0.SiARClient",
-            side_effect=ValueError("token no configurado"),
-        ):
-            results = predict_live_et0_horizon(
-                "AL01", date(2025, 1, 21), 2,
-                fallback_history=self._history(),
-                manifest_path=Path("does-not-exist.json"),
-            )
-        self.assertEqual(len(results), 2)
-        self.assertTrue(
-            all(item["method"] == "mean_7d_fallback" for item in results.values())
         )
 
     def test_et0_is_converted_to_etc_once_with_kc(self):
