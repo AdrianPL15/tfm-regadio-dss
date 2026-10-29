@@ -367,6 +367,16 @@ ablación frente a Ridge reducido, 74 de 81 intervalos cruzaron cero y cinco
 favorecieron al reducido; por tanto, no se atribuye una ganancia estable a las
 variables meteorológicas auxiliares.
 
+La persistencia corregida utilizada como segunda referencia parte de la última
+ET0 observada y añade el cambio climatológico esperado entre origen y objetivo,
+estimado exclusivamente con los años de entrenamiento. Ridge obtuvo 81 de 81
+intervalos favorables frente a ella. Frente a media 7 días, los intervalos
+favorables / no concluyentes por `h=1…9` fueron 9/0, 6/3, 6/3, 5/4, 5/4, 7/2,
+8/1, 8/1 y 9/0. En la ablación completo frente a reducido, solo dos intervalos
+favorecieron al completo, 74 cruzaron cero y cinco favorecieron al reducido.
+El desglose completo queda versionado en
+`docs/data_samples/et0_multiyear_uncertainty_by_horizon.csv`.
+
 La cobertura retrospectiva de 2026 fue aproximadamente 97 % con Ridge en AL01
 y BA08. En Z06, SiAR solo devolvió 13 jornadas para enero–octubre y Ridge tuvo
 0 % de cobertura tras exigir 14 observaciones completas. El sistema no fabrica
@@ -379,7 +389,7 @@ del 80 %. Una tarea diaria emite `h=1…9` sin depender de aperturas de la app,
 conserva el primer valor SiAR provisional, detecta revisiones y consolida tras
 siete días. Con 30 casos consolidados, Ridge se mantiene solo si su MAE
 prospectivo es menor que el de media 7 días; en caso contrario se activa
-automáticamente el respaldo físico. La documentación completa y las 162
+automáticamente el respaldo físico. La documentación completa y las 243
 comparaciones bootstrap se conservan en
 [`SINTESIS_ET0_PARA_MEMORIA.md`](../tecnica/SINTESIS_ET0_PARA_MEMORIA.md) y en
 los ficheros de evidencia del repositorio.

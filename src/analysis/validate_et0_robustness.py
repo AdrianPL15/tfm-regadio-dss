@@ -26,6 +26,9 @@ DEFAULT_OUTPUT = ROOT / "docs/data_samples/et0_multiyear_robustness.csv"
 DEFAULT_SUMMARY = ROOT / "docs/data_samples/et0_multiyear_robustness_summary.json"
 DEFAULT_PREDICTIONS = ROOT / "docs/data_samples/et0_multiyear_robustness_predictions.csv"
 DEFAULT_UNCERTAINTY = ROOT / "docs/data_samples/et0_multiyear_robustness_uncertainty.csv"
+DEFAULT_UNCERTAINTY_BY_HORIZON = (
+    ROOT / "docs/data_samples/et0_multiyear_uncertainty_by_horizon.csv"
+)
 STATIONS = {
     "AL01": ROOT / "data/interim/et0_history_AL01_2021_2025.csv",
     "Z06": ROOT / "data/interim/et0_history_Z06_2021_2025.csv",
@@ -148,6 +151,9 @@ def evaluate_station(
                     "prediction_date": fair["prediction_date"].dt.date.astype(str),
                     "target_et0_mm": y_true.to_numpy(),
                     "mean_7d_prediction_mm": fair["baseline_mean_7d"].to_numpy(),
+                    "seasonal_persistence_prediction_mm": fair[
+                        "baseline_seasonal_persistence"
+                    ].to_numpy(),
                     "ridge_full_prediction_mm": model_predictions["Ridge completo"],
                     "ridge_reduced_prediction_mm": model_predictions[
                         "Ridge ET0 + estacionalidad"
@@ -164,7 +170,7 @@ def evaluate_station(
 
 
 def build_uncertainty(predictions: pd.DataFrame) -> pd.DataFrame:
-    """Cuantifica, por ventana rodante, Ridge frente a media 7d y ablación."""
+    """Cuantifica Ridge frente a las dos referencias y frente a la ablación."""
 
     rows: list[dict] = []
     for (station, year, horizon), group in predictions.groupby(
@@ -174,6 +180,7 @@ def build_uncertainty(predictions: pd.DataFrame) -> pd.DataFrame:
         ridge_error = (group["ridge_full_prediction_mm"] - target).abs()
         for reference_name, column in {
             "media_7d": "mean_7d_prediction_mm",
+            "persistencia_estacional": "seasonal_persistence_prediction_mm",
             "ridge_reducido": "ridge_reduced_prediction_mm",
         }.items():
             reference_error = (group[column] - target).abs()
@@ -194,6 +201,51 @@ def build_uncertainty(predictions: pd.DataFrame) -> pd.DataFrame:
                 }
             )
     return pd.DataFrame(rows)
+
+
+def classify_interval(row: pd.Series) -> str:
+    """Clasifica el IC95 de referencia - Ridge sin ocultar casos inconclusos."""
+
+    lower = float(row["ci_95_lower_mm_day"])
+    upper = float(row["ci_95_upper_mm_day"])
+    if lower > 0:
+        return "favorece_ridge_completo"
+    if upper < 0:
+        return "favorece_referencia"
+    return "cruza_cero"
+
+
+def summarize_uncertainty_by_horizon(uncertainty: pd.DataFrame) -> pd.DataFrame:
+    """Cuenta la evidencia por contraste y horizonte (nueve ventanas cada uno)."""
+
+    frame = uncertainty.copy()
+    frame["interval_class"] = frame.apply(classify_interval, axis=1)
+    counts = (
+        frame.groupby(["comparison", "horizon_days", "interval_class"], sort=True)
+        .size()
+        .unstack(fill_value=0)
+        .reset_index()
+    )
+    for column in (
+        "favorece_ridge_completo",
+        "cruza_cero",
+        "favorece_referencia",
+    ):
+        if column not in counts:
+            counts[column] = 0
+    counts["total_ventanas"] = counts[
+        ["favorece_ridge_completo", "cruza_cero", "favorece_referencia"]
+    ].sum(axis=1)
+    return counts[
+        [
+            "comparison",
+            "horizon_days",
+            "favorece_ridge_completo",
+            "cruza_cero",
+            "favorece_referencia",
+            "total_ventanas",
+        ]
+    ]
 
 
 def build_summary(results: pd.DataFrame, uncertainty: pd.DataFrame | None = None) -> dict:
@@ -237,16 +289,28 @@ def build_summary(results: pd.DataFrame, uncertainty: pd.DataFrame | None = None
         "total_station_years": int(len(comparison_frame)),
     }
     if uncertainty is not None:
-        mean7 = uncertainty[uncertainty["comparison"] == "media_7d_vs_ridge_completo"]
+        classified = uncertainty.copy()
+        classified["interval_class"] = classified.apply(classify_interval, axis=1)
+        by_horizon = summarize_uncertainty_by_horizon(uncertainty)
+        totals = (
+            classified.groupby(["comparison", "interval_class"]).size().unstack(fill_value=0)
+        )
+        comparison_counts = {}
+        for comparison, row in totals.iterrows():
+            comparison_counts[comparison] = {
+                "favorece_ridge_completo": int(row.get("favorece_ridge_completo", 0)),
+                "cruza_cero": int(row.get("cruza_cero", 0)),
+                "favorece_referencia": int(row.get("favorece_referencia", 0)),
+                "total": int(row.sum()),
+            }
         summary["bootstrap"] = {
             "method": "bootstrap pareado por bloques temporales circulares",
             "replicates": 5_000,
             "block_days": 7,
             "seed": 42,
             "comparisons": int(len(uncertainty)),
-            "ridge_vs_mean_7d_ci_excludes_zero_count": int(
-                (mean7["ci_95_lower_mm_day"] > 0).sum()
-            ),
+            "counts_by_comparison": comparison_counts,
+            "counts_by_horizon": by_horizon.to_dict(orient="records"),
             "interpretation": (
                 "Incertidumbre muestral interna de cada ventana estación-año; "
                 "no demuestra transferencia a campañas futuras."
@@ -261,6 +325,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
     parser.add_argument("--predictions", type=Path, default=DEFAULT_PREDICTIONS)
     parser.add_argument("--uncertainty", type=Path, default=DEFAULT_UNCERTAINTY)
+    parser.add_argument(
+        "--uncertainty-by-horizon",
+        type=Path,
+        default=DEFAULT_UNCERTAINTY_BY_HORIZON,
+    )
     return parser.parse_args()
 
 
@@ -279,11 +348,15 @@ def main() -> None:
     results = pd.concat(frames, ignore_index=True)
     predictions = pd.concat(prediction_frames, ignore_index=True)
     uncertainty = build_uncertainty(predictions)
+    uncertainty_by_horizon = summarize_uncertainty_by_horizon(uncertainty)
     summary = build_summary(results, uncertainty)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     results.to_csv(args.output, index=False, encoding="utf-8")
     predictions.to_csv(args.predictions, index=False, encoding="utf-8")
     uncertainty.to_csv(args.uncertainty, index=False, encoding="utf-8")
+    uncertainty_by_horizon.to_csv(
+        args.uncertainty_by_horizon, index=False, encoding="utf-8"
+    )
     args.summary.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print(
         "Ridge completo gana frente a media movil 7 dias en "

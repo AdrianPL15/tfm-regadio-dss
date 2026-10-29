@@ -1166,8 +1166,245 @@
     "replicates": 5000,
     "block_days": 7,
     "seed": 42,
-    "comparisons": 162,
-    "ridge_vs_mean_7d_ci_excludes_zero_count": 63,
+    "comparisons": 243,
+    "counts_by_comparison": {
+      "media_7d_vs_ridge_completo": {
+        "favorece_ridge_completo": 63,
+        "cruza_cero": 18,
+        "favorece_referencia": 0,
+        "total": 81
+      },
+      "persistencia_estacional_vs_ridge_completo": {
+        "favorece_ridge_completo": 81,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total": 81
+      },
+      "ridge_reducido_vs_ridge_completo": {
+        "favorece_ridge_completo": 2,
+        "cruza_cero": 74,
+        "favorece_referencia": 5,
+        "total": 81
+      }
+    },
+    "counts_by_horizon": [
+      {
+        "comparison": "media_7d_vs_ridge_completo",
+        "horizon_days": 1,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "media_7d_vs_ridge_completo",
+        "horizon_days": 2,
+        "favorece_ridge_completo": 6,
+        "cruza_cero": 3,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "media_7d_vs_ridge_completo",
+        "horizon_days": 3,
+        "favorece_ridge_completo": 6,
+        "cruza_cero": 3,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "media_7d_vs_ridge_completo",
+        "horizon_days": 4,
+        "favorece_ridge_completo": 5,
+        "cruza_cero": 4,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "media_7d_vs_ridge_completo",
+        "horizon_days": 5,
+        "favorece_ridge_completo": 5,
+        "cruza_cero": 4,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "media_7d_vs_ridge_completo",
+        "horizon_days": 6,
+        "favorece_ridge_completo": 7,
+        "cruza_cero": 2,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "media_7d_vs_ridge_completo",
+        "horizon_days": 7,
+        "favorece_ridge_completo": 8,
+        "cruza_cero": 1,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "media_7d_vs_ridge_completo",
+        "horizon_days": 8,
+        "favorece_ridge_completo": 8,
+        "cruza_cero": 1,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "media_7d_vs_ridge_completo",
+        "horizon_days": 9,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "persistencia_estacional_vs_ridge_completo",
+        "horizon_days": 1,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "persistencia_estacional_vs_ridge_completo",
+        "horizon_days": 2,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "persistencia_estacional_vs_ridge_completo",
+        "horizon_days": 3,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "persistencia_estacional_vs_ridge_completo",
+        "horizon_days": 4,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "persistencia_estacional_vs_ridge_completo",
+        "horizon_days": 5,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "persistencia_estacional_vs_ridge_completo",
+        "horizon_days": 6,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "persistencia_estacional_vs_ridge_completo",
+        "horizon_days": 7,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "persistencia_estacional_vs_ridge_completo",
+        "horizon_days": 8,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "persistencia_estacional_vs_ridge_completo",
+        "horizon_days": 9,
+        "favorece_ridge_completo": 9,
+        "cruza_cero": 0,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "ridge_reducido_vs_ridge_completo",
+        "horizon_days": 1,
+        "favorece_ridge_completo": 0,
+        "cruza_cero": 8,
+        "favorece_referencia": 1,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "ridge_reducido_vs_ridge_completo",
+        "horizon_days": 2,
+        "favorece_ridge_completo": 1,
+        "cruza_cero": 8,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "ridge_reducido_vs_ridge_completo",
+        "horizon_days": 3,
+        "favorece_ridge_completo": 1,
+        "cruza_cero": 8,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "ridge_reducido_vs_ridge_completo",
+        "horizon_days": 4,
+        "favorece_ridge_completo": 0,
+        "cruza_cero": 9,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "ridge_reducido_vs_ridge_completo",
+        "horizon_days": 5,
+        "favorece_ridge_completo": 0,
+        "cruza_cero": 8,
+        "favorece_referencia": 1,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "ridge_reducido_vs_ridge_completo",
+        "horizon_days": 6,
+        "favorece_ridge_completo": 0,
+        "cruza_cero": 8,
+        "favorece_referencia": 1,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "ridge_reducido_vs_ridge_completo",
+        "horizon_days": 7,
+        "favorece_ridge_completo": 0,
+        "cruza_cero": 8,
+        "favorece_referencia": 1,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "ridge_reducido_vs_ridge_completo",
+        "horizon_days": 8,
+        "favorece_ridge_completo": 0,
+        "cruza_cero": 8,
+        "favorece_referencia": 1,
+        "total_ventanas": 9
+      },
+      {
+        "comparison": "ridge_reducido_vs_ridge_completo",
+        "horizon_days": 9,
+        "favorece_ridge_completo": 0,
+        "cruza_cero": 9,
+        "favorece_referencia": 0,
+        "total_ventanas": 9
+      }
+    ],
     "interpretation": "Incertidumbre muestral interna de cada ventana estación-año; no demuestra transferencia a campañas futuras."
   }
 }

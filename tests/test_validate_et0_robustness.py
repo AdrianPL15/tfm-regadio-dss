@@ -7,6 +7,7 @@ from src.analysis.validate_et0_robustness import (
     _seasonally_adjusted_persistence,
     build_summary,
     evaluate_station,
+    summarize_uncertainty_by_horizon,
 )
 
 
@@ -86,6 +87,39 @@ class Et0RobustnessTests(unittest.TestCase):
         summary = build_summary(pd.DataFrame(rows))
         self.assertEqual(summary["total_station_years"], 2)
         self.assertEqual(summary["ridge_full_wins_vs_mean_7d"], 2)
+
+        uncertainty = pd.DataFrame(
+            [
+                {
+                    "comparison": "media_7d_vs_ridge_completo",
+                    "horizon_days": 1,
+                    "ci_95_lower_mm_day": 0.01,
+                    "ci_95_upper_mm_day": 0.20,
+                },
+                {
+                    "comparison": "media_7d_vs_ridge_completo",
+                    "horizon_days": 1,
+                    "ci_95_lower_mm_day": -0.03,
+                    "ci_95_upper_mm_day": 0.05,
+                },
+                {
+                    "comparison": "ridge_reducido_vs_ridge_completo",
+                    "horizon_days": 1,
+                    "ci_95_lower_mm_day": -0.20,
+                    "ci_95_upper_mm_day": -0.01,
+                },
+            ]
+        )
+        counts = summarize_uncertainty_by_horizon(uncertainty).set_index("comparison")
+        self.assertEqual(
+            int(counts.loc["media_7d_vs_ridge_completo", "favorece_ridge_completo"]), 1
+        )
+        self.assertEqual(
+            int(counts.loc["media_7d_vs_ridge_completo", "cruza_cero"]), 1
+        )
+        self.assertEqual(
+            int(counts.loc["ridge_reducido_vs_ridge_completo", "favorece_referencia"]), 1
+        )
 
 
 if __name__ == "__main__":

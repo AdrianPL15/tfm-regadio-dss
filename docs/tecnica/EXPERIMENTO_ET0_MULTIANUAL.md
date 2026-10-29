@@ -226,19 +226,31 @@ intervalo cruza cero dentro de 2025; la mejora es consistente geográficamente
 en este conjunto, aunque todavía no acredita estabilidad en otros años futuros.
 
 La extensión `h=1…9` repite el mismo procedimiento, con 5.000 réplicas y
-semilla 42, para cada combinación estación-año-horizonte y para dos contrastes:
-Ridge completo frente a media móvil de siete días y frente a Ridge reducido.
-Las 162 comparaciones, incluidas las de `h=2`, se conservan en
+semilla 42, para cada combinación estación-año-horizonte y para tres contrastes:
+Ridge completo frente a media móvil de siete días, frente a persistencia
+corregida estacionalmente y frente a Ridge reducido. Las 243 comparaciones,
+incluidas las de `h=2`, se conservan en
 `docs/data_samples/et0_multiyear_robustness_uncertainty.csv`; las predicciones
 diarias pareadas que permiten recomputarlas están en
 `docs/data_samples/et0_multiyear_robustness_predictions.csv`.
 
-Frente a la media móvil, 63 intervalos excluyeron cero a favor de Ridge y 18
-lo cruzaron; ninguno favoreció significativamente a la media. En la ablación
-Ridge completo frente a Ridge reducido, solo 2 intervalos favorecieron al
-completo, 74 cruzaron cero y 5 favorecieron al reducido. Esta evidencia impide
-atribuir una mejora estable a las variables meteorológicas auxiliares: el valor
-principal procede de la historia de ET0 y la estacionalidad.
+La persistencia corregida se calcula como la última ET0 observada más el cambio
+climatológico esperado entre origen y objetivo, estimado exclusivamente con
+los años de entrenamiento. Ridge obtuvo un intervalo favorable frente a esta
+referencia en 81 de 81 ventanas. Frente a la media móvil, 63 intervalos
+excluyeron cero a favor de Ridge y 18 lo cruzaron; ninguno favoreció
+significativamente a la media. El desglose de intervalos favorables / que
+cruzan cero por horizonte fue 9/0, 6/3, 6/3, 5/4, 5/4, 7/2, 8/1, 8/1 y 9/0
+para `h=1…9`.
+
+En la ablación Ridge completo frente a Ridge reducido, solo 2 intervalos
+favorecieron al completo, 74 cruzaron cero y 5 favorecieron al reducido. Por
+horizonte, la clasificación completo / inconcluso / reducido fue 0/8/1,
+1/8/0, 1/8/0, 0/9/0, 0/8/1, 0/8/1, 0/8/1, 0/8/1 y 0/9/0. Esta evidencia
+impide atribuir una mejora estable a las variables meteorológicas auxiliares:
+el valor principal procede de la historia de ET0 y la estacionalidad. El
+resumen tabular regenerable se conserva en
+`docs/data_samples/et0_multiyear_uncertainty_by_horizon.csv`.
 
 ## Relación entre latencia y siete días de recomendación
 

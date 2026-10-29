@@ -47,13 +47,33 @@ fueron:
 | 8 | 0,571 | 0,687 | 0,898 |
 | 9 | 0,570 | 0,708 | 0,899 |
 
-En el contraste frente a media 7 días, 63 de 81 intervalos excluyeron cero a
-favor de Ridge y 18 lo cruzaron; ninguno favoreció significativamente a la
-media. En la ablación completo frente a reducido, 2 intervalos favorecieron al
-completo, 74 cruzaron cero y 5 favorecieron al reducido. Por tanto, existe
-evidencia consistente de mejora respecto al respaldo físico, pero no de que la
+El baseline de persistencia corregida no es una etiqueta: parte de la última
+ET0 observada y suma el cambio climatológico esperado entre el día de origen y
+el día objetivo, calculado solo con los años de entrenamiento. Ridge completo
+obtuvo intervalos positivos frente a esta referencia en las 81 ventanas.
+
+La clasificación de los demás intervalos por horizonte es:
+
+| h | Ridge frente a media 7 d: favorable / cruza cero | Completo frente a reducido: favorable / cruza cero / favorable al reducido |
+|---:|---:|---:|
+| 1 | 9 / 0 | 0 / 8 / 1 |
+| 2 | 6 / 3 | 1 / 8 / 0 |
+| 3 | 6 / 3 | 1 / 8 / 0 |
+| 4 | 5 / 4 | 0 / 9 / 0 |
+| 5 | 5 / 4 | 0 / 8 / 1 |
+| 6 | 7 / 2 | 0 / 8 / 1 |
+| 7 | 8 / 1 | 0 / 8 / 1 |
+| 8 | 8 / 1 | 0 / 8 / 1 |
+| 9 | 9 / 0 | 0 / 9 / 0 |
+
+En total, frente a media 7 días, 63 de 81 intervalos excluyeron cero a favor
+de Ridge y 18 lo cruzaron; ninguno favoreció significativamente a la media. En
+la ablación completo frente a reducido, 2 intervalos favorecieron al completo,
+74 cruzaron cero y 5 favorecieron al reducido. Por tanto, existe evidencia
+consistente de mejora respecto a los dos respaldos físicos, pero no de que la
 meteorología auxiliar aporte una ganancia estable sobre ET0 histórica y
-estacionalidad.
+estacionalidad. El detalle regenerable está en
+`docs/data_samples/et0_multiyear_uncertainty_by_horizon.csv`.
 
 La regla de exportación no es manual: solo se serializa un horizonte si Ridge
 supera puntualmente a media 7 días en las nueve ventanas. Los nueve horizontes
