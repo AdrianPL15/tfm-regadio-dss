@@ -319,9 +319,11 @@ exacta.
 | Z06 | 1 día | 0,00 % | 1,36 % | 0,68 % | 97,97 % |
 | Z06 | 2 días | 0,00 % | 0,87 % | 0,58 % | 98,55 % |
 
-SiAR devolvió 301 jornadas en AL01 y BA08, pero solo 13 en Z06 para todo el
-intervalo solicitado. Tras exigir 14 valores completos, Z06 no puede usar
-Ridge en la simulación. El DSS no rellena los meses ausentes: utiliza un
+El CSV de campaña conserva 239 jornadas de Z06. La cifra de 13 corresponde
+exclusivamente a la consulta del flujo operativo al endpoint público para el
+intervalo solicitado, frente a 301 jornadas devueltas en AL01 y BA08. Tras
+exigir 14 valores completos, esa consulta de Z06 no puede usar Ridge en la
+simulación. El DSS no rellena los meses ausentes: utiliza un
 respaldo solo durante siete días y después declara la recomendación como no
 disponible. Esta es una limitación de cobertura de la fuente/estación, no un
 fallo predictivo oculto. El detalle reproducible se conserva en

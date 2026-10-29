@@ -349,7 +349,7 @@ decisión de no desplegar los árboles con los datos actuales.
 El Anexo A recoge el comando y las rutas que regeneran el informe XAI, las
 importancias globales, las explicaciones locales y la Figura 4.9.
 
-## 4.3.13. Predicción multianual de ET0 a siete días
+## 4.3.13. Predicción multianual de ET0 para siete días operativos
 
 Para superar la limitación de una única campaña por cultivo se planteó un
 experimento independiente sobre ET0 diaria de estación entre 2021 y 2025. Se
@@ -389,23 +389,53 @@ reducido. Por ello Ridge se integra de forma controlada, con media 7 días como
 respaldo y una puerta prospectiva de 30 casos pareados, ventana móvil máxima de
 60 y mejora mínima del 5 %.
 
-La cobertura retrospectiva de 2026 fue aproximadamente 97 % con Ridge en AL01
-y BA08. En Z06, SiAR solo devolvió 13 jornadas para enero–octubre y Ridge tuvo
-0 % de cobertura tras exigir 14 observaciones completas. El sistema no fabrica
-esa serie: usa media 7 días durante un máximo de siete días y después declara
-la recomendación no disponible.
+La comprobación operativa de 2026 distinguió cobertura del CSV agronómico y
+disponibilidad de la serie ET0 consultada. El CSV de alfalfa Z06 contiene 239
+jornadas de campaña, pero una consulta concreta al servicio de datos devolvió
+solo 13 jornadas continuas para la ventana solicitada. Tras exigir 14
+observaciones completas, aquella ejecución tuvo 0 % de cobertura Ridge. Esta
+cifra describe una limitación de esa consulta y del flujo operativo, no una
+ausencia estructural de datos en la estación. AL01 y BA08 alcanzaron
+aproximadamente un 97 % de cobertura. Cuando faltan ventanas completas, el
+sistema usa media 7 días durante un máximo de siete días y después declara la
+recomendación no disponible.
 
 Streamlit genera una ET0 distinta para cada fecha, aplica `ET0 × Kc`, descuenta
 la lluvia AEMET utilizable y muestra el método y un intervalo residual central
-del 80 %. Una tarea diaria emite `h=1…9` sin depender de aperturas de la app,
-conserva el primer valor SiAR provisional, detecta revisiones y consolida tras
-siete días. Con 30 casos consolidados y pareados, la puerta evalúa como máximo
-los 60 más recientes. Ridge se mantiene solo si reduce al menos un 5 % el MAE
-de media 7 días; en caso contrario se activa automáticamente el respaldo
-físico. El manifiesto fija un reentrenamiento anual tras cerrar y auditar la
+del 80 %. Antes de reunir 30 casos prospectivos consolidados y pareados, Ridge
+se utiliza de forma provisional por su evidencia retrospectiva, con el método
+identificado y el respaldo disponible cuando faltan datos. Alcanzado ese
+umbral, la puerta evalúa como máximo los 60 casos más recientes y mantiene
+Ridge solo si reduce al menos un 5 % el MAE de media 7 días; de lo contrario
+activa automáticamente el respaldo. Una tarea diaria emite `h=1…9`, conserva
+el primer valor SiAR provisional, detecta revisiones y consolida tras siete
+días. El manifiesto fija un reentrenamiento anual tras cerrar y auditar la
 campaña. La documentación completa y las 243
 comparaciones bootstrap se conservan en
 [`SINTESIS_ET0_PARA_MEMORIA.md`](../tecnica/SINTESIS_ET0_PARA_MEMORIA.md) y en
 los ficheros de evidencia del repositorio. La batería final de 150 pruebas
 incluye la ausencia de fuga temporal, las ventanas completas, los horizontes,
 la integridad de los artefactos y la activación del respaldo.
+
+**Tabla 4.18. Rendimiento medio de Ridge ET0 frente a la media móvil de siete días por horizonte.**
+
+| Horizonte | MAE Ridge (mm/día) | MAE media 7 d (mm/día) | Mejora relativa | Bootstrap en 9 ventanas |
+|---:|---:|---:|---:|---|
+| h=1 | 0,472 | 0,551 | 14,3 % | 9 favorables; 0 no concluyentes |
+| h=2 | 0,524 | 0,587 | 10,8 % | 6 favorables; 3 no concluyentes |
+| h=3 | 0,546 | 0,607 | 10,0 % | 6 favorables; 3 no concluyentes |
+| h=4 | 0,557 | 0,622 | 10,4 % | 5 favorables; 4 no concluyentes |
+| h=5 | 0,565 | 0,636 | 11,1 % | 5 favorables; 4 no concluyentes |
+| h=6 | 0,567 | 0,650 | 12,8 % | 7 favorables; 2 no concluyentes |
+| h=7 | 0,571 | 0,666 | 14,3 % | 8 favorables; 1 no concluyente |
+| h=8 | 0,571 | 0,687 | 16,9 % | 8 favorables; 1 no concluyente |
+| h=9 | 0,570 | 0,708 | 19,5 % | 9 favorables; 0 no concluyentes |
+
+Los MAE son medias de nueve ventanas (tres estaciones por tres años de
+prueba). La aplicación usa `h=2…8` cuando recomienda desde hoy y `h=3…9`
+cuando comienza mañana. Los resultados proceden de
+`et0_multiyear_robustness.csv` y
+`et0_multiyear_uncertainty_by_horizon.csv`. La evaluación extremo a extremo de
+necesidad neta solo se realizó a un día en pimiento, maíz y algodón, con
+mejoras relativas del 18,6 %, 23,3 % y 18,2 %, respectivamente; no se extrapola
+esa mejora a `h=2…8`.

@@ -181,7 +181,7 @@ frente a 0,126 mm.
 Los intervalos pareados de la diferencia de MAE muestran una evidencia menos
 uniforme que los valores puntuales. En desarrollo, los días 2 a 7 presentan
 intervalos positivos, mientras que el día 1 incluye el cero. En prueba, solo
-los días 1 y 3 tienen un límite inferior positivo: 0,029 [0,001; 0,067] y
+los días 1 y 3 tienen un límite inferior positivo: 0,029 [0,002; 0,067] y
 0,046 [0,010; 0,084] mm/día. Los días 2, 4, 5 y 6 incluyen el cero, y el día 7
 arroja -0,007 [-0,026; 0,011] mm/día. Por tanto, no se atribuye una mejora
 concluyente a todos los horizontes.
@@ -306,17 +306,16 @@ todo del dibujo de la interfaz y no del cálculo.
 
 ## 5.3.9. Análisis crítico
 
-El resultado más relevante del capítulo es que el sistema mejora a la
-referencia predictiva del capítulo 4 sin recurrir a un algoritmo más complejo.
-La mejora no procede de aprender mejor la serie, sino de separar en la
-estimación lo que es incierto, la demanda atmosférica, de lo que se conoce de
-antemano, el calendario del cultivo. Este hallazgo matiza la conclusión del
-apartado 4.3 en lugar de contradecirla: allí se comprobó que, con un único
-ciclo, los modelos de aprendizaje no superaban a la persistencia; aquí se
-comprueba que incorporar conocimiento agronómico explícito sí lo hace. Es un
-argumento a favor de los sistemas híbridos defendidos en el apartado 2.3, en los
-que el aprendizaje automático, cuando se disponga de más datos, debería
-corregir una referencia física y no sustituirla.
+El capítulo 5 aporta una evaluación retrospectiva del motor físico `ET0
+reciente × Kc` frente a persistencia. Esa prueba permite medir las reglas
+agronómicas y los cambios de fase con datos cerrados, pero no evalúa la vía
+Ridge multianual que utiliza la aplicación operativa. En producción, el orden
+de decisión descrito en 5.1.3 es distinto: Ridge ET0 por horizonte es la vía
+preferente provisional; la media de siete días actúa como respaldo cuando
+faltan ventanas completas o cuando la puerta prospectiva no acredita una
+mejora mínima del 5 %. Por tanto, el buen resultado retrospectivo del cálculo
+físico justifica el respaldo y no debe interpretarse como una comparación
+extremo a extremo de Ridge en `h=2…8`.
 
 La interpretación queda condicionada por la referencia SiAR, el tamaño del
 piloto y la ausencia de validación de campo. El apartado 5.3.10 comprueba el

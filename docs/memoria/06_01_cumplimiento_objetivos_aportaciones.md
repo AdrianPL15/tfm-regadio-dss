@@ -51,48 +51,26 @@ limitaciones ordenan las líneas de mejora del apartado 6.3.
 
 ## 6.1.2. Aportaciones del trabajo
 
-La aportación principal es un resultado empírico que no estaba previsto en el
-anteproyecto. En este piloto, para anticipar la necesidad de riego de un
-cultivo con calendario definido, separar la estimación en sus dos componentes
-resultó más eficaz que aumentar la complejidad del modelo. Uno de ellos, la
-demanda atmosférica, es
-incierto pero evoluciona de forma gradual; el otro, el coeficiente de cultivo,
-cambia de forma brusca pero se conoce de antemano. La vía que multiplica la ET0
-media de los siete días anteriores por el Kc del día objetivo reduce el MAE de
-la recomendación a un día frente a la persistencia en un 7 % en desarrollo y en
-un 25 % en la prueba, y el RMSE de desarrollo en un 18 %. La diferencia se
-amplía con la anticipación: a siete días, en el periodo de desarrollo, el error
-del sistema es de 0,48 mm frente a 0,87 mm de la persistencia, porque se
-mantiene prácticamente estable a lo largo del horizonte. Donde el método se
-distingue con más claridad es en los cambios de fase. El 1 de septiembre,
-cuando el Kc pasa de 1,00 a 0,30, la persistencia se desvía 3,52 mm y el
-sistema 0,01 mm.
+La aportación principal es una arquitectura híbrida que asigna funciones
+distintas a la predicción y al conocimiento agronómico. La vía operativa
+preferente predice ET0 mediante Ridge multianual para `h=1…9` y combina cada
+predicción con el Kc conocido de la fecha; la media de siete días permanece
+como respaldo controlado. En la validación con origen rodante, 63 de 81
+intervalos bootstrap favorecieron a Ridge frente al respaldo y 18 fueron no
+concluyentes. Esta evidencia es retrospectiva: hasta reunir 30 casos
+prospectivos pareados, Ridge se etiqueta como provisional y no se afirma una
+mejora operativa consolidada.
 
-La segunda aportación es un resultado negativo bien acotado. Seis enfoques,
-desde la persistencia hasta XGBoost, se compararon sobre la misma variable
-objetivo, los mismos cortes temporales y una prueba reservada que no intervino
-en la selección. Los cinco algoritmos de aprendizaje utilizaron el conjunto de
-variables definido en el apartado 4.3; la persistencia utilizó el último valor
-observado. Ninguno de los algoritmos de aprendizaje superó de forma estable a
-esta referencia sencilla. Este resultado no resta valor al trabajo. Es
-coherente con lo expuesto en el apartado 2.2: con un único ciclo de 148
-observaciones y una necesidad neta muy relacionada con el calendario del
-cultivo (su correlación con el Kc es de 0,93), los modelos más complejos no
-disponen de diversidad suficiente para demostrar una mejora estable. La
-validez de la comparación de los seis enfoques del capítulo 4 descansa en dos decisiones documentadas. La primera
-fue excluir la ET0, la ETc y la precipitación efectiva del mismo día, que
-habrían permitido reconstruir el objetivo de forma algebraica y producir
-métricas aparentemente excelentes. Para hacer la comparación más equitativa,
-los algoritmos recibieron también retardos y medias móviles de ET0 calculados
-solo con fechas anteriores; aun así, no mejoraron de forma estable a la
-persistencia. La segunda decisión fue seleccionar el enfoque antes de
-consultar la prueba final. El método ET0 reciente × Kc se desarrolló y evaluó
-después usando las mismas fechas de septiembre; su resultado no constituye una
-validación independiente adicional. Leídos conjuntamente, los capítulos 4 y 5 respaldan
-el planteamiento híbrido del apartado 2.3: con pocos datos, el conocimiento
-agronómico explícito aporta más que el algoritmo, y el aprendizaje automático
-encuentra su lugar como corrección de una referencia física, no como sustituto
-de ella.
+La segunda aportación es una comparación temporal reproducible y una
+interpretación honesta de resultados diferentes. En el piloto de una sola
+campaña, cinco algoritmos de aprendizaje no superaron de forma estable a
+persistencia. En cambio, la ampliación multianual de ET0 sí mostró una mejora
+consistente frente a la media móvil de siete días. La evaluación física del
+capítulo 5 reutiliza fechas del piloto y valida el respaldo `ET0 reciente ×
+Kc`, no la vía Ridge completa. En su prueba reservada a un día, ese respaldo
+redujo el MAE un 25 %, pero la diferencia absoluta fue 0,029 mm/día y su
+intervalo bootstrap del 95 % [0,002; 0,067] quedó próximo a cero; por ello se
+presenta como evidencia interna, no como generalización agronómica.
 
 La tercera aportación es de diseño. El motor hace visibles sus limitaciones en
 la salida. Cada recomendación indica el método que la produjo, las reglas

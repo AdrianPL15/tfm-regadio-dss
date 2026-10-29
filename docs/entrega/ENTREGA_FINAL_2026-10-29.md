@@ -17,6 +17,8 @@ Fecha de última comprobación técnica: 29 de octubre de 2026.
 | Explicabilidad de Random Forest y XGBoost en el tramo temporal reservado | [Informe XAI](../data_samples/xai_analysis_4_3.json), [importancias](../data_samples/xai_feature_importance_4_3.csv) y [figura](../images/model_xai_4_3.png) |
 | Instantánea de evaluación cerrada el 22/10/2026: seis combinaciones, 1776 filas CSV y 1584 jornadas activas válidas | [Reentrenamiento por caso](../data_samples/model_retraining_2026.json) |
 | Selección entre el modelo de ETc y `ET0 reciente × Kc` para la dosis | [Comparación por caso](../data_samples/etc_model_deployment_2026.json) y [código](../../src/models/train_etc_for_dss.py) |
+| Predicción multianual de ET0 para siete fechas operativas (`h=2…8`) y dos horizontes técnicos adicionales | [Documento técnico](../tecnica/EXPERIMENTO_ET0_MULTIANUAL.md), [modelos](../../models/et0_multiyear/) y [evaluación por horizonte](../data_samples/et0_multiyear_horizon_metrics.csv) |
+| Monitorización prospectiva, cobertura operativa y puerta de decisión tras 30 casos | [Inferencia diaria](../../src/analysis/run_daily_et0_prospective.py), [cobertura 2026](../data_samples/et0_operational_coverage_2026.csv) y [MLOps](../tecnica/MLOPS_MONITORIZACION.md) |
 | Reglas de riego y validación retrospectiva | [Motor](../../src/dss/engine.py) y [13 escenarios](../data_samples/dss_validation_5_3.json) |
 | Interfaz desplegada | [Código Streamlit](../../src/dss/app_streamlit.py) |
 | Reutilización académica y operación | [Ficha del conjunto](../tecnica/DATASET_CARD.md), [principios FAIR](../tecnica/FAIR_Y_CITACION.md) y [plan MLOps](../tecnica/MLOPS_MONITORIZACION.md) |
@@ -29,7 +31,8 @@ El 29/10/2026 se ejecutaron **150 pruebas correctas**, incluidas la ausencia de 
 - El piloto retrospectivo de 2025 asume pimiento al aire libre. El CSV SiAR identifica «Pimiento» sin indicar el sistema productivo.
 - Los modelos se compararon con necesidades calculadas por SiAR. No se registró el riego aplicado ni se midió ahorro, rendimiento o precisión en campo.
 - La app estima primero la ETc antes de lluvia. Solo descuenta lluvia AEMET cuando hay milímetros horarios utilizables y aplica una fracción aprovechable **supuesta y editable**. La dosis de hoy representa la necesidad del día completo y requiere ajuste si ya se ha regado.
-- En cinco de los seis casos, `ET0 reciente × Kc` tuvo menor MAE de prueba que el modelo de ETc seleccionado. La app muestra el modelo como contraste en los cultivos activos de octubre; no afirma una mejora general debida al aprendizaje automático.
+- La vía operativa preferente predice ET0 con Ridge multianual y la combina con el Kc conocido. Hasta acumular 30 casos prospectivos pareados se etiqueta como provisional; si faltan ventanas completas o no supera la puerta definida, se utiliza `ET0 reciente × Kc` como respaldo trazable.
+- En cinco de los seis casos del experimento de ETc, el respaldo físico tuvo menor MAE de prueba que el modelo de ETc seleccionado. Esa comparación no evalúa Ridge multianual extremo a extremo y no se presenta como mejora general del aprendizaje automático.
 - El carácter inteligente del DSS reside en la arquitectura híbrida, la integración automatizada de fuentes, la selección trazable del método y las reglas agronómicas; comprobar que un modelo complejo no mejora de forma estable la referencia física es un resultado experimental válido.
 - Los días posteriores al primero son orientativos. No hay histórico de emisiones AEMET alineadas con 2025 ni balance hídrico de la parcela para validarlos prospectivamente.
 - La prioridad de evolución es un balance hídrico de parcela con sensores de humedad, propiedades del suelo y registro del riego realmente aplicado.
