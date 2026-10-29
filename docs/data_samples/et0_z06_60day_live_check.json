@@ -1,0 +1,38 @@
+{
+  "experiment": "ET0 multianual: prueba operativa h=1/h=7",
+  "issued_at": "2026-10-29",
+  "target_date": "2026-10-29",
+  "results": [
+    {
+      "station_code": "Z06",
+      "query_start": "2026-08-30",
+      "query_end": "2026-10-28",
+      "records": 13,
+      "last_observation_date": "2026-10-28",
+      "prediction": {
+        "et0_mm": 2.326069488094967,
+        "method": "ridge_et0_multiyear_h1",
+        "horizon_days": 1,
+        "station_code": "Z06",
+        "target_date": "2026-10-29",
+        "artifact": "ridge_et0_Z06.joblib",
+        "artifact_sha256": "5cb21a6b77719462ffecdbdbcdda6c3a2992a45fd4dfb6a2ce46a950900787a8",
+        "model_trained_through": "2025-10-20",
+        "external_test_ridge_mae_mm_day": 0.5580841019237991,
+        "external_test_persistence_mae_mm_day": 0.6879522184300342,
+        "external_test_mean_7d_mae_mm_day": 0.6311165285226719,
+        "missing_feature_columns_imputed": [],
+        "missing_feature_values_imputed": [
+          "et0_lag_14d"
+        ],
+        "fallback_reason": null,
+        "baseline_mean_7d_mm": 2.3042827285714287,
+        "baseline_persistence_mm": 2.569114
+      },
+      "prospective_record_created": true,
+      "provisional_snapshot": "data/raw/siar/provisional_et0/issued=2026-10-29/station=Z06.csv",
+      "validated_comparison_status": "pending_future_requery"
+    }
+  ],
+  "provisional_vs_validated": "Los valores quedan archivados como snapshot provisional. La comparación solo podrá cerrarse al volver a consultar esas mismas fechas después de su validación por SiAR."
+}

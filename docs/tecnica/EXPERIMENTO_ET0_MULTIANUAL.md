@@ -4,7 +4,7 @@
 
 Este trabajo se desarrolla en `codex/experimento-et0-multianual` y no modifica
 la versión estable del TFM ni la memoria. Su objetivo es comprobar si una
-predicción de ET0 a uno o dos días mejora las referencias físicas antes de
+predicción de ET0 entre uno y siete días mejora las referencias físicas antes de
 decidir si merece incorporarse al DSS. La integración con Streamlit existe
 únicamente en esta rama experimental; `main` permanece sin cambios.
 
@@ -144,7 +144,7 @@ estructurada se conservan en `src/analysis/validate_et0_robustness.py`,
 `docs/data_samples/et0_multiyear_robustness.csv` y
 `docs/data_samples/et0_multiyear_robustness_summary.json`.
 
-## Horizonte de dos días ante la latencia de SiAR
+## Horizontes de uno a siete días ante la latencia de SiAR
 
 La prueba operativa del 29 de octubre mostró que la última observación SiAR
 disponible era del día 27. Se repitió por ello el mismo protocolo para predecir
@@ -160,14 +160,32 @@ En la prueba de 2025 se obtuvieron los siguientes resultados:
 | Z06 | 293 | 0,767 | 0,673 | 0,615 | 0,606 | 10,0 % |
 | BA08 | 365 | 0,580 | 0,544 | 0,486 | 0,461 | 15,2 % |
 
-Los valores son MAE en mm/día. La evaluación con origen rodante de 2023, 2024
-y 2025 confirmó además que Ridge completo superó a la media de siete días en
-las nueve combinaciones estación-año a horizonte dos. Considerando conjuntamente
-los horizontes uno y dos, ganó las 18 comparaciones frente a esa referencia.
-El horizonte dos queda por tanto validado como candidato experimental para
-resolver el desfase observado. Se serializó después para las tres estaciones y
-se conectó únicamente a la versión de Streamlit de esta rama; la aplicación
-estable de `main` no queda modificada hasta aprobar la fusión.
+Los valores son MAE en mm/día. Se amplió a continuación el protocolo completo
+a `h=1…7`, siempre construyendo las variables con información disponible en
+`t` o antes. El MAE medio de las nueve ventanas estación-año fue:
+
+| Horizonte | Ridge completo | Media 7 días | Ventanas ganadas |
+|---:|---:|---:|---:|
+| 1 | 0,470 | 0,551 | 9/9 |
+| 2 | 0,522 | 0,587 | 9/9 |
+| 3 | 0,544 | 0,607 | 9/9 |
+| 4 | 0,555 | 0,622 | 9/9 |
+| 5 | 0,563 | 0,636 | 9/9 |
+| 6 | 0,566 | 0,650 | 9/9 |
+| 7 | 0,570 | 0,666 | 9/9 |
+
+Los valores son promedios descriptivos de MAE en mm/día, no siete pruebas
+externas independientes. Ridge ganó por valor puntual las 63 combinaciones.
+El bootstrap por bloques mostró un intervalo completamente positivo frente a
+la media de siete días en 51 de 63 ventanas: 9/9 en `h=1`, 7/9 en `h=2`, 7/9
+en `h=3`, 7/9 en `h=4`, 5/9 en `h=5`, 8/9 en `h=6` y 8/9 en `h=7`. Por tanto,
+la señal media es favorable, pero la incertidumbre crece y no se afirma
+superioridad estadística en cada estación-año individual.
+
+La regla de exportación queda codificada: un horizonte solo se serializa si
+Ridge completo presenta menor MAE puntual que la media móvil de siete días en
+las nueve ventanas. Los siete horizontes cumplieron esta regla; el manifiesto
+conserva los 9/9 resultados que justifican cada artefacto.
 
 ## Validación geográfica sin reajuste
 
@@ -201,6 +219,14 @@ Los intervalos del 95 % de la diferencia `MAE persistencia − MAE Ridge` fueron
 La proporción de réplicas positivas fue 1,000 en las tres estaciones. Ningún
 intervalo cruza cero dentro de 2025; la mejora es consistente geográficamente
 en este conjunto, aunque todavía no acredita estabilidad en otros años futuros.
+
+La extensión `h=1…7` repite el mismo procedimiento, con 5.000 réplicas y
+semilla 42, para cada combinación estación-año-horizonte y para dos contrastes:
+Ridge completo frente a media móvil de siete días y frente a Ridge reducido.
+Las 126 comparaciones, incluidas las de `h=2`, se conservan en
+`docs/data_samples/et0_multiyear_robustness_uncertainty.csv`; las predicciones
+diarias pareadas que permiten recomputarlas están en
+`docs/data_samples/et0_multiyear_robustness_predictions.csv`.
 
 La evaluación se reproduce con:
 
@@ -255,21 +281,27 @@ procede mantenerlo separado de la entrega estable:
 6. la comparación entre valores provisionales y posteriormente validados de
    SiAR requiere conservar instantáneas y esperar a que el proveedor consolide
    esas mismas fechas; no puede cerrarse retrospectivamente con una sola
-   consulta.
+   consulta;
+7. que un intervalo bootstrap cruce cero no invalida el modelo, pero impide
+   presentar esa ventana individual como una mejora estadísticamente concluyente;
+8. la validación prospectiva está iniciada, pero necesita al menos 30 días
+   cerrados —preferiblemente 60— antes de apoyar una decisión de despliegue.
 
 La decisión provisional pasa a ser **candidato favorable a integración
-controlada**, no integración automática. Los horizontes uno y dos ya están
-serializados y la rama experimental elige uno automáticamente según la fecha
-del último dato. La media reciente de siete días continúa siendo el respaldo
-físico cuando Ridge no es aplicable, y la persistencia permanece como último
-respaldo trazable. La fusión en la aplicación estable se decidirá solo después
-de revisar esta rama y conservar evidencia de funcionamiento operativo.
+controlada**, no integración automática. Los horizontes de uno a siete días se
+serializan porque cumplen la regla predefinida de 9/9 victorias puntuales frente
+a la media móvil. La rama experimental selecciona el horizonte según la fecha
+del último dato. La media reciente de siete días, calculada con al menos tres
+observaciones, continúa siendo el primer respaldo físico; la persistencia solo
+se usa cuando tampoco existe esa ventana mínima. La fusión en la aplicación
+estable se decidirá después de revisar esta rama y acumular evidencia
+prospectiva suficiente.
 
 ## Preparación técnica para una integración controlada
 
 Tras congelar la evaluación externa de 2025, Ridge se reajusta con todo el
-histórico 2021–2025 de cada estación y horizonte. Los seis artefactos —`h=1` y
-`h=2` para AL01, Z06 y BA08— se conservan en
+histórico 2021–2025 de cada estación y horizonte. Los 21 artefactos —`h=1…7`
+para AL01, Z06 y BA08— se conservan en
 `models/experimental_et0_multiyear/` junto a un manifiesto que declara:
 
 - estación, periodo y número de filas de entrenamiento;
@@ -278,16 +310,19 @@ histórico 2021–2025 de cada estación y horizonte. Los seis artefactos —`h=
   reajuste, sobre 2025;
 - nombre y huella SHA-256 del artefacto;
 - versiones de Python, NumPy, pandas, scikit-learn y joblib usadas al exportar;
+- regla de selección y número de victorias frente a media 7 días por horizonte;
 - estado explícito `experimental_not_deployed`.
 
 La inferencia de `src/dss/predict_et0.py` calcula la distancia entre el último
-dato y la fecha objetivo y selecciona `h=1` o `h=2`. Exige al menos tres
+dato y la fecha objetivo y selecciona `h=1…7`. Exige al menos tres
 retardos de ET0 válidos, verifica la huella del artefacto y no utiliza registros
 de la fecha objetivo ni posteriores. También declara los valores concretos que
-el `Pipeline` ha debido imputar. Ante un horizonte superior, un modelo ausente
+el `Pipeline` ha debido imputar y rechaza la inferencia si más de un valor de
+entrada requiere imputación. Ante un horizonte superior, un modelo ausente
 o manipulado, una estación no registrada, datos desactualizados o histórico
-insuficiente, devuelve de forma trazable la persistencia de la última ET0
-observada. Si tampoco existe esa ET0, declara el resultado como no disponible.
+insuficiente, devuelve de forma trazable la media de ET0 de los últimos siete
+días si contiene al menos tres observaciones. Solo después recurre a la última
+ET0 observada; si tampoco existe, declara el resultado como no disponible.
 
 Una comprobación de inferencia para el 1 de enero de 2026 produjo Ridge en AL01
 y BA08, mientras Z06 activó correctamente el respaldo por falta de suficientes
@@ -324,7 +359,7 @@ del horizonte dos no altera retroactivamente esa decisión segura.
 
 La auditoría original registró el estado
 `blocked_siar_publication_lag_for_same_day`. La barrera se resolvió en esta rama
-al validar y versionar `h=2`. La prueba viva final del 29 de octubre recuperó
+al validar y versionar `h=1…7`. La primera prueba viva del 29 de octubre recuperó
 datos hasta el día 27 en las tres estaciones y seleccionó automáticamente
 `ridge_et0_multiyear_h2`: 2,314 mm en AL01, 2,121 mm en Z06 y 2,269 mm en BA08
 para el día 29. AL01 y BA08 no necesitaron imputaciones; Z06 imputó únicamente
@@ -333,6 +368,18 @@ AEMET no publica ET0: su lluvia prevista se descuenta después de `ET0 × Kc`.
 El informe de preparación se guarda en
 `docs/data_samples/et0_operational_readiness.json` y la evidencia de la prueba
 real en `docs/data_samples/et0_live_siar_smoke_latest.json`.
+
+Una consulta posterior de 60 días confirmó 60 observaciones hasta el día 28 en
+AL01 y BA08 y ejecutó `h=1` sin imputaciones. SiAR rechazó en el primer lote las
+consultas siguientes por superar su cuota, por lo que se repitió Z06 de forma
+aislada. Aunque se solicitaron 60 días, el proveedor devolvió 13 observaciones
+continuas hasta el día 28; `h=1` pudo ejecutarse imputando únicamente
+`et0_lag_14d`. El umbral operativo admite como máximo una imputación; con dos o
+más se activa la media física de siete días. La evidencia específica queda en
+`docs/data_samples/et0_z06_60day_live_check.json`; la comprobación equivalente
+de BA08 queda en `et0_ba08_60day_live_check.json`. Esta limitación confirma que
+un intervalo solicitado no garantiza la misma cobertura en todas las
+estaciones y que las consultas masivas deben escalonarse.
 
 El botón de la interfaz experimental reúne las tres operaciones sin mezclarlas:
 actualiza el calendario y Kc del cultivo desde SiAR, obtiene ET0 mediante el
@@ -363,6 +410,22 @@ sean definitivos. `src/analysis/compare_et0_provisional_snapshot.py` permite
 repetir la comparación más adelante y separa revisiones de valores, fechas
 nuevas y fechas desaparecidas.
 
+## Validación prospectiva
+
+Cada predicción Ridge emitida por Streamlit o por la prueba viva queda guardada
+localmente en `data/raw/siar/prospective_et0/predictions.csv`, ruta excluida de
+Git. La clave estación-fecha-huella hace la escritura idempotente y conserva la
+fecha de emisión UTC, horizonte, ET0 predicha, media de siete días,
+persistencia y versión exacta del artefacto. Cuando SiAR publica la ET0 de la
+fecha objetivo, `src/analysis/update_et0_prospective_validation.py` reconsulta
+el dato, cierra el registro y actualiza el MAE de Ridge y de ambas referencias.
+
+El informe público `docs/data_samples/et0_prospective_validation_latest.json`
+solo podrá pasar de `collecting` a `minimum_window_reached` al reunir 30 casos
+validados; se recomiendan 60. Hasta entonces no se presentará el rendimiento
+prospectivo como validación del modelo. La primera emisión se registró el 29 de
+octubre de 2026 para AL01, Z06 y BA08 y permanece pendiente de observación consolidada.
+
 ## Artefactos generados
 
 - `src/analysis/audit_et0_availability.py`: inventario de fuentes disponibles;
@@ -379,6 +442,9 @@ nuevas y fechas desaparecidas.
   provisionales para su validación posterior;
 - `src/analysis/compare_et0_provisional_snapshot.py`: comparación reproducible
   entre la instantánea y una reconsulta posterior;
+- `src/dss/et0_prospective.py`: registro idempotente y cierre de predicciones;
+- `src/analysis/update_et0_prospective_validation.py`: reconsulta de valores
+  observados y actualización del informe prospectivo;
 - `docs/data_samples/et0_multiyear_metrics.csv`: métricas de modelos;
 - `docs/data_samples/et0_multiyear_predictions_2025.csv`: predicciones de prueba;
 - `docs/data_samples/et0_multiyear_statistical_evidence.csv`: incertidumbre;
@@ -395,12 +461,15 @@ nuevas y fechas desaparecidas.
   del mecanismo de detección de revisiones.
 - `docs/data_samples/et0_streamlit_smoke_latest.json`: prueba visual del flujo
   completo en los tres casos activos.
+- `docs/data_samples/et0_multiyear_robustness_predictions.csv` y
+  `et0_multiyear_robustness_uncertainty.csv`: pares diarios e intervalos por
+  bloques para los siete horizontes.
 
-Las pruebas automatizadas comprueban los objetivos a uno y dos días, el uso de
+Las pruebas automatizadas comprueban los objetivos de uno a siete días, el uso de
 retardos de calendario reales, la ausencia de fuga temporal, la calidad del
 calendario, la reproducibilidad del bootstrap, la integridad SHA-256 de los
 artefactos, los respaldos y la aplicación única de Kc y precipitación. La
-verificación final suma 139 pruebas no visuales superadas, compilación correcta
-de la aplicación y una consulta real satisfactoria en las tres estaciones. La
-prueba visual completa de Streamlit y la fusión en `main` se mantienen como
-puertas deliberadas de revisión, no como resultados ya aprobados.
+verificación específica de esta ampliación suma 32 pruebas superadas y
+compilación correcta de `src`, además de una consulta real satisfactoria en las
+tres estaciones. La batería completa de la entrega y la fusión en `main` se
+mantienen como puertas deliberadas de revisión, no como resultados ya aprobados.

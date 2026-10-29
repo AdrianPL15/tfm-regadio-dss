@@ -17,12 +17,15 @@ import pandas as pd
 from sklearn.base import clone
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 
+from src.analysis.build_current_statistical_evidence import paired_block_bootstrap
 from src.models.train_et0_multiyear import _models, build_feature_table
 
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT = ROOT / "docs/data_samples/et0_multiyear_robustness.csv"
 DEFAULT_SUMMARY = ROOT / "docs/data_samples/et0_multiyear_robustness_summary.json"
+DEFAULT_PREDICTIONS = ROOT / "docs/data_samples/et0_multiyear_robustness_predictions.csv"
+DEFAULT_UNCERTAINTY = ROOT / "docs/data_samples/et0_multiyear_robustness_uncertainty.csv"
 STATIONS = {
     "AL01": ROOT / "data/interim/et0_history_AL01_2021_2025.csv",
     "Z06": ROOT / "data/interim/et0_history_Z06_2021_2025.csv",
@@ -78,7 +81,9 @@ def evaluate_station(
     station: str,
     test_years: tuple[int, ...] = (2023, 2024, 2025),
     horizon_days: int = 1,
-) -> pd.DataFrame:
+    *,
+    return_predictions: bool = False,
+) -> pd.DataFrame | tuple[pd.DataFrame, pd.DataFrame]:
     table, full_features = build_feature_table(history, horizon_days=horizon_days)
     reduced_features = [
         name
@@ -86,6 +91,7 @@ def evaluate_station(
         if name.startswith("et0_") or name in {"target_day_sin", "target_day_cos"}
     ]
     rows: list[dict] = []
+    prediction_rows: list[pd.DataFrame] = []
 
     for year in test_years:
         train = table[
@@ -122,6 +128,7 @@ def evaluate_station(
                 )
             )
 
+        model_predictions: dict[str, np.ndarray] = {}
         for method, features in {
             "Ridge ET0 + estacionalidad": reduced_features,
             "Ridge completo": full_features,
@@ -129,12 +136,67 @@ def evaluate_station(
             model = clone(_models()["Ridge"])
             model.fit(train[features], train["target_et0_mm"])
             pred = np.clip(model.predict(fair[features]), 0, None)
+            model_predictions[method] = pred
             rows.append(_metric_row(station, year, horizon_days, method, y_true, pred))
 
+        prediction_rows.append(
+            pd.DataFrame(
+                {
+                    "station_code": station,
+                    "test_year": year,
+                    "horizon_days": horizon_days,
+                    "prediction_date": fair["prediction_date"].dt.date.astype(str),
+                    "target_et0_mm": y_true.to_numpy(),
+                    "mean_7d_prediction_mm": fair["baseline_mean_7d"].to_numpy(),
+                    "ridge_full_prediction_mm": model_predictions["Ridge completo"],
+                    "ridge_reduced_prediction_mm": model_predictions[
+                        "Ridge ET0 + estacionalidad"
+                    ],
+                }
+            )
+        )
+
+    metrics = pd.DataFrame(rows)
+    if not return_predictions:
+        return metrics
+    predictions = pd.concat(prediction_rows, ignore_index=True) if prediction_rows else pd.DataFrame()
+    return metrics, predictions
+
+
+def build_uncertainty(predictions: pd.DataFrame) -> pd.DataFrame:
+    """Cuantifica, por ventana rodante, Ridge frente a media 7d y ablación."""
+
+    rows: list[dict] = []
+    for (station, year, horizon), group in predictions.groupby(
+        ["station_code", "test_year", "horizon_days"], sort=True
+    ):
+        target = group["target_et0_mm"]
+        ridge_error = (group["ridge_full_prediction_mm"] - target).abs()
+        for reference_name, column in {
+            "media_7d": "mean_7d_prediction_mm",
+            "ridge_reducido": "ridge_reduced_prediction_mm",
+        }.items():
+            reference_error = (group[column] - target).abs()
+            result = paired_block_bootstrap(
+                reference_error,
+                ridge_error,
+                replicates=5_000,
+                block_days=7,
+                seed=42,
+            )
+            rows.append(
+                {
+                    "station_code": station,
+                    "test_year": int(year),
+                    "horizon_days": int(horizon),
+                    "comparison": f"{reference_name}_vs_ridge_completo",
+                    **result,
+                }
+            )
     return pd.DataFrame(rows)
 
 
-def build_summary(results: pd.DataFrame) -> dict:
+def build_summary(results: pd.DataFrame, uncertainty: pd.DataFrame | None = None) -> dict:
     comparisons = []
     for (station, year, horizon), group in results.groupby(
         ["station_code", "test_year", "horizon_days"]
@@ -161,7 +223,7 @@ def build_summary(results: pd.DataFrame) -> dict:
             }
         )
     comparison_frame = pd.DataFrame(comparisons)
-    return {
+    summary = {
         "protocol": "rolling_origin_yearly_by_forecast_horizon",
         "test_years": sorted(int(year) for year in results["test_year"].unique()),
         "stations": sorted(results["station_code"].unique().tolist()),
@@ -174,28 +236,54 @@ def build_summary(results: pd.DataFrame) -> dict:
         ),
         "total_station_years": int(len(comparison_frame)),
     }
+    if uncertainty is not None:
+        mean7 = uncertainty[uncertainty["comparison"] == "media_7d_vs_ridge_completo"]
+        summary["bootstrap"] = {
+            "method": "bootstrap pareado por bloques temporales circulares",
+            "replicates": 5_000,
+            "block_days": 7,
+            "seed": 42,
+            "comparisons": int(len(uncertainty)),
+            "ridge_vs_mean_7d_ci_excludes_zero_count": int(
+                (mean7["ci_95_lower_mm_day"] > 0).sum()
+            ),
+            "interpretation": (
+                "Incertidumbre muestral interna de cada ventana estación-año; "
+                "no demuestra transferencia a campañas futuras."
+            ),
+        }
+    return summary
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
     parser.add_argument("--summary", type=Path, default=DEFAULT_SUMMARY)
+    parser.add_argument("--predictions", type=Path, default=DEFAULT_PREDICTIONS)
+    parser.add_argument("--uncertainty", type=Path, default=DEFAULT_UNCERTAINTY)
     return parser.parse_args()
 
 
 def main() -> None:
     args = parse_args()
     frames = []
+    prediction_frames = []
     for station, path in STATIONS.items():
         history = pd.read_csv(path)
-        for horizon_days in (1, 2):
-            frames.append(
-                evaluate_station(history, station, horizon_days=horizon_days)
+        for horizon_days in range(1, 8):
+            metrics, predictions = evaluate_station(
+                history, station, horizon_days=horizon_days, return_predictions=True
             )
+            frames.append(metrics)
+            prediction_frames.append(predictions)
     results = pd.concat(frames, ignore_index=True)
-    summary = build_summary(results)
+    predictions = pd.concat(prediction_frames, ignore_index=True)
+    uncertainty = build_uncertainty(predictions)
+    summary = build_summary(results, uncertainty)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     results.to_csv(args.output, index=False, encoding="utf-8")
+    predictions.to_csv(args.predictions, index=False, encoding="utf-8")
+    uncertainty.to_csv(args.uncertainty, index=False, encoding="utf-8")
     args.summary.write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print(
         "Ridge completo gana frente a media movil 7 dias en "

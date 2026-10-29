@@ -35,8 +35,8 @@ class PredictEt0Tests(unittest.TestCase):
             date(2025, 1, 21),
             manifest_path=Path("does-not-exist.json"),
         )
-        self.assertEqual(result["method"], "persistence_fallback")
-        self.assertAlmostEqual(result["et0_mm"], 3.0)
+        self.assertEqual(result["method"], "mean_7d_fallback")
+        self.assertAlmostEqual(result["et0_mm"], self._history()["et0_mm"].tail(7).mean())
 
     def test_stale_history_does_not_invoke_model(self):
         with TemporaryDirectory(dir=".test_tmp") as folder:
@@ -47,7 +47,7 @@ class PredictEt0Tests(unittest.TestCase):
                 "AL01", self._history().iloc[:-1], date(2025, 1, 21),
                 manifest_path=manifest, model_dir=root,
             )
-            self.assertEqual(result["method"], "persistence_fallback")
+            self.assertEqual(result["method"], "mean_7d_fallback")
 
     def test_missing_operational_columns_force_fallback(self):
         history = self._history()[["date", "et0_mm"]]
@@ -69,7 +69,7 @@ class PredictEt0Tests(unittest.TestCase):
                 "AL01", history, date(2025, 1, 21),
                 manifest_path=manifest, model_dir=root,
             )
-            self.assertEqual(result["method"], "persistence_fallback")
+            self.assertEqual(result["method"], "mean_7d_fallback")
             self.assertIn("faltan columnas", result["fallback_reason"])
 
     def test_valid_artifact_returns_ridge_method(self):
@@ -135,14 +135,66 @@ class PredictEt0Tests(unittest.TestCase):
             self.assertEqual(result["horizon_days"], 2)
             self.assertAlmostEqual(result["et0_mm"], 2.7)
 
-    def test_more_than_two_days_uses_fallback(self):
+    def test_more_than_one_imputed_input_forces_physical_fallback(self):
+        with TemporaryDirectory(dir=".test_tmp") as folder:
+            root = Path(folder)
+            history = self._history()
+            history.loc[history.index[-1], [
+                "temperature_mean_c", "temperature_max_c"
+            ]] = np.nan
+            features = [
+                "et0_lag_1d", "et0_lag_2d", "et0_lag_3d",
+                "temperature_mean_c_lag_1d", "temperature_max_c_lag_1d",
+            ]
+            model = DummyRegressor(strategy="constant", constant=2.5)
+            model.fit(pd.DataFrame([[1.0] * len(features)], columns=features), [2.5])
+            artifact = root / "model.joblib"
+            joblib.dump(model, artifact)
+            import hashlib
+            digest = hashlib.sha256(artifact.read_bytes()).hexdigest()
+            manifest = root / "manifest.json"
+            manifest.write_text(
+                json.dumps({"stations": {"AL01": {"horizons": {"1": {
+                    "artifact": artifact.name,
+                    "sha256": digest,
+                    "feature_columns": features,
+                }}}}}),
+                encoding="utf-8",
+            )
+            result = predict_et0_with_fallback(
+                "AL01", history, date(2025, 1, 21),
+                manifest_path=manifest, model_dir=root,
+            )
+            self.assertEqual(result["method"], "mean_7d_fallback")
+            self.assertIn("demasiados valores", result["fallback_reason"])
+
+    def test_unversioned_horizon_uses_mean_7d_before_persistence(self):
+        with TemporaryDirectory(dir=".test_tmp") as folder:
+            root = Path(folder)
+            manifest = root / "manifest.json"
+            manifest.write_text(
+                json.dumps({"stations": {"AL01": {"horizons": {"1": {}}}}}),
+                encoding="utf-8",
+            )
+            result = predict_et0_with_fallback(
+                "AL01",
+                self._history().iloc[:-2],
+                date(2025, 1, 21),
+                manifest_path=manifest,
+                model_dir=root,
+            )
+            self.assertEqual(result["method"], "mean_7d_fallback")
+            self.assertEqual(result["fallback_observations"], 7)
+            self.assertIn("no soportado", result["fallback_reason"])
+
+    def test_fallback_uses_persistence_when_three_recent_values_do_not_exist(self):
+        history = self._history().iloc[[0, 10, 19]].copy()
         result = predict_et0_with_fallback(
-            "AL01",
-            self._history().iloc[:-2],
-            date(2025, 1, 21),
+            "AL01", history, date(2025, 1, 21),
+            manifest_path=Path("does-not-exist.json"),
         )
         self.assertEqual(result["method"], "persistence_fallback")
-        self.assertIn("no soportado", result["fallback_reason"])
+        self.assertEqual(result["fallback_observations"], 1)
 
     def test_siar_adapter_produces_training_schema(self):
         record = {
@@ -166,7 +218,7 @@ class PredictEt0Tests(unittest.TestCase):
             "AL01", date(2025, 1, 21), client=FailingSource(),
             fallback_history=self._history(),
         )
-        self.assertEqual(result["method"], "persistence_fallback")
+        self.assertEqual(result["method"], "mean_7d_fallback")
         self.assertIn("fallo del extractor", result["fallback_reason"])
 
     def test_et0_is_converted_to_etc_once_with_kc(self):
@@ -189,7 +241,7 @@ class PredictEt0Tests(unittest.TestCase):
     def test_fallback_cannot_be_converted_to_etc_model(self):
         with self.assertRaises(ValueError):
             to_etc_model_estimate(
-                {"et0_mm": 3.0, "method": "persistence_fallback"}, 0.8
+                {"et0_mm": 3.0, "method": "mean_7d_fallback"}, 0.8
             )
 
 

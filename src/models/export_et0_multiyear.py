@@ -44,9 +44,9 @@ def export_models(
     manifest: dict[str, object] = {
         "status": "experimental_not_deployed",
         "model_family": "Ridge",
-        "target": "ET0 a uno o dos días (mm/día)",
+        "target": "ET0 de uno a siete días (mm/día)",
         "training_policy": "reajuste final con 2021-2025 tras evaluación externa congelada en 2025",
-        "fallback": "persistencia de la última ET0 observada",
+        "fallback": "media de ET0 de los últimos 7 días con al menos 3 observaciones; en último término, persistencia",
         "exported_at": date.today().isoformat(),
         "runtime_versions": {
             "python": platform.python_version(),
@@ -57,14 +57,40 @@ def export_models(
         },
         "stations": {},
     }
+    robustness = pd.read_csv(metrics_root / "et0_multiyear_robustness.csv")
+    comparison = robustness.pivot_table(
+        index=["station_code", "test_year", "horizon_days"],
+        columns="method",
+        values="mae_mm_day",
+        aggfunc="first",
+    ).reset_index()
+    comparison["approved"] = (
+        comparison["Ridge completo"] < comparison["Media movil 7 dias"]
+    )
+    horizon_approval = comparison.groupby("horizon_days")["approved"].agg(["all", "sum", "count"])
+    approved_horizons = [
+        int(horizon)
+        for horizon, row in horizon_approval.iterrows()
+        if bool(row["all"])
+    ]
+    manifest["selection_policy"] = (
+        "se serializa un horizonte solo si Ridge completo supera a la media móvil de 7 días "
+        "en todas las combinaciones estación-año de la validación rolling-origin"
+    )
+    manifest["approved_horizons_days"] = approved_horizons
+    manifest["selection_evidence"] = {
+        str(int(horizon)): {
+            "wins_vs_mean_7d": int(row["sum"]),
+            "comparisons": int(row["count"]),
+            "approved": bool(row["all"]),
+        }
+        for horizon, row in horizon_approval.iterrows()
+    }
     for station in STATIONS:
         history_path = data_root / f"et0_history_{station}_2021_2025.csv"
-        metrics_name = "et0_multiyear_metrics.csv" if station == "AL01" else f"et0_multiyear_metrics_{station}.csv"
-        metrics = pd.read_csv(metrics_root / metrics_name)
         history = pd.read_csv(history_path)
-        robustness = pd.read_csv(metrics_root / "et0_multiyear_robustness.csv")
         station_horizons: dict[str, object] = {}
-        for horizon_days in (1, 2):
+        for horizon_days in approved_horizons:
             table, features = build_feature_table(history, horizon_days=horizon_days)
             training = table.dropna(subset=["target_et0_mm"]).copy()
             model = _models()["Ridge"]
@@ -72,26 +98,13 @@ def export_models(
             suffix = "" if horizon_days == 1 else f"_h{horizon_days}"
             artifact = model_dir / f"ridge_et0_{station}{suffix}.joblib"
             joblib.dump(model, artifact, compress=3)
-            if horizon_days == 1:
-                test = metrics[
-                    (metrics["phase"] == "test_2025")
-                    & metrics["model"].isin(["Ridge", "Persistencia"])
-                ].set_index("model")
-                ridge_mae = float(test.loc["Ridge", "mae_mm"])
-                persistence_mae = float(test.loc["Persistencia", "mae_mm"])
-            else:
-                test = robustness[
-                    (robustness["station_code"] == station)
-                    & (robustness["test_year"] == 2025)
-                    & (robustness["horizon_days"] == horizon_days)
-                ].set_index("method")
-                ridge_mae = float(test.loc["Ridge completo", "mae_mm_day"])
-                persistence_mae = float(test.loc["Persistencia", "mae_mm_day"])
             robustness_test = robustness[
                 (robustness["station_code"] == station)
                 & (robustness["test_year"] == 2025)
                 & (robustness["horizon_days"] == horizon_days)
             ].set_index("method")
+            ridge_mae = float(robustness_test.loc["Ridge completo", "mae_mm_day"])
+            persistence_mae = float(robustness_test.loc["Persistencia", "mae_mm_day"])
             mean_7d_mae = float(
                 robustness_test.loc["Media movil 7 dias", "mae_mm_day"]
             )

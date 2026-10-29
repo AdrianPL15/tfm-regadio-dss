@@ -1,4 +1,4 @@
-"""Inferencia experimental de ET0 con respaldo explícito a persistencia."""
+"""Inferencia experimental de ET0 con respaldos físicos explícitos."""
 
 from __future__ import annotations
 
@@ -20,6 +20,7 @@ from src.data.transform_interim import normalize_siar_daily
 ROOT = Path(__file__).resolve().parents[2]
 MODEL_DIR = ROOT / "models/experimental_et0_multiyear"
 MANIFEST = MODEL_DIR / "manifest.json"
+MAX_IMPUTED_FEATURE_VALUES = 1
 
 
 class SiARDailySource(Protocol):
@@ -30,15 +31,54 @@ def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _persistence(history: pd.DataFrame, target_day: date, reason: str) -> dict:
+def _physical_fallback(history: pd.DataFrame, target_day: date, reason: str) -> dict:
+    if "date" not in history.columns or "et0_mm" not in history.columns:
+        return {"et0_mm": None, "method": "unavailable", "fallback_reason": reason}
     known = history.loc[pd.to_datetime(history["date"]).dt.date < target_day].copy()
-    values = pd.to_numeric(known.get("et0_mm"), errors="coerce").dropna()
+    known["date"] = pd.to_datetime(known["date"], errors="coerce")
+    known["et0_mm"] = pd.to_numeric(known.get("et0_mm"), errors="coerce")
+    known = known.dropna(subset=["date", "et0_mm"]).sort_values("date")
+    values = known["et0_mm"]
     if values.empty:
         return {"et0_mm": None, "method": "unavailable", "fallback_reason": reason}
+    last_day = known["date"].max()
+    recent = known.loc[known["date"].ge(last_day - pd.Timedelta(days=6)), "et0_mm"]
+    if len(recent) >= 3:
+        return {
+            "et0_mm": float(max(0.0, recent.mean())),
+            "method": "mean_7d_fallback",
+            "fallback_observations": int(len(recent)),
+            "fallback_reason": reason,
+        }
     return {
         "et0_mm": float(max(0.0, values.iloc[-1])),
         "method": "persistence_fallback",
+        "fallback_observations": 1,
         "fallback_reason": reason,
+    }
+
+
+def _baseline_values(history: pd.DataFrame, target_day: date) -> dict[str, float | None]:
+    """Devuelve referencias físicas calculadas únicamente con datos disponibles."""
+
+    fallback = _physical_fallback(history, target_day, "referencia física")
+    known = history.copy()
+    if "date" not in known.columns or "et0_mm" not in known.columns:
+        return {"baseline_mean_7d_mm": None, "baseline_persistence_mm": None}
+    known["date"] = pd.to_datetime(known["date"], errors="coerce")
+    known["et0_mm"] = pd.to_numeric(known["et0_mm"], errors="coerce")
+    known = known.loc[known["date"].dt.date < target_day].dropna(
+        subset=["date", "et0_mm"]
+    ).sort_values("date")
+    persistence = float(known["et0_mm"].iloc[-1]) if not known.empty else None
+    mean_7d = (
+        float(fallback["et0_mm"])
+        if fallback.get("method") == "mean_7d_fallback"
+        else None
+    )
+    return {
+        "baseline_mean_7d_mm": mean_7d,
+        "baseline_persistence_mm": persistence,
     }
 
 
@@ -50,7 +90,7 @@ def predict_et0_with_fallback(
     manifest_path: Path = MANIFEST,
     model_dir: Path = MODEL_DIR,
 ) -> dict:
-    """Predice ET0 a uno o dos días o devuelve persistencia trazable."""
+    """Predice ET0 para un horizonte versionado o devuelve respaldo trazable."""
 
     station_code = station_code.upper()
     try:
@@ -62,16 +102,16 @@ def predict_et0_with_fallback(
         if data.empty:
             raise ValueError("no existen observaciones anteriores a la fecha objetivo")
         horizon_days = (target_day - data["date"].max().date()).days
-        if horizon_days not in (1, 2):
-            raise ValueError(
-                f"horizonte operativo no soportado: {horizon_days} días desde el último dato"
-            )
         horizons = station_entry.get("horizons")
         if horizons is None:
             if horizon_days != 1:
                 raise ValueError("el manifiesto legado solo contiene el horizonte de un día")
             entry = station_entry
         else:
+            if str(horizon_days) not in horizons:
+                raise ValueError(
+                    f"horizonte operativo no soportado: {horizon_days} días desde el último dato"
+                )
             entry = horizons[str(horizon_days)]
         artifact = model_dir / entry["artifact"]
         if artifact.parent.resolve() != model_dir.resolve() or not artifact.is_file():
@@ -94,11 +134,16 @@ def predict_et0_with_fallback(
                 "faltan columnas operativas completas: " + ", ".join(missing_columns)
             )
         imputed_values = feature_frame.columns[feature_frame.isna().iloc[0]].tolist()
+        if len(imputed_values) > MAX_IMPUTED_FEATURE_VALUES:
+            raise ValueError(
+                "demasiados valores de entrada requieren imputación: "
+                f"{len(imputed_values)} > {MAX_IMPUTED_FEATURE_VALUES}"
+            )
         model = joblib.load(artifact)
         prediction = float(model.predict(feature_frame)[0])
         if not np.isfinite(prediction) or prediction < 0:
             raise ValueError("predicción no válida")
-        return {
+        result = {
             "et0_mm": prediction,
             "method": f"ridge_et0_multiyear_h{horizon_days}",
             "horizon_days": horizon_days,
@@ -120,9 +165,12 @@ def predict_et0_with_fallback(
             "missing_feature_values_imputed": imputed_values,
             "fallback_reason": None,
         }
+        result.update(_baseline_values(data, target_day))
+        return result
     except (FileNotFoundError, KeyError, TypeError, ValueError, json.JSONDecodeError) as exc:
-        result = _persistence(history, target_day, str(exc))
+        result = _physical_fallback(history, target_day, str(exc))
         result.update({"station_code": station_code, "target_date": target_day.isoformat()})
+        result.update(_baseline_values(history, target_day))
         return result
 
 
@@ -189,7 +237,7 @@ def predict_live_et0(
     manifest_path: Path = MANIFEST,
     model_dir: Path = MODEL_DIR,
 ) -> dict:
-    """Consulta SiAR hasta t-1 y elige h=1 o h=2 según el último dato."""
+    """Consulta SiAR hasta t-1 y elige un horizonte validado entre h=1 y h=7."""
 
     if lookback_days < 14:
         raise ValueError("El periodo operativo debe cubrir al menos 14 días.")
@@ -205,7 +253,9 @@ def predict_live_et0(
         fallback = fallback_history if fallback_history is not None else pd.DataFrame(
             columns=["date", "et0_mm"]
         )
-        result = _persistence(fallback, target_day, f"fallo del extractor SiAR: {exc}")
+        result = _physical_fallback(
+            fallback, target_day, f"fallo del extractor SiAR: {exc}"
+        )
         result.update({"station_code": station_code.upper(), "target_date": target_day.isoformat()})
         return result
     return predict_et0_with_fallback(

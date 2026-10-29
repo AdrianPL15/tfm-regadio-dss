@@ -1,0 +1,36 @@
+{
+  "experiment": "ET0 multianual: prueba operativa h=1/h=7",
+  "issued_at": "2026-10-29",
+  "target_date": "2026-10-29",
+  "results": [
+    {
+      "station_code": "BA08",
+      "query_start": "2026-08-30",
+      "query_end": "2026-10-28",
+      "records": 60,
+      "last_observation_date": "2026-10-28",
+      "prediction": {
+        "et0_mm": 2.3068423515880037,
+        "method": "ridge_et0_multiyear_h1",
+        "horizon_days": 1,
+        "station_code": "BA08",
+        "target_date": "2026-10-29",
+        "artifact": "ridge_et0_BA08.joblib",
+        "artifact_sha256": "511003c7f9e91e56a0b1f59b9e8fe20f45d677e169ae614d57b6bd0b4f916974",
+        "model_trained_through": "2025-12-31",
+        "external_test_ridge_mae_mm_day": 0.4026961540345424,
+        "external_test_persistence_mae_mm_day": 0.4664931506849315,
+        "external_test_mean_7d_mae_mm_day": 0.5051389432485324,
+        "missing_feature_columns_imputed": [],
+        "missing_feature_values_imputed": [],
+        "fallback_reason": null,
+        "baseline_mean_7d_mm": 2.3303857285714287,
+        "baseline_persistence_mm": 2.1535814
+      },
+      "prospective_record_created": true,
+      "provisional_snapshot": "data/raw/siar/provisional_et0/issued=2026-10-29/station=BA08.csv",
+      "validated_comparison_status": "pending_future_requery"
+    }
+  ],
+  "provisional_vs_validated": "Los valores quedan archivados como snapshot provisional. La comparación solo podrá cerrarse al volver a consultar esas mismas fechas después de su validación por SiAR."
+}

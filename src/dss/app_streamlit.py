@@ -40,6 +40,7 @@ from src.dss.live_calendar import (  # noqa: E402
 )
 from src.dss.predict_etc import ModelUnavailable, predict_tomorrow_etc  # noqa: E402
 from src.dss import predict_et0 as et0_model  # noqa: E402
+from src.dss.et0_prospective import record_prediction  # noqa: E402
 
 
 st.set_page_config(page_title="DSS de riego", layout="wide")
@@ -232,6 +233,12 @@ with st.sidebar:
                     client=siar_provider,
                     fallback_history=history,
                 )
+                try:
+                    record_prediction(et0_result)
+                except (OSError, KeyError, TypeError, ValueError):
+                    # El registro prospectivo es evidencia auxiliar y nunca debe
+                    # impedir que el agricultor obtenga su recomendación.
+                    pass
                 st.session_state[et0_key] = et0_result
             if et0_result["method"].startswith("ridge_et0_multiyear_h"):
                 st.success(

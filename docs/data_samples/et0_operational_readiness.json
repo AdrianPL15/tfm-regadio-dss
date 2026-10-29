@@ -8,15 +8,30 @@
   "available_horizons_by_station": {
     "AL01": [
       1,
-      2
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
     ],
     "Z06": [
       1,
-      2
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
     ],
     "BA08": [
       1,
-      2
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
     ]
   },
   "required_daily_observation_columns": [
@@ -72,5 +87,5 @@
   "ridge_integration_gate": "experimental_streamlit_integration_ready",
   "fallback_enabled": true,
   "required_next_component": "Conservar snapshots provisionales y compararlos con los valores SiAR validados cuando estén disponibles; vigilar error y latencia.",
-  "decision": "La rama experimental puede usar Ridge h=1/h=2 cuando el último dato SiAR lo permite. Si no, mantiene la media reciente y la persistencia trazable."
+  "decision": "La rama experimental puede usar Ridge h=1…7 cuando el último dato SiAR lo permite. Si no, mantiene la media reciente y, en último término, la persistencia trazable."
 }
