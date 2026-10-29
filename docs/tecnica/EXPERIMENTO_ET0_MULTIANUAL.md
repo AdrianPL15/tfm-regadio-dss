@@ -2,11 +2,13 @@
 
 ## Alcance y separación de la entrega
 
-Este trabajo se desarrolla en `codex/experimento-et0-multianual` y no modifica
-la versión estable del TFM ni la memoria. Su objetivo es comprobar si una
-predicción de ET0 entre uno y nueve días mejora las referencias físicas antes de
-decidir si merece incorporarse al DSS. La integración con Streamlit existe
-únicamente en esta rama experimental; `main` permanece sin cambios.
+Este documento conserva la trazabilidad técnica completa del experimento ya
+integrado de forma controlada en `main`. Su objetivo es comprobar si una
+predicción de ET0 entre uno y nueve días mejora las referencias físicas y bajo
+qué condiciones puede participar en el DSS. No forma parte íntegra de la
+memoria: el texto académico condensado se encuentra en el apartado 4.3.13 y en
+[`SINTESIS_ET0_PARA_MEMORIA.md`](SINTESIS_ET0_PARA_MEMORIA.md). Aquí se mantienen
+el protocolo, las evidencias reproducibles y la bitácora resumida para auditoría.
 
 La ET0 es una variable meteorológica asociada a la estación, no al cultivo. La
 transformación agronómica se realiza después mediante `ETc = ET0 × Kc`. En el
@@ -346,18 +348,17 @@ procede mantenerlo separado de la entrega estable:
    consulta;
 7. que un intervalo bootstrap cruce cero no invalida el modelo, pero impide
    presentar esa ventana individual como una mejora estadísticamente concluyente;
-8. la validación prospectiva está iniciada, pero necesita al menos 30 días
-   cerrados —preferiblemente 60— antes de apoyar una decisión de despliegue.
+8. la validación prospectiva está iniciada, pero necesita al menos 30 casos
+   consolidados y pareados antes de mantener Ridge por evidencia viva.
 
-La decisión provisional pasa a ser **candidato favorable a integración
-controlada**, no integración automática. Los horizontes de uno a nueve días se
+La decisión es una **integración operativa controlada**, no una sustitución
+incondicional del método físico. Los horizontes de uno a nueve días se
 serializan porque cumplen la regla predefinida de 9/9 victorias puntuales frente
-a la media móvil. La rama experimental selecciona el horizonte según la fecha
-del último dato. La media reciente de siete días, calculada con al menos tres
-observaciones, continúa siendo el primer respaldo físico; la persistencia solo
-se usa cuando tampoco existe esa ventana mínima. La fusión en la aplicación
-estable se decidirá después de revisar esta rama y acumular evidencia
-prospectiva suficiente.
+a la media móvil. La aplicación selecciona el horizonte según la fecha del
+último dato. La media reciente de siete días, calculada con al menos tres
+observaciones, continúa siendo el primer respaldo; la persistencia solo se usa
+cuando tampoco existe esa ventana mínima. La puerta prospectiva puede devolver
+automáticamente el sistema a la media de siete días.
 
 ## Preparación técnica para una integración controlada
 
@@ -373,7 +374,7 @@ para AL01, Z06 y BA08— se conservan en
 - nombre y huella SHA-256 del artefacto;
 - versiones de Python, NumPy, pandas, scikit-learn y joblib usadas al exportar;
 - regla de selección y número de victorias frente a media 7 días por horizonte;
-- estado explícito `experimental_not_deployed`.
+- estado explícito `operational_controlled_with_fallback`.
 
 La inferencia de `src/dss/predict_et0.py` calcula la distancia entre el último
 dato y la fecha objetivo y selecciona `h=1…9`. Exige al menos tres
@@ -396,7 +397,7 @@ separado de aportar la lluvia prevista que se descuenta tras `ET0 × Kc`.
 
 ## Auditoría de preparación operativa
 
-### Estado final de esta rama
+### Estado final integrado
 
 - se consulta una vez el histórico reciente de cada estación y se generan siete
   fechas con artefactos `h=1…9`, según la latencia real;
@@ -413,81 +414,24 @@ separado de aportar la lluvia prevista que se descuenta tras `ET0 × Kc`.
 
 ### Bitácora de incidencias ya resueltas
 
-La primera auditoría `src/analysis/audit_et0_operational_readiness.py` detectó
-que los CSV de necesidades hídricas usados por Streamlit no satisfacían el
-contrato de Ridge. Esos ficheros aportan fecha, Kc, ET0, ETc, Pe y necesidad
-neta, pero no las series completas de temperatura, humedad, viento, radiación
-y precipitación observada del experimento. Por ello no se imputaron columnas
-enteras ni se atribuyeron a ese escenario las métricas de 2025. La brecha se
-resolvió consultando directamente las observaciones diarias de la API SiAR y
-normalizándolas con el adaptador probado de `src/dss/predict_et0.py`.
+La bitácora no describe el estado vigente; documenta problemas encontrados y
+su resolución para que no se confundan con limitaciones todavía abiertas.
 
-AEMET tampoco debe rellenar esas columnas: el producto municipal disponible
-aporta lluvia prevista y su probabilidad, no las observaciones SiAR de la
-estación en `t-1`. Su papel permanece separado y correcto: descontar una sola
-vez la lluvia prevista después de obtener `ETc = ET0 × Kc`.
+| Incidencia detectada | Resolución aplicada | Evidencia principal |
+|---|---|---|
+| Los CSV de necesidades no incluían todas las variables de Ridge | Adaptador directo de observaciones diarias SiAR; no se imputan columnas completas | `et0_operational_readiness.json` |
+| La latencia SiAR exigía más de un paso para recomendar hoy | Modelos independientes y versionados para `h=1…9` | `et0_live_siar_smoke_latest.json` |
+| Z06 devolvía menos histórico que el solicitado | Máximo de una entrada imputada; después, media 7 días o no disponibilidad | `et0_z06_60day_live_check.json` |
+| El selector terminaba en el último día del CSV | Extensión exclusiva de Kc hasta siete días, dentro del mismo mes y con `Kc > 0` | pruebas de la aplicación |
+| Faltaba comprobar el flujo completo | Prueba viva en coliflor/AL01, alfalfa/Z06 y alcachofa/BA08 | `et0_streamlit_smoke_latest.json` |
+| Los valores SiAR recientes podían revisarse | Conservación del primer valor, recuento de revisiones y consolidación tras siete días | `et0_prospective_validation_latest.json` |
 
-Se implementó después un adaptador de la API SiAR que normaliza las
-observaciones diarias al esquema del entrenamiento. La prueba real realizada
-el 29 de octubre de 2026 sobre AL01 recuperó 29 registros, todos con ET0 y
-calidad `PASS`, pero la última observación disponible correspondía al 27 de
-octubre. Para recomendar el día 29 había que proyectar dos pasos y, en ese
-momento, el experimento solo había validado uno. El sistema activó correctamente
-persistencia en vez de extrapolar fuera de su alcance. La evaluación posterior
-del horizonte dos no altera retroactivamente esa decisión segura.
-
-La auditoría original registró el estado
-`blocked_siar_publication_lag_for_same_day`. La barrera se resolvió en esta rama
-al validar y versionar `h=1…9`. La primera prueba viva del 29 de octubre recuperó
-datos hasta el día 27 en las tres estaciones y seleccionó automáticamente
-`ridge_et0_multiyear_h2`: 2,314 mm en AL01, 2,121 mm en Z06 y 2,269 mm en BA08
-para el día 29. AL01 y BA08 no necesitaron imputaciones; Z06 imputó únicamente
-el retardo de 14 días porque la API devolvió una serie continua de 12 jornadas.
-AEMET no publica ET0: su lluvia prevista se descuenta después de `ET0 × Kc`.
-El informe de preparación se guarda en
-`docs/data_samples/et0_operational_readiness.json` y la evidencia de la prueba
-real en `docs/data_samples/et0_live_siar_smoke_latest.json`.
-
-Una consulta posterior de 60 días confirmó 60 observaciones hasta el día 28 en
-AL01 y BA08 y ejecutó `h=1` sin imputaciones. SiAR rechazó en el primer lote las
-consultas siguientes por superar su cuota, por lo que se repitió Z06 de forma
-aislada. Aunque se solicitaron 60 días, el proveedor devolvió 13 observaciones
-continuas hasta el día 28; `h=1` pudo ejecutarse imputando únicamente
-`et0_lag_14d`. El umbral operativo admite como máximo una imputación; con dos o
-más se activa la media física de siete días. La evidencia específica queda en
-`docs/data_samples/et0_z06_60day_live_check.json`; la comprobación equivalente
-de BA08 queda en `et0_ba08_60day_live_check.json`. Esta limitación confirma que
-un intervalo solicitado no garantiza la misma cobertura en todas las
-estaciones y que las consultas masivas deben escalonarse.
-
-El botón de la interfaz experimental reúne las tres operaciones sin mezclarlas:
-actualiza el calendario y Kc del cultivo desde SiAR, obtiene ET0 mediante el
-artefacto compatible con la latencia y consulta a AEMET para descontar una sola
-vez la lluvia prevista aprovechable. Si falla cualquiera de las fuentes, el
-motor conserva el respaldo físico y muestra la causa al usuario.
-
-La prueba visual detectó además que el selector de fecha seguía limitado por el
-último día del CSV local. Se corrigió para admitir hoy y mañana cuando el Kc
-publicado tenga como máximo siete días, permanezca dentro del mismo mes activo
-y sea positivo. Solo se prolonga Kc, una magnitud de fase fenológica; ET0,
-lluvia y necesidad observadas no se fabrican. La interfaz declara la fecha desde
-la que se prolonga y rechaza automáticamente una antigüedad mayor.
-
-El recorrido completo se ejecutó el 29 de octubre en los tres casos activos:
-coliflor/AL01, alfalfa/Z06 y alcachofa/BA08. SiAR añadió dos jornadas y quedó en
-el día 27, el selector eligió Ridge `h=2` y AEMET respondió en los tres casos.
-Las dosis visibles fueron respectivamente 2,5, 2,0 y 2,4 L/m². La lluvia
-restante publicada fue 0,0 mm, por lo que no hubo descuento en esta ejecución.
-La evidencia redondeada de la interfaz se conserva en
-`docs/data_samples/et0_streamlit_smoke_latest.json`.
-
-Las instantáneas normalizadas de esta prueba se conservan localmente fuera del
-control de versiones. Una reconsulta realizada el mismo 29 de octubre no
-detectó cambios en ninguna de las once variables comparadas de AL01, Z06 o
-BA08. Este resultado solo verifica el comparador: no acredita que los valores
-sean definitivos. `src/analysis/compare_et0_provisional_snapshot.py` permite
-repetir la comparación más adelante y separa revisiones de valores, fechas
-nuevas y fechas desaparecidas.
+Las instantáneas brutas de las pruebas vivas permanecen fuera de Git por ser
+regenerables. Los informes públicos conservan valores redondeados, fechas,
+métodos y causas de respaldo. La separación funcional es única en todo el
+sistema: SiAR aporta observaciones y Kc; Ridge o la referencia física estiman
+ET0; AEMET aporta únicamente la precipitación prevista que se descuenta una vez
+después de `ETc = ET0 × Kc`.
 
 ## Validación prospectiva
 
@@ -563,12 +507,15 @@ como garantía.
 - `docs/data_samples/et0_multiyear_robustness_predictions.csv` y
   `et0_multiyear_robustness_uncertainty.csv`: pares diarios e intervalos por
   bloques para los nueve horizontes.
+- `docs/data_samples/et0_multiyear_uncertainty_by_horizon.csv`: clasificación
+  de los 243 intervalos por comparación y horizonte.
 
 Las pruebas automatizadas comprueban los objetivos de uno a nueve días, el uso de
 retardos de calendario reales, la ausencia de fuga temporal, la calidad del
 calendario, la reproducibilidad del bootstrap, la integridad SHA-256 de los
 artefactos, los respaldos y la aplicación única de Kc y precipitación. La
-verificación específica de esta ampliación suma 32 pruebas superadas y
-compilación correcta de `src`, además de una consulta real satisfactoria en las
-tres estaciones. La batería completa de la entrega y la fusión en `main` se
-mantienen como puertas deliberadas de revisión, no como resultados ya aprobados.
+integración específica se incluye en la batería completa de 150 pruebas
+superadas, junto con la compilación correcta de `src` y una consulta real
+satisfactoria en las tres estaciones. La permanencia de Ridge se somete además
+a la puerta prospectiva; la integración en `main` no elimina el respaldo ni
+convierte la prueba viva en validación agronómica.

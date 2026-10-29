@@ -42,7 +42,7 @@ def export_models(
 ) -> dict:
     model_dir.mkdir(parents=True, exist_ok=True)
     manifest: dict[str, object] = {
-        "status": "experimental_not_deployed",
+        "status": "operational_controlled_with_fallback",
         "model_family": "Ridge",
         "target": "ET0 de uno a nueve días (mm/día)",
         "training_policy": "reajuste final con 2021-2025 tras evaluación externa congelada en 2025",

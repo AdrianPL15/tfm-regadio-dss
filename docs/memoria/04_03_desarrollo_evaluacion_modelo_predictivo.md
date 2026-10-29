@@ -377,6 +377,17 @@ favorecieron al completo, 74 cruzaron cero y cinco favorecieron al reducido.
 El desglose completo queda versionado en
 `docs/data_samples/et0_multiyear_uncertainty_by_horizon.csv`.
 
+**Tabla 4.18. Síntesis del experimento multianual de ET0 y su decisión de uso.**
+
+| Elemento | Evidencia | Decisión |
+|---|---|---|
+| Diseño temporal | Origen rodante 2023–2025, entrenando solo con años anteriores | Evita mezclar futuro y entrenamiento |
+| Alcance | Tres estaciones, nueve horizontes y 81 ventanas estación-año-horizonte | Permite cubrir siete fechas pese a la latencia SiAR |
+| Ridge frente a media 7 días | 63 intervalos favorables y 18 no concluyentes; ninguno favorece la referencia | Integración controlada con respaldo físico |
+| Ridge frente a persistencia estacional | 81 intervalos favorables | Confirma mejora frente a una segunda referencia temporal |
+| Aporte de variables auxiliares | 74 intervalos no concluyentes, 2 favorables al modelo completo y 5 al reducido | No se atribuye una mejora estable a esas variables |
+| Control operativo | 30 casos pareados, ventana móvil de 60 y mejora mínima del 5 % | Retorno automático a media 7 días si se degrada |
+
 La cobertura retrospectiva de 2026 fue aproximadamente 97 % con Ridge en AL01
 y BA08. En Z06, SiAR solo devolvió 13 jornadas para enero–octubre y Ridge tuvo
 0 % de cobertura tras exigir 14 observaciones completas. El sistema no fabrica
@@ -394,4 +405,6 @@ físico. El manifiesto fija un reentrenamiento anual tras cerrar y auditar la
 campaña. La documentación completa y las 243
 comparaciones bootstrap se conservan en
 [`SINTESIS_ET0_PARA_MEMORIA.md`](../tecnica/SINTESIS_ET0_PARA_MEMORIA.md) y en
-los ficheros de evidencia del repositorio.
+los ficheros de evidencia del repositorio. La batería final de 150 pruebas
+incluye la ausencia de fuga temporal, las ventanas completas, los horizontes,
+la integridad de los artefactos y la activación del respaldo.
