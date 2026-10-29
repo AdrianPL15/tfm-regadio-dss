@@ -21,7 +21,6 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
-from xgboost import XGBRegressor
 
 
 DEFAULT_INPUT = Path("data/interim/et0_history_AL01_2021_2025.csv")
@@ -88,6 +87,12 @@ def build_feature_table(
 
 
 def _models() -> dict[str, object]:
+    # XGBoost solo es necesario durante el entrenamiento comparativo. Mantener
+    # esta importación diferida evita que la aplicación operativa dependa de la
+    # carga de su librería nativa cuando reutiliza únicamente la ingeniería de
+    # variables mediante ``build_feature_table``.
+    from xgboost import XGBRegressor
+
     return {
         "Ridge": Pipeline(
             [
