@@ -38,7 +38,9 @@ multianual por horizonte y descuenta la lluvia AEMET disponible, pero su
 validación prospectiva acaba de comenzar y aún no contiene 30 casos
 consolidados. Además, la simulación retrospectiva con ventanas completas
 alcanza una cobertura cercana al 97 % en AL01 y BA08, pero 0 % para Ridge en
-la consulta operativa de Z06 que solo devolvió 13 jornadas continuas. Ese
+la consulta operativa de Z06 que solo devolvió 13 jornadas continuas. No se ha
+determinado si esta devolución parcial responde a una incidencia, a un retraso
+de publicación o a una limitación de la consulta. Ese
 porcentaje no describe el CSV agronómico de alfalfa, que contiene 239
 jornadas, ni implica que Ridge sea siempre imposible: la consulta pública
 repetida el 30 de octubre de 2026 volvió a devolver 13 registros; permitió

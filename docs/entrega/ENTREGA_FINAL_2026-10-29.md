@@ -1,5 +1,10 @@
 # Guía de la entrega del TFM
 
+Estado reproducible de la entrega: etiqueta
+[`v1.0.6-entrega-final`](https://github.com/AdrianPL15/tfm-regadio-dss/tree/v1.0.6-entrega-final)
+de la rama `main`. Esta referencia fija el código, los artefactos y las
+evidencias utilizados en la memoria.
+
 Fecha de última comprobación técnica: 30 de octubre de 2026.
 
 ## Archivos que se presentan

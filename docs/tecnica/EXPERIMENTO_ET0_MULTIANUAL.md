@@ -342,7 +342,9 @@ objetivo del día 30 activó `mean_7d_fallback`, porque habrían sido necesarias
 dos imputaciones y la política admite como máximo una. Por tanto, el 0 % de la
 simulación con ventanas completas no debe presentarse como indisponibilidad
 absoluta de Ridge: la cobertura efectiva depende del horizonte y del número de
-entradas ausentes. La evidencia viva queda archivada en
+entradas ausentes. La evidencia disponible no permite determinar si la
+devolución parcial de Z06 responde a una incidencia, a un retraso de
+publicación o a una limitación de la consulta. La evidencia viva queda archivada en
 `docs/data_samples/et0_z06_60day_live_check.json`.
 
 ## Limitaciones y decisión provisional

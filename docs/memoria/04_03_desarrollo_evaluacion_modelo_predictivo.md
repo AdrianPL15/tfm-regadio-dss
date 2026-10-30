@@ -398,8 +398,10 @@ disponibilidad de la serie ET0 consultada. El CSV de alfalfa Z06 contiene 239
 jornadas de campaña, pero una consulta concreta al servicio de datos devolvió
 solo 13 jornadas continuas para la ventana solicitada. Tras exigir 14
 observaciones completas, aquella ejecución tuvo 0 % de cobertura Ridge. Esta
-cifra describe una limitación de esa consulta y del flujo operativo, no una
-ausencia estructural de datos en la estación. AL01 y BA08 alcanzaron
+cifra describe el resultado de esa consulta y del protocolo de ventanas
+completas. Con la evidencia disponible no se ha determinado si la devolución
+parcial obedece a una incidencia, a un retraso de publicación o a una
+limitación de la consulta. AL01 y BA08 alcanzaron
 aproximadamente un 97 % de cobertura. Cuando faltan ventanas completas, el
 sistema usa media 7 días durante un máximo de siete días y después declara la
 recomendación no disponible.
