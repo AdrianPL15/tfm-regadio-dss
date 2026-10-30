@@ -47,7 +47,7 @@ fijar la longitud de esa ventana se evaluaron cinco alternativas, de uno a
 catorce días, simulando emisiones diarias con horizontes de uno a siete días.
 Para mantener la coherencia con el capítulo 4, se utilizó para la evaluación
 el mismo tramo, del 8 al 30 de septiembre, y la selección de ventana se hizo
-únicamente con el periodo de desarrollo. No se trata de una segunda prueba
+únicamente con objetivos anteriores al 8 de septiembre, excluyendo los objetivos de prueba de emisiones anteriores al corte. No se trata de una segunda prueba
 independiente: esas fechas ya habían sido consultadas en el experimento del
 capítulo 4. Como criterio se fijó, antes de calcular los
 resultados, elegir la ventana más corta cuyo error no superase al mínimo en más
@@ -57,11 +57,11 @@ de un 1 %, porque una ventana corta reacciona antes ante un cambio de tiempo.
 
 | Ventana | Desarrollo | Prueba |
 |---:|---:|---:|
-| 1 día | 0,517 | 0,127 |
-| 3 días | 0,494 | 0,110 |
-| 5 días | 0,484 | 0,101 |
-| 7 días | **0,471** | **0,101** |
-| 14 días | 0,469 | 0,124 |
+| 1 día | 0,525 | 0,127 |
+| 3 días | 0,503 | 0,110 |
+| 5 días | 0,493 | 0,101 |
+| 7 días | **0,480** | **0,101** |
+| 14 días | 0,478 | 0,124 |
 
 Las ventanas de siete y catorce días son prácticamente equivalentes en
 desarrollo, con una diferencia de 0,002 mm, y el criterio selecciona la de
@@ -118,10 +118,7 @@ campaña.
 El sesgo del sistema es ligeramente positivo, de 0,04 a 0,05 mm al día. Tiende
 por tanto a recomendar algo más de agua que la referencia, sobre todo en
 septiembre, cuando la ET0 desciende de forma sostenida y la media de los siete
-días anteriores queda siempre por encima del valor del día. En una herramienta
-de apoyo al riego un sesgo pequeño y positivo es preferible a uno negativo,
-porque el déficit hídrico tiene consecuencias más difíciles de revertir que un
-ligero exceso. Aun así, a lo largo de la campaña ese sesgo se traduce en 535,2
+días anteriores queda siempre por encima del valor del día. La conveniencia agronómica de ese exceso depende del cultivo, la fase y el suelo; no se ha evaluado en este trabajo. Aun así, a lo largo de la campaña ese sesgo se traduce en 535,2
 mm recomendados frente a 528,7 mm de referencia en los mismos días, un 1,2 %
 más, y esta cifra debe tenerse presente si el sistema se utiliza para
 planificar volúmenes.

@@ -2,7 +2,7 @@
 
 [![Pruebas automáticas](https://github.com/AdrianPL15/tfm-regadio-dss/actions/workflows/ci.yml/badge.svg)](https://github.com/AdrianPL15/tfm-regadio-dss/actions/workflows/ci.yml)
 [![Aplicación Streamlit](https://img.shields.io/badge/Streamlit-aplicación%20pública-FF4B4B?logo=streamlit&logoColor=white)](https://tfm-regadio-dss-adrianpl15.streamlit.app/)
-[![Versión estable](https://img.shields.io/badge/versión-v1.0.6--entrega--final-2ea44f)](https://github.com/AdrianPL15/tfm-regadio-dss/tree/v1.0.6-entrega-final)
+[![Versión estable](https://img.shields.io/badge/versión-v1.0.7--entrega--final-2ea44f)](https://github.com/AdrianPL15/tfm-regadio-dss/tree/v1.0.7-entrega-final)
 
 Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apoyo a la decisión (DSS) orientado a estimar las necesidades de riego de distintos tipos de cultivo a partir de variables meteorológicas, agrometeorológicas e hidrológicas, con el fin de ofrecer recomendaciones de riego comprensibles y trazables para agricultores, cooperativas y gestores de explotaciones.
 
@@ -14,7 +14,7 @@ Trabajo Fin de Máster en Data Science. El proyecto desarrolla un sistema de apo
 | Observaciones activas y completas | 1.584 |
 | Combinaciones cultivo-estación evaluadas | 6 |
 | Enfoques comparados por caso | 6 |
-| Pruebas automáticas | 150 superadas |
+| Pruebas automáticas | 159 superadas |
 | Escenarios técnicos del DSS | 13 de 13 superados |
 | MAE diario del DSS en la prueba del piloto | 0,09 mm/día |
 | Error semanal relativo del piloto | 4,8 % |
@@ -87,6 +87,12 @@ El proyecto distingue entre tecnologías utilizadas en el prototipo y componente
 - Condicional: un motor SQL distribuido como Trino y, solo si las mediciones de volumen y latencia lo justifican, procesamiento distribuido; no son necesarios para el piloto actual.
 
 Para reproducir el entorno de Python se puede usar indistintamente `environment.yml` (conda) o `requirements.txt` (pip y entornos virtuales). Se recomienda trabajar siempre dentro de un entorno virtual propio del proyecto para evitar conflictos de versiones entre los distintos miembros del equipo.
+
+## Entorno reproducible de entrega
+
+Para reproducir la entrega con Python 3.12: python -m pip install -r requirements-reproducible.txt. Este archivo fija también las dependencias indirectas e incluye marcadores para Windows y Linux. La aplicación mantiene sus requisitos mínimos en src/dss/requirements.txt.
+
+El aviso de fecha fuera de ciclo o datos no vigentes se muestra junto a la fecha y en el área principal, antes de la dosis. El selector ET0 conserva tanto el respaldo como la abstención hasta el resultado final.
 
 ## Cómo empezar
 

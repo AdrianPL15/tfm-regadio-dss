@@ -38,9 +38,9 @@ from src.dss.live_calendar import (  # noqa: E402
     MAX_KC_STALENESS_DAYS,
     extend_recent_kc,
 )
-from src.dss.predict_etc import ModelUnavailable, predict_tomorrow_etc  # noqa: E402
 from src.dss import predict_et0 as et0_model  # noqa: E402
 from src.dss.et0_prospective import record_prediction  # noqa: E402
+from src.dss.consultation_status import availability_notice  # noqa: E402
 
 
 st.set_page_config(page_title="DSS de riego", layout="wide")
@@ -225,6 +225,12 @@ with st.sidebar:
             "se cuenta desde la última observación SiAR, no desde hoy."
         ),
     )
+    date_notice = availability_notice(
+        history, metadata, issue=issue, today=today,
+        planning=mode == "planificacion", live_case=live_case, horizon=horizon,
+    )
+    if date_notice:
+        st.warning(date_notice)
     if generate and operational_view:
         try:
             with st.spinner("Calculando ET0 con observaciones recientes de SiAR…"):
@@ -275,19 +281,6 @@ with st.sidebar:
                 f"Kc prolongado desde el último dato SiAR publicado ({last_day:%d/%m/%Y}); "
                 "no se prolongan ET0, lluvia ni necesidad observadas."
             )
-    if case.campaign_year == today.year and not live_case:
-        if today.month not in metadata.get("active_months", []) or float(history["kc"].iloc[-1]) <= 0:
-            st.warning(
-                "No hay predicción actual: este cultivo figura fuera de su periodo "
-                "de ciclo en SiAR (Kc nulo o mes no activo). Hay datos históricos, "
-                "pero no se aplicará la previsión AEMET de hoy."
-            )
-        else:
-            st.warning(
-                "No hay predicción actual: falta una observación SiAR reciente y "
-                "completa. Prueba a actualizar las fuentes."
-            )
-
     st.header("Parcela")
     system = st.selectbox("Sistema de riego", list(IRRIGATION_EFFICIENCY), index=0)
     efficiency = st.slider(
@@ -331,6 +324,10 @@ with st.sidebar:
             "que quedan; para mañana se exige el día completo con mm numéricos."
         )
 
+# Aviso principal visible sin tener que bajar por la barra lateral.
+if date_notice:
+    st.warning(date_notice)
+
 live_forecast = st.session_state.get(aemet_key)
 forecast_input = None
 if live_forecast is not None:
@@ -373,8 +370,16 @@ try:
         if operational_view else history
     )
     model_estimate = None
+    et0_predictions = None
     if operational_view:
-        et0_predictions = st.session_state.get(et0_key, {})
+        et0_predictions = st.session_state.get(et0_key)
+        if et0_predictions is None:
+            et0_predictions = {
+                day.isoformat(): et0_model._physical_fallback(
+                    history, day, "Actualiza las fuentes para consultar Ridge; se usa el respaldo guardado."
+                )
+                for day in [issue + timedelta(days=offset) for offset in range(horizon)]
+            }
         model_estimates = {}
         for target_date in [issue + timedelta(days=offset) for offset in range(horizon)]:
             prediction = et0_predictions.get(target_date.isoformat())
@@ -391,11 +396,6 @@ try:
                     prediction, float(target_row["kc"].iat[0])
                 )
         model_estimate = model_estimates.get(issue.isoformat())
-        if model_estimate is None:
-            try:
-                model_estimate = predict_tomorrow_etc(case, calculation_history, issue)
-            except (ModelUnavailable, OSError, ImportError) as error:
-                st.warning(f"Modelo no disponible; se usa el cálculo físico SiAR: {error}")
     result = recommend(
         request, history=calculation_history, metadata=metadata,
         forecast=forecast_input,
@@ -406,6 +406,7 @@ try:
         model_estimates=(
             model_estimates if operational_view and model_estimates else None
         ),
+        et0_predictions=et0_predictions,
     )
 except ValueError as error:
     st.error(str(error))
@@ -506,11 +507,13 @@ if horizon > 1:
         f"{horizon} días · orientación"
     )
     col1, col2, col3 = st.columns(3)
-    col1.metric("Riego total estimado", f"{fmt_es(summary['gross_dose_total_mm'])} L/m²")
+    col1.metric("Riego total estimado", f"{fmt_es(summary['gross_dose_total_mm'])} L/m²"
+                if summary["days_with_recommendation"] else "sin datos")
     col2.metric(
         "Para tu parcela en total",
         f"{fmt_es(summary['volume_total_m3'], 0)} m³"
-        if summary["volume_total_m3"] is not None else "indica superficie",
+        if summary["volume_total_m3"] is not None and summary["days_with_recommendation"]
+        else "sin datos" if not summary["days_with_recommendation"] else "indica superficie",
     )
     col3.metric(
         "Días calculables",

@@ -22,27 +22,27 @@
     "mae_by_window": [
       {
         "window_days": 1,
-        "desarrollo": 0.517,
+        "desarrollo": 0.525,
         "prueba": 0.127
       },
       {
         "window_days": 3,
-        "desarrollo": 0.494,
+        "desarrollo": 0.503,
         "prueba": 0.11
       },
       {
         "window_days": 5,
-        "desarrollo": 0.484,
+        "desarrollo": 0.493,
         "prueba": 0.101
       },
       {
         "window_days": 7,
-        "desarrollo": 0.471,
+        "desarrollo": 0.48,
         "prueba": 0.101
       },
       {
         "window_days": 14,
-        "desarrollo": 0.469,
+        "desarrollo": 0.478,
         "prueba": 0.124
       }
     ],
@@ -272,9 +272,9 @@
     "passed": 13
   },
   "runtime": {
-    "seven_day_recommendation_ms_mean": 11.6,
-    "seven_day_recommendation_ms_max": 14.7,
-    "campaign_simulation_s": 1.01
+    "seven_day_recommendation_ms_mean": 32.8,
+    "seven_day_recommendation_ms_max": 39.5,
+    "campaign_simulation_s": 1.45
   },
   "limitations": [
     "La referencia es la necesidad calculada por SiAR, no el riego aplicado.",

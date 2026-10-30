@@ -130,3 +130,6 @@ al., 2016). El prototipo responde a esas condiciones con explicaciones en
 lenguaje llano, avisos visibles y un formato numérico adaptado al usuario
 español, pero mientras no se evalúe con usuarios reales su efecto sobre la toma
 de decisiones sigue siendo una hipótesis.
+
+
+Para valorar la adopción, el primer usuario propuesto es el técnico de una cooperativa que prepara recomendaciones para varias explotaciones. Un piloto debe comparar el tiempo de preparación con el proceso habitual, el porcentaje de consultas calculables, la comprensión de dosis y avisos y el coste mensual de operación y mantenimiento. El balance económico se estimaría como horas ahorradas por coste horario menos costes del servicio. Sin mediciones de uso y riego aplicado, tanto ese balance como cualquier ahorro de agua siguen siendo hipótesis.

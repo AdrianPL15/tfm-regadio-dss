@@ -12,6 +12,14 @@ APP_PATH = Path(__file__).resolve().parents[1] / "src/dss/app_streamlit.py"
 
 
 class IrrigationUnitsUiTests(unittest.TestCase):
+    def test_out_of_cycle_warning_is_visible_in_main_content(self):
+        app = AppTest.from_file(str(APP_PATH), default_timeout=30).run()
+        app.selectbox[2].select("Pimiento").run()
+        self.assertEqual(len(app.exception), 0)
+        # El mensaje no queda únicamente en la barra lateral.
+        self.assertTrue(any("No hay recomendación actual" in item.value
+                            for item in app.main.warning))
+
     def test_daily_depth_volume_and_weekly_outlook_are_visible(self):
         app = AppTest.from_file(
             str(APP_PATH), default_timeout=30
@@ -33,6 +41,7 @@ class IrrigationUnitsUiTests(unittest.TestCase):
         app = AppTest.from_file(str(APP_PATH), default_timeout=30).run()
         self.assertEqual(app.button[0].label, "Actualizar fuentes y generar recomendación")
         with (
+            patch("src.dss.et0_prospective.record_prediction", return_value=False),
             patch("src.data.refresh_siar_crop_needs.download_csv", return_value=source),
             patch("src.data.aemet_client.AEMETClient"),
             patch("src.dss.aemet_forecast.fetch_live_forecast", side_effect=AEMETError("prueba")),

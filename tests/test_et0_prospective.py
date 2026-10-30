@@ -9,6 +9,26 @@ from src.dss.et0_prospective import record_prediction, validate_log
 
 
 class Et0ProspectiveTests(unittest.TestCase):
+    def test_groups_cannot_compensate_each_other_or_count_as_thirty_days(self):
+        with TemporaryDirectory() as folder:
+            root = Path(folder)
+            log = root / "log.csv"
+            actuals = []
+            for station, predicted in [("AL01", 2.0), ("BA08", 2.5)]:
+                for day in pd.date_range("2026-09-01", periods=30):
+                    p = self._prediction()
+                    p.update(station_code=station, target_date=day.date().isoformat(),
+                             et0_mm=predicted, artifact_sha256=station)
+                    record_prediction(p, log_path=log)
+                    actuals.append({"date": day, "station_code": station, "et0_mm": 2.0})
+            result = validate_log(pd.DataFrame(actuals), log_path=log,
+                summary_path=root / "summary.json",
+                validated_at=datetime(2026, 11, 15, tzinfo=timezone.utc))
+            self.assertEqual(result["group_gates"]["AL01:h2"]["deployment_gate"], "ridge")
+            self.assertEqual(result["group_gates"]["BA08:h2"]["deployment_gate"], "physical_mean_7d")
+            self.assertEqual(result["distinct_target_dates"], 30)
+            self.assertEqual(result["records"], 60)
+
     def _prediction(self):
         return {
             "station_code": "AL01",

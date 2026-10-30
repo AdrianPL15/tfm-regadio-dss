@@ -121,6 +121,11 @@ def window_selection(history: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for window in WINDOW_CANDIDATES:
         errors = horizon_errors(history, window)
+        # La selección no puede conocer etiquetas del bloque reservado aunque
+        # la emisión de una predicción multihorizonte sea anterior al corte.
+        errors = errors.loc[~(
+            errors["period"].eq("desarrollo") & errors["target_date"].ge(TEST_START)
+        )]
         for period, group in errors.groupby("period"):
             rows.append(
                 {

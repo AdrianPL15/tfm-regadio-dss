@@ -47,6 +47,7 @@ RAIN_PROBABILITY_THRESHOLD_PCT = 60.0
 
 # Antigüedad máxima admitida del último dato observado.
 MAX_DATA_AGE_DAYS = 2
+MAX_FALLBACK_AGE_DAYS = 7
 
 
 @dataclass(frozen=True)

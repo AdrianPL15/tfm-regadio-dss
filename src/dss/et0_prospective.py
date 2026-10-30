@@ -224,6 +224,44 @@ def validate_log(
             "recientes y usar Ridge solo si reduce al menos un 5 % el MAE de la "
             "media física de 7 días."
         )
+        # El agregado anterior se conserva como diagnóstico, pero la operación
+        # decide por estación y horizonte, sin compensar grupos entre sí.
+        group_gates = {}
+        for (station, horizon), group in log.groupby(["station_code", "horizon_days"]):
+            paired = group.loc[group["status"].eq("consolidated")].copy()
+            for label, column in {
+                "actual": "actual_et0_latest_mm", "ridge": "prediction_et0_mm",
+                "mean_7d": "baseline_mean_7d_mm",
+            }.items():
+                paired[label] = pd.to_numeric(paired[column], errors="coerce")
+            paired = paired.dropna(subset=["actual", "ridge", "mean_7d"])
+            paired = paired.sort_values(["target_date", "issued_at_utc"]).drop_duplicates(
+                "target_date", keep="last"
+            ).tail(GATE_WINDOW_CASES)
+            n_dates = int(paired["target_date"].nunique())
+            ridge_mae = float((paired["ridge"] - paired["actual"]).abs().mean()) if n_dates else None
+            mean_mae = float((paired["mean_7d"] - paired["actual"]).abs().mean()) if n_dates else None
+            improvement = (100 * (mean_mae - ridge_mae) / mean_mae) if mean_mae else None
+            decision = (
+                "experimental_ridge_collecting_evidence" if n_dates < MINIMUM_GATE_CASES
+                else "ridge" if improvement is not None and improvement >= 100 * MINIMUM_RELATIVE_IMPROVEMENT
+                else "physical_mean_7d"
+            )
+            group_gates[f"{str(station).upper()}:h{int(horizon)}"] = {
+                "deployment_gate": decision, "distinct_target_dates": n_dates,
+                "gate_evaluation_cases": len(paired), "ridge_mae_mm_day": ridge_mae,
+                "mean_7d_mae_mm_day": mean_mae,
+                "observed_relative_improvement_pct": improvement,
+            }
+        summary["group_gates"] = group_gates
+        summary["operational_gate_scope"] = "station_and_horizon"
+        summary["distinct_target_dates"] = int(log["target_date"].nunique())
+        summary["gate_rule"] = (
+            "Decisión por estación y horizonte: al menos 30 fechas objetivo distintas, "
+            "consolidadas y pareadas; evaluar hasta las 60 más recientes y exigir "
+            "una mejora del MAE del 5 %. El agregado global es solo diagnóstico. "
+            "El umbral no constituye una prueba de significación estadística."
+        )
     summary_path.parent.mkdir(parents=True, exist_ok=True)
     summary_path.write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

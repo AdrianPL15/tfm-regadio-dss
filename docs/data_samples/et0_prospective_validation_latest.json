@@ -14,5 +14,8 @@
   "interpretation": "Registro prospectivo; no sustituye la evaluación rolling-origin hasta alcanzar una ventana temporal suficiente.",
   "deployment_gate": "experimental_ridge_collecting_evidence",
   "gate_reason": "faltan casos pareados: 0/30",
-  "gate_rule": "Con al menos 30 casos consolidados y pareados, evaluar los 60 más recientes y usar Ridge solo si reduce al menos un 5 % el MAE de la media física de 7 días."
+  "gate_rule": "Por estación y horizonte: al menos 30 fechas objetivo distintas, consolidadas y pareadas; hasta 60 fechas recientes; mejora mínima del MAE del 5 %. El agregado global es solo diagnóstico.",
+  "operational_gate_scope": "station_and_horizon",
+  "group_gates": {},
+  "snapshot_note": "Se conserva la instantánea publicada anterior; las decisiones por grupo se poblarán con la siguiente ejecución prospectiva."
 }

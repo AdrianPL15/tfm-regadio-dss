@@ -16,6 +16,7 @@ import pandas as pd
 from src.models.train_et0_multiyear import build_feature_table
 from src.data.siar_client import SiARClient, SiARError
 from src.data.transform_interim import normalize_siar_daily
+from src.dss.config import MAX_FALLBACK_AGE_DAYS
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -23,7 +24,6 @@ MODEL_DIR = ROOT / "models/experimental_et0_multiyear"
 MANIFEST = MODEL_DIR / "manifest.json"
 MONITORING_SUMMARY = ROOT / "docs/data_samples/et0_prospective_validation_latest.json"
 MAX_IMPUTED_FEATURE_VALUES = 1
-MAX_FALLBACK_AGE_DAYS = 7
 
 
 class SiARDailySource(Protocol):
@@ -113,9 +113,10 @@ def predict_et0_with_fallback(
     station_code = station_code.upper()
     try:
         manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        monitoring = {}
         if monitoring_path is not None and monitoring_path.exists():
             monitoring = json.loads(monitoring_path.read_text(encoding="utf-8"))
-            if monitoring.get("deployment_gate") == "physical_mean_7d":
+            if not monitoring.get("group_gates") and monitoring.get("deployment_gate") == "physical_mean_7d":
                 raise ValueError(
                     "la monitorización prospectiva ha activado la media física de 7 días"
                 )
@@ -126,6 +127,9 @@ def predict_et0_with_fallback(
         if data.empty:
             raise ValueError("no existen observaciones anteriores a la fecha objetivo")
         horizon_days = (target_day - data["date"].max().date()).days
+        group_gate = monitoring.get("group_gates", {}).get(f"{station_code}:h{horizon_days}", {})
+        if group_gate.get("deployment_gate") == "physical_mean_7d":
+            raise ValueError("la monitorización prospectiva de esta estación y horizonte activa el respaldo")
         horizons = station_entry.get("horizons")
         if horizons is None:
             if horizon_days != 1:

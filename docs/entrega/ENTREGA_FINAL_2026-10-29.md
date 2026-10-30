@@ -1,7 +1,7 @@
 # Guía de la entrega del TFM
 
 Estado reproducible de la entrega: etiqueta
-[`v1.0.6-entrega-final`](https://github.com/AdrianPL15/tfm-regadio-dss/tree/v1.0.6-entrega-final)
+[`v1.0.7-entrega-final`](https://github.com/AdrianPL15/tfm-regadio-dss/tree/v1.0.7-entrega-final)
 de la rama `main`. Esta referencia fija el código, los artefactos y las
 evidencias utilizados en la memoria.
 
@@ -29,7 +29,7 @@ Fecha de última comprobación técnica: 30 de octubre de 2026.
 | Interfaz desplegada | [Código Streamlit](../../src/dss/app_streamlit.py) |
 | Reutilización académica y operación | [Ficha del conjunto](../tecnica/DATASET_CARD.md), [principios FAIR](../tecnica/FAIR_Y_CITACION.md) y [plan MLOps](../tecnica/MLOPS_MONITORIZACION.md) |
 
-El 30/10/2026 se ejecutaron **150 pruebas correctas**, incluidas la ausencia de fuga temporal, el protocolo multicaso, XAI, ET0 h=1…9, monitorización prospectiva y las dos pruebas `AppTest` de Streamlit. La suite terminó correctamente en el entorno Windows normal. La consulta pública depende de los datos SiAR y AEMET disponibles en cada momento.
+El 30/10/2026 se ejecutaron **159 pruebas correctas**, incluidas la ausencia de fuga temporal, el protocolo multicaso, XAI, ET0 h=1…9, monitorización prospectiva y las dos pruebas `AppTest` de Streamlit. La suite terminó correctamente en el entorno Windows normal. La consulta pública depende de los datos SiAR y AEMET disponibles en cada momento.
 
 ## Alcance que debe explicarse
 

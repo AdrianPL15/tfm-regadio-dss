@@ -28,6 +28,7 @@ from src.dss.config import (
     EXTRAPOLATION_MARGIN,
     M3_PER_MM_HA,
     MAX_DATA_AGE_DAYS,
+    MAX_FALLBACK_AGE_DAYS,
     RAIN_AMOUNT_THRESHOLD_MM,
     RAIN_PROBABILITY_THRESHOLD_PCT,
     VALIDATED_HORIZON_DAYS,
@@ -36,13 +37,14 @@ from src.dss.config import (
 from src.dss.data_access import load_case, normalise_forecast
 
 
-ENGINE_VERSION = "1.1.0"
+ENGINE_VERSION = "1.2.0"
 
 METHOD_LABELS = {
     "referencia_siar": "Referencia SiAR observada (ET0 × Kc − Pe)",
     "et0_prevista": "ET0 prevista × Kc del calendario",
     "et0_reciente_kc": f"ET0 media de los últimos {ET0_WINDOW_DAYS} días × Kc del calendario",
     "persistencia": "Persistencia de la última necesidad neta conocida",
+    "et0_persistencia_kc": "Persistencia de ET0 × Kc del calendario",
     "modelo_etc": "Modelo SiAR de ETc previa a lluvia + previsión AEMET",
     "sin_recomendacion": "Sin datos suficientes para recomendar",
 }
@@ -156,6 +158,7 @@ def estimate_day(
     forecast_row: pd.Series | None,
     mode: str,
     model_etc_mm: float | None = None,
+    et0_prediction: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Estima la necesidad neta de un día y registra el origen del cálculo."""
 
@@ -179,6 +182,14 @@ def estimate_day(
         }
 
     kc = float(target["kc"])
+    if mode == "planificacion" and kc <= 0:
+        return {
+            "kc": kc, "et0_used_mm": np.nan, "et0_origin": "sin_dato",
+            "net_need_mm": np.nan, "method": "sin_recomendacion",
+            "persistence_baseline_mm": persistence,
+            "rules": ["R2 cultivo fuera de ciclo"],
+            "warnings": ["El Kc de SiAR es nulo; no se emite una dosis fuera del ciclo del cultivo."],
+        }
     if bool(target.get("kc_imputed", False)):
         if target.get("record_status") == "kc_proyectado_mes":
             warnings.append(
@@ -215,14 +226,38 @@ def estimate_day(
         )
         rules.append("R1 sustitución por ausencia de dato observado")
 
+    if mode == "planificacion" and et0_prediction is not None:
+        method = str(et0_prediction.get("method", "unavailable"))
+        value = et0_prediction.get("et0_mm")
+        if method == "unavailable" or value is None or not np.isfinite(float(value)):
+            return {
+                "kc": kc, "et0_used_mm": np.nan, "et0_origin": "unavailable",
+                "net_need_mm": np.nan, "method": "sin_recomendacion",
+                "persistence_baseline_mm": persistence,
+                "rules": ["R1 abstención del selector ET0"],
+                "warnings": warnings + [et0_prediction.get("fallback_reason") or "ET0 no disponible para esta fecha."],
+            }
+        if method in {"mean_7d_fallback", "persistence_fallback"}:
+            et0 = float(value)
+            if et0 < 0:
+                raise ValueError("La ET0 de respaldo debe ser no negativa.")
+            return {
+                "kc": kc, "et0_used_mm": et0, "et0_origin": method,
+                "net_need_mm": et0 * kc,
+                "method": "et0_reciente_kc" if method == "mean_7d_fallback" else "et0_persistencia_kc",
+                "persistence_baseline_mm": persistence,
+                "rules": rules + ["R1 respaldo ET0 elegido por el selector operativo"],
+                "warnings": warnings + [et0_prediction.get("fallback_reason") or "Se utiliza el respaldo físico ET0."],
+            }
+
     if mode == "planificacion" and model_etc_mm is not None:
         if not np.isfinite(model_etc_mm) or model_etc_mm < 0:
             raise ValueError("La ETc predicha por el modelo debe ser finita y no negativa.")
         rules.append("R0 ETc predicha por modelo SiAR antes de la lluvia prevista")
         return {
             "kc": kc,
-            "et0_used_mm": np.nan,
-            "et0_origin": "modelo_etc",
+            "et0_used_mm": float(et0_prediction["et0_mm"]) if et0_prediction is not None else np.nan,
+            "et0_origin": str(et0_prediction["method"]) if et0_prediction is not None else "modelo_etc",
             "net_need_mm": model_etc_mm,
             "method": "modelo_etc",
             "persistence_baseline_mm": persistence,
@@ -244,6 +279,17 @@ def estimate_day(
             "warnings": warnings,
         }
 
+    last_et0_day = known.dropna(subset=["et0_mm"])["date"].max()
+    last_fallback_day = last_et0_day if pd.notna(last_et0_day) else known.dropna(subset=["net_need_mm"])["date"].max()
+    if (mode == "planificacion" and pd.notna(last_fallback_day)
+            and (pd.Timestamp(target.get("date", target.name)) - last_fallback_day).days > MAX_FALLBACK_AGE_DAYS):
+        return {
+            "kc": kc, "et0_used_mm": np.nan, "et0_origin": "unavailable",
+            "net_need_mm": np.nan, "method": "sin_recomendacion",
+            "persistence_baseline_mm": persistence,
+            "rules": rules + ["R1 abstención por antigüedad de ET0"],
+            "warnings": warnings + [f"La última ET0 supera {MAX_FALLBACK_AGE_DAYS} días; actualiza las fuentes."],
+        }
     et0_recent, n_values = _recent_et0(known)
     if et0_recent is not None:
         if n_values < (ET0_WINDOW_DAYS + 1) // 2:
@@ -332,6 +378,8 @@ def _explain(row: dict[str, Any], efficiency: float, area_ha: float | None) -> s
             f"la ETc previa a lluvia predicha por el modelo "
             f"{row['predictive_model']} ({fmt_es(row['base_need_before_rain_mm'])} mm)"
         )
+    elif row["method"] == "et0_persistencia_kc":
+        origin = f"la última ET0 observada ({fmt_es(row['et0_used_mm'], 2)} mm) por Kc {fmt_es(row['kc'], 2)}"
     else:
         origin = "la última necesidad neta conocida"
 
@@ -365,6 +413,7 @@ def recommend(
     expected_errors: dict[int, float] | None = None,
     model_estimate: dict[str, Any] | None = None,
     model_estimates: dict[str, dict[str, Any]] | None = None,
+    et0_predictions: dict[str, dict[str, Any]] | None = None,
 ) -> Recommendation:
     """Genera la recomendación diaria y el resumen del horizonte solicitado."""
 
@@ -419,12 +468,18 @@ def recommend(
         elif offset == 0:
             daily_model = model_estimate
         use_model = (
-            request.mode == "planificacion" and not stale_data
+            request.mode == "planificacion" and (not stale_data or et0_predictions is not None)
             and daily_model is not None
+        )
+        selector_result = None if et0_predictions is None else et0_predictions.get(
+            target_date.strftime("%Y-%m-%d"),
+            {"method": "unavailable", "et0_mm": None,
+             "fallback_reason": "No hay una predicción ET0 para esta fecha; actualiza las fuentes."},
         )
         estimate = estimate_day(
             target=target, known=known, forecast_row=forecast_row, mode=request.mode,
             model_etc_mm=float(daily_model["etc_mm"]) if use_model else None,
+            et0_prediction=selector_result,
         )
         rules = list(estimate.pop("rules"))
         warnings = list(estimate.pop("warnings"))

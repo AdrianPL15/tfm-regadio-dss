@@ -448,3 +448,10 @@ cuando comienza mañana. Los resultados proceden de
 necesidad neta solo se realizó a un día en pimiento, maíz y algodón, con
 mejoras relativas del 18,6 %, 23,3 % y 18,2 %, respectivamente; no se extrapola
 esa mejora a `h=2…8`.
+
+
+### Precisiones del cierre de entrega
+
+La puerta prospectiva decide por estación y horizonte: exige al menos 30 fechas objetivo distintas, consolidadas y pareadas, y evalúa hasta las 60 más recientes. Mantiene Ridge solo si reduce al menos un 5 % el MAE de la media de siete días; si no, activa el respaldo para ese grupo. Antes del umbral, su uso es provisional. El agregado global es diagnóstico y no sustituye esta decisión ni constituye una prueba de significación estadística.
+
+La aprobación de horizontes utiliza la evidencia rolling-origin 2023–2025. Después se reajusta con 2021–2025; 2025 no confirma de forma independiente esa selección. La confirmación posterior corresponde al seguimiento prospectivo. Los rangos residuales históricos del 80 % no garantizan cobertura futura ni incorporan incertidumbre de Kc o lluvia.
