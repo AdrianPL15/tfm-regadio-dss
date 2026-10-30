@@ -6,7 +6,7 @@
       "station_code": "AL01",
       "last_observation_date": "2026-10-29",
       "records_received": 45,
-      "new_emissions": 9,
+      "new_emissions": 0,
       "methods_by_horizon": {
         "1": "ridge_et0_multiyear_h1",
         "2": "ridge_et0_multiyear_h2",
@@ -24,7 +24,7 @@
       "station_code": "Z06",
       "last_observation_date": "2026-10-29",
       "records_received": 14,
-      "new_emissions": 9,
+      "new_emissions": 0,
       "methods_by_horizon": {
         "1": "ridge_et0_multiyear_h1",
         "2": "ridge_et0_multiyear_h2",
@@ -42,7 +42,7 @@
       "station_code": "BA08",
       "last_observation_date": "2026-10-29",
       "records_received": 45,
-      "new_emissions": 9,
+      "new_emissions": 0,
       "methods_by_horizon": {
         "1": "ridge_et0_multiyear_h1",
         "2": "ridge_et0_multiyear_h2",
