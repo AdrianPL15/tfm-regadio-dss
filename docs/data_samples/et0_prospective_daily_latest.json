@@ -1,10 +1,10 @@
 {
-  "run_date": "2026-10-29",
+  "run_date": "2026-10-31",
   "selection_policy": "todas las estaciones y h=1…9, sin apertura de la app",
   "stations": [
     {
       "station_code": "AL01",
-      "last_observation_date": "2026-10-28",
+      "last_observation_date": "2026-10-30",
       "records_received": 45,
       "new_emissions": 9,
       "methods_by_horizon": {
@@ -22,25 +22,25 @@
     },
     {
       "station_code": "Z06",
-      "last_observation_date": "2026-10-28",
-      "records_received": 13,
-      "new_emissions": 0,
+      "last_observation_date": "2026-10-30",
+      "records_received": 15,
+      "new_emissions": 9,
       "methods_by_horizon": {
-        "1": "mean_7d_fallback",
-        "2": "mean_7d_fallback",
-        "3": "mean_7d_fallback",
-        "4": "mean_7d_fallback",
-        "5": "mean_7d_fallback",
-        "6": "mean_7d_fallback",
-        "7": "mean_7d_fallback",
-        "8": "unavailable",
-        "9": "unavailable"
+        "1": "ridge_et0_multiyear_h1",
+        "2": "ridge_et0_multiyear_h2",
+        "3": "ridge_et0_multiyear_h3",
+        "4": "ridge_et0_multiyear_h4",
+        "5": "ridge_et0_multiyear_h5",
+        "6": "ridge_et0_multiyear_h6",
+        "7": "ridge_et0_multiyear_h7",
+        "8": "ridge_et0_multiyear_h8",
+        "9": "ridge_et0_multiyear_h9"
       },
       "status": "ok"
     },
     {
       "station_code": "BA08",
-      "last_observation_date": "2026-10-28",
+      "last_observation_date": "2026-10-30",
       "records_received": 45,
       "new_emissions": 9,
       "methods_by_horizon": {
@@ -59,20 +59,243 @@
   ],
   "validation": {
     "status": "collecting",
-    "records": 18,
-    "provisional": 0,
+    "records": 72,
+    "provisional": 7,
     "consolidated": 0,
-    "pending": 18,
+    "pending": 65,
     "revisions_detected": 0,
     "consolidation_days": 7,
     "minimum_validation_cases": 30,
     "recommended_validation_cases": 60,
     "gate_window_cases": 60,
     "minimum_relative_improvement_pct": 5.0,
-    "gate_evaluation_cases": 0,
     "interpretation": "Registro prospectivo; no sustituye la evaluación rolling-origin hasta alcanzar una ventana temporal suficiente.",
+    "ridge_mae_mm_day": 0.3970969449779597,
+    "mean_7d_mae_mm_day": 0.3497113714285714,
+    "persistence_mae_mm_day": 0.30094137142857136,
+    "gate_evaluation_cases": 0,
     "deployment_gate": "experimental_ridge_collecting_evidence",
     "gate_reason": "faltan casos pareados: 0/30",
-    "gate_rule": "Con al menos 30 casos consolidados y pareados, evaluar los 60 más recientes y usar Ridge solo si reduce al menos un 5 % el MAE de la media física de 7 días."
+    "gate_rule": "Decisión por estación y horizonte: al menos 30 fechas objetivo distintas, consolidadas y pareadas; evaluar hasta las 60 más recientes y exigir una mejora del MAE del 5 %. El agregado global es solo diagnóstico. El umbral no constituye una prueba de significación estadística.",
+    "group_gates": {
+      "AL01:h1": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "AL01:h2": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "AL01:h3": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "AL01:h4": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "AL01:h5": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "AL01:h6": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "AL01:h7": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "AL01:h8": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "AL01:h9": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "BA08:h1": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "BA08:h2": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "BA08:h3": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "BA08:h4": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "BA08:h5": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "BA08:h6": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "BA08:h7": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "BA08:h8": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "BA08:h9": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "Z06:h1": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "Z06:h2": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "Z06:h3": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "Z06:h4": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "Z06:h5": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "Z06:h6": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "Z06:h7": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "Z06:h8": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      },
+      "Z06:h9": {
+        "deployment_gate": "experimental_ridge_collecting_evidence",
+        "distinct_target_dates": 0,
+        "gate_evaluation_cases": 0,
+        "ridge_mae_mm_day": null,
+        "mean_7d_mae_mm_day": null,
+        "observed_relative_improvement_pct": null
+      }
+    },
+    "operational_gate_scope": "station_and_horizon",
+    "distinct_target_dates": 11
   }
 }
