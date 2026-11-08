@@ -1,9 +1,9 @@
 {
   "status": "collecting",
-  "records": 252,
-  "provisional": 105,
-  "consolidated": 15,
-  "pending": 132,
+  "records": 279,
+  "provisional": 121,
+  "consolidated": 25,
+  "pending": 133,
   "revisions_detected": 0,
   "consolidation_days": 7,
   "minimum_validation_cases": 30,
@@ -11,48 +11,48 @@
   "gate_window_cases": 60,
   "minimum_relative_improvement_pct": 5.0,
   "interpretation": "Registro prospectivo; no sustituye la evaluación rolling-origin hasta alcanzar una ventana temporal suficiente.",
-  "ridge_mae_mm_day": 0.2994582949076813,
-  "mean_7d_mae_mm_day": 0.3364855961904761,
-  "persistence_mae_mm_day": 0.25047097333333324,
-  "gate_evaluation_cases": 15,
-  "gate_ridge_mae_mm_day": 0.2994582949076813,
-  "gate_mean_7d_mae_mm_day": 0.3364855961904761,
-  "observed_relative_improvement_pct": 11.004126685361761,
+  "ridge_mae_mm_day": 0.3330472634809029,
+  "mean_7d_mae_mm_day": 0.31645102799999997,
+  "persistence_mae_mm_day": 0.34302239599999995,
+  "gate_evaluation_cases": 25,
+  "gate_ridge_mae_mm_day": 0.3330472634809029,
+  "gate_mean_7d_mae_mm_day": 0.31645102799999997,
+  "observed_relative_improvement_pct": -5.24448777613165,
   "deployment_gate": "experimental_ridge_collecting_evidence",
-  "gate_reason": "faltan casos pareados: 15/30",
+  "gate_reason": "faltan casos pareados: 25/30",
   "gate_rule": "Decisión por estación y horizonte: al menos 30 fechas objetivo distintas, consolidadas y pareadas; evaluar hasta las 60 más recientes y exigir una mejora del MAE del 5 %. El agregado global es solo diagnóstico. El umbral no constituye una prueba de significación estadística.",
   "group_gates": {
     "AL01:h1": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 3,
-      "gate_evaluation_cases": 3,
-      "ridge_mae_mm_day": 0.3211122129830298,
-      "mean_7d_mae_mm_day": 0.1855039380952379,
-      "observed_relative_improvement_pct": -73.10263937263178
+      "distinct_target_dates": 4,
+      "gate_evaluation_cases": 4,
+      "ridge_mae_mm_day": 0.3267895493383511,
+      "mean_7d_mae_mm_day": 0.18017416785714274,
+      "observed_relative_improvement_pct": -81.37425205008154
     },
     "AL01:h2": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 2,
-      "gate_evaluation_cases": 2,
-      "ridge_mae_mm_day": 0.30442195394106986,
-      "mean_7d_mae_mm_day": 0.23839606428571447,
-      "observed_relative_improvement_pct": -27.69588074080965
+      "distinct_target_dates": 3,
+      "gate_evaluation_cases": 3,
+      "ridge_mae_mm_day": 0.27526983138733363,
+      "mean_7d_mae_mm_day": 0.20975705238095257,
+      "observed_relative_improvement_pct": -31.23269433029565
     },
     "AL01:h3": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 1,
-      "gate_evaluation_cases": 1,
-      "ridge_mae_mm_day": 0.03724427446364276,
-      "mean_7d_mae_mm_day": 0.07881121428571403,
-      "observed_relative_improvement_pct": 52.74241768611607
+      "distinct_target_dates": 2,
+      "gate_evaluation_cases": 2,
+      "ridge_mae_mm_day": 0.16063799539211754,
+      "mean_7d_mae_mm_day": 0.1411102357142855,
+      "observed_relative_improvement_pct": -13.838655699910454
     },
     "AL01:h4": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 0,
-      "gate_evaluation_cases": 0,
-      "ridge_mae_mm_day": null,
-      "mean_7d_mae_mm_day": null,
-      "observed_relative_improvement_pct": null
+      "distinct_target_dates": 1,
+      "gate_evaluation_cases": 1,
+      "ridge_mae_mm_day": 0.29844259418874985,
+      "mean_7d_mae_mm_day": 0.204752585714286,
+      "observed_relative_improvement_pct": -45.757668040002144
     },
     "AL01:h5": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
@@ -104,27 +104,27 @@
     },
     "BA08:h2": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 2,
-      "gate_evaluation_cases": 2,
-      "ridge_mae_mm_day": 0.29387207087807454,
-      "mean_7d_mae_mm_day": 0.39406279285714263,
-      "observed_relative_improvement_pct": 25.425065191422338
+      "distinct_target_dates": 3,
+      "gate_evaluation_cases": 3,
+      "ridge_mae_mm_day": 0.22747545316743945,
+      "mean_7d_mae_mm_day": 0.29909329999999995,
+      "observed_relative_improvement_pct": 23.94498533820735
     },
     "BA08:h3": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 1,
-      "gate_evaluation_cases": 1,
-      "ridge_mae_mm_day": 0.06893589844594761,
-      "mean_7d_mae_mm_day": 0.2891145285714285,
-      "observed_relative_improvement_pct": 76.15619706606466
+      "distinct_target_dates": 2,
+      "gate_evaluation_cases": 2,
+      "ridge_mae_mm_day": 0.03584102985311999,
+      "mean_7d_mae_mm_day": 0.24144564285714276,
+      "observed_relative_improvement_pct": 85.15565266409624
     },
     "BA08:h4": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 0,
-      "gate_evaluation_cases": 0,
-      "ridge_mae_mm_day": null,
-      "mean_7d_mae_mm_day": null,
-      "observed_relative_improvement_pct": null
+      "distinct_target_dates": 1,
+      "gate_evaluation_cases": 1,
+      "ridge_mae_mm_day": 0.005466896111999908,
+      "mean_7d_mae_mm_day": 0.2332130285714289,
+      "observed_relative_improvement_pct": 97.65583589155032
     },
     "BA08:h5": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
@@ -168,27 +168,27 @@
     },
     "Z06:h1": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 2,
-      "gate_evaluation_cases": 2,
-      "ridge_mae_mm_day": 0.3910999527178588,
-      "mean_7d_mae_mm_day": 0.6076333571428569,
-      "observed_relative_improvement_pct": 35.63553611394154
+      "distinct_target_dates": 3,
+      "gate_evaluation_cases": 3,
+      "ridge_mae_mm_day": 0.57778279147707,
+      "mean_7d_mae_mm_day": 0.6158099523809523,
+      "observed_relative_improvement_pct": 6.175145555354373
     },
     "Z06:h2": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 1,
-      "gate_evaluation_cases": 1,
-      "ridge_mae_mm_day": 0.6391627090005092,
-      "mean_7d_mae_mm_day": 0.8990628571428569,
-      "observed_relative_improvement_pct": 28.90789515744068
+      "distinct_target_dates": 2,
+      "gate_evaluation_cases": 2,
+      "ridge_mae_mm_day": 0.7525511698033714,
+      "mean_7d_mae_mm_day": 0.7404262500000001,
+      "observed_relative_improvement_pct": -1.637559419776295
     },
     "Z06:h3": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
-      "distinct_target_dates": 0,
-      "gate_evaluation_cases": 0,
-      "ridge_mae_mm_day": null,
-      "mean_7d_mae_mm_day": null,
-      "observed_relative_improvement_pct": null
+      "distinct_target_dates": 1,
+      "gate_evaluation_cases": 1,
+      "ridge_mae_mm_day": 0.7710623334936457,
+      "mean_7d_mae_mm_day": 0.3890691428571431,
+      "observed_relative_improvement_pct": -98.18131240923452
     },
     "Z06:h4": {
       "deployment_gate": "experimental_ridge_collecting_evidence",
@@ -240,5 +240,5 @@
     }
   },
   "operational_gate_scope": "station_and_horizon",
-  "distinct_target_dates": 18
+  "distinct_target_dates": 19
 }
